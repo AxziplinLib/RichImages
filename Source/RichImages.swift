@@ -1712,11 +1712,14 @@ extension UIImage {
     /// Otherwise returns the cg-image rendered with the ci image.
     ///
     /// Otherwise returns the cg-image initialized with the jpeg data.
-    fileprivate func _makeCgImage() -> CGImage! {
+    ///
+    /// - Parameter dest: A render destination used by the ci context
+    ///                   to generate cg images.
+    fileprivate func _makeCgImage(_ dest: UIImage.RenderDestination = .auto) -> CGImage! {
         var cgImage: CGImage! = nil
         if let underlyingCgImage = self.cgImage {
             cgImage = underlyingCgImage
-        } else if let ciImage = self.ciImage, let context = _autoCIContext.context, let renderedCgImage = context.createCGImage(ciImage, from: ciImage.extent) {
+        } else if let ciImage = self.ciImage, let context = _ciContext(at: dest), let renderedCgImage = context.createCGImage(ciImage, from: ciImage.extent) {
             cgImage = renderedCgImage
         } else {
             guard let data = UIImageJPEGRepresentation(self, 1.0) as CFData?, let dataProvider = CGDataProvider(data: data) else { return nil }
