@@ -348,8 +348,11 @@ extension UIImage {
     public enum RenderDestination {
         /// A type representing the GPU-Based rendering.
         public enum GPU {
+            /// Indicates the rendering is based on the default GPU device.
+            case `default`
             /// Indicates the rendering is based on a `MTLDevice`. The GPU-Based contex for this value
             /// will automatic fallthrough to the OpenGL ES-Based if the Metal device is not available.
+            @available(iOS 9.0, *)
             case metal
             /// Indicates the rendering is based on the api of `OpenGL ES`.
             case openGLES
@@ -363,6 +366,16 @@ extension UIImage {
     }
 }
 
+extension UIImage.RenderDestination {
+    public static var availableGPURelatedDestinations: [UIImage.RenderDestination] {
+        if #available(iOS 9.0, *) {
+            return [.auto, .gpu(.default), .gpu(.metal), .gpu(.openGLES)]
+        } else {
+            return [.auto, .gpu(.default), .gpu(.openGLES)]
+        }
+    }
+}
+
 // MARK: - Alpha.
 
 extension UIImage {
@@ -373,7 +386,7 @@ extension UIImage {
         let alp_ops: [CGImageAlphaInfo] = [.first, .last, .premultipliedFirst, .premultipliedLast]
         return (alp_ops.contains(alp) && colorSpace.model == .rgb) || (colorSpace.model == .monochrome && alp == .alphaOnly)
     }
-    /// Returns a copied instance based on the receiver if the receiver image contains no any alpha channels. 
+    /// Returns a copied instance based on the receiver if the receiver image contains no any alpha channels.
     /// Animated image supported.
     ///
     /// Nil will be returned if the new image context cannot be created or any other errors occured.
@@ -540,7 +553,7 @@ extension UIImage {
     /// - Parameter dest: A value of `RenderDestination` indicates the rendering destination of the image cropping processing.
     ///
     /// - Returns: An copy of the receiver cropped to the given rectangle.
-    public func crop(to rect: CGRect, rendering dest: RenderDestination = .gpu(.metal)) -> UIImage! {
+    public func crop(to rect: CGRect, rendering dest: RenderDestination = .cpu) -> UIImage! {
         guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.crop(to: rect, rendering: dest) } }), duration: duration) }
         // Early fatal checking.
         guard rect.width > 0.0 && rect.height > 0.0 else { return nil }
@@ -554,7 +567,7 @@ extension UIImage {
             fallthrough
         case .gpu(_):
             guard let ciImage = _makeCiImage()?.cropping(to: croppingRect)             else { return fallthroughToCpu ? crop(to:rect, rendering: .cpu) : nil }
-            guard let ciContext = _ciContext(of: dest)                                 else { return fallthroughToCpu ? crop(to:rect, rendering: .cpu) : nil }
+            guard let ciContext = _ciContext(at: dest)                                 else { return fallthroughToCpu ? crop(to:rect, rendering: .cpu) : nil }
             guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? crop(to:rect, rendering: .cpu) : nil }
             
             return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
@@ -575,7 +588,7 @@ extension UIImage {
     ///                   The value will use `.center` by default.
     ///
     /// - Returns: An copy of the receiver cropped to the given size and resizing mode.
-    public func crop(fits size: CGSize, using mode: ResizingMode = .center, rendering dest: RenderDestination = .gpu(.metal)) -> UIImage! {
+    public func crop(fits size: CGSize, using mode: ResizingMode = .center, rendering dest: RenderDestination = .cpu) -> UIImage! {
         // Scales points to pxiels.
         var croppingRect = CGRect(origin: .zero, size: size).scale(by: scale)
         switch mode {
@@ -773,7 +786,7 @@ extension UIImage {
 // MARK: - Compressing.
 
 extension UIImage {
-    /// Creates a data stream of the receiver by compressing to the specific max allowed 
+    /// Creates a data stream of the receiver by compressing to the specific max allowed
     /// bits length and max allowed width of size using `JPEGRepresentation`.
     ///
     /// - Parameter length: An integer value indicates the max allowed bits length to compress to.
@@ -924,7 +937,7 @@ extension UIImage {
                     imageRect.size.width   = max(resultRect.width, pageRect.width)
                     imageRect.size.height  = max(resultRect.height, pageRect.height)
                     if horizontal == .leftToRight { pageRect.origin.x =               0.0 } else {
-                       resultRect.origin.x =                                          0.0
+                        resultRect.origin.x =                                          0.0
                     }
                     resultRect.origin.y    = (imageRect.height - resultRect.height) * 0.5
                     pageRect.origin.y      = (imageRect.height - pageRect.height  ) * 0.5
@@ -939,7 +952,7 @@ extension UIImage {
                     imageRect.size.width   = max(resultRect.width, pageRect.width)
                     imageRect.size.height  = max(resultRect.height, pageRect.height)
                     if horizontal == .leftToRight { pageRect.origin.x =               0.0 } else {
-                       resultRect.origin.x =                                          0.0
+                        resultRect.origin.x =                                          0.0
                     }
                 case .topRight:
                     imageRect.size.width   = max(resultRect.width, pageRect.width)
@@ -950,7 +963,7 @@ extension UIImage {
                     imageRect.size.width   = max(resultRect.width, pageRect.width)
                     imageRect.size.height  = max(resultRect.height, pageRect.height)
                     if horizontal == .leftToRight { pageRect.origin.x =               0.0 } else {
-                       resultRect.origin.x =                                          0.0
+                        resultRect.origin.x =                                          0.0
                     }
                     resultRect.origin.y    = (imageRect.height - resultRect.height) * 1.0
                     pageRect.origin.y      = (imageRect.height - pageRect.height  ) * 1.0
@@ -990,7 +1003,7 @@ extension UIImage {
                     resultRect.origin.x   = (imageRect.width - resultRect.width)   * 0.5
                     pageRect.origin.x     = (imageRect.width - pageRect.width  )   * 0.5
                     if vertical == .topToBottom { pageRect.origin.y =                0.0 } else {
-                       resultRect.origin.y =                                         0.0
+                        resultRect.origin.y =                                         0.0
                     }
                 case .bottom:
                     imageRect.size.width  = max(resultRect.width, pageRect.width)
@@ -1010,7 +1023,7 @@ extension UIImage {
                     imageRect.size.width  = max(resultRect.width, pageRect.width)
                     imageRect.size.height = max(resultRect.height, pageRect.height)
                     if vertical == .topToBottom { pageRect.origin.y =                0.0 } else {
-                       resultRect.origin.y =                                         0.0
+                        resultRect.origin.y =                                         0.0
                     }
                 case .topRight:
                     imageRect.size.width  = max(resultRect.width, pageRect.width)
@@ -1018,7 +1031,7 @@ extension UIImage {
                     resultRect.origin.x   = (imageRect.width - resultRect.width)   * 1.0
                     pageRect.origin.x     = (imageRect.width  - pageRect.width )   * 1.0
                     if vertical == .topToBottom { pageRect.origin.y =                0.0 } else {
-                       resultRect.origin.y =                                         0.0
+                        resultRect.origin.y =                                         0.0
                     }
                 case .bottomLeft:
                     imageRect.size.width  = max(resultRect.width, pageRect.width)
@@ -1035,7 +1048,7 @@ extension UIImage {
                 }
                 resultImage = resultImage._merge(with: image, size: imageRect.size, beginsRect: resultRect, endsRect: pageRect)
             }
-        } }
+            } }
         return resultImage
     }
     
@@ -1220,7 +1233,7 @@ extension UIImage {
             }
             
             pageIndex += 1
-        } }
+            } }
         
         if let tintColor = color, let cgImage = image._makeCgImage() {
             UIGraphicsBeginImageContextWithOptions(image.size, false, UIScreen.main.scale)
@@ -1314,7 +1327,7 @@ extension UIImage {
     /// Animated image supported.
     public var horizontallyFlipped: UIImage! { return _flip(horizontally: true) }
     /// Creates a copy of the receiver image by the given angle. Animated image supported.
-    /// 
+    ///
     /// - Parameter angle: A float value indicates the angle to rotate by.
     ///
     /// - Returns: A new image with the given angle rotated.
@@ -1612,47 +1625,64 @@ extension UIImage {
     /// A type representing a core image context using automatic rendering by choosing the appropriate or best available CPU or GPU rendering technology based on the current device.
     fileprivate struct _AutomaticCIContext {
         lazy var context: CIContext! = { () -> CIContext! in
-            let date = Date()
             let context = CIContext()
-            print("Context creating cost timing: \(Date().timeIntervalSince(date))")
-            return CIContext()
+            return context
+        }()
+    }
+    /// A type representing a core image context using the GPU-Based rendering.
+    fileprivate struct _GPUBasedCIContext {
+        lazy var context: CIContext! = { () -> CIContext! in
+            let context = CIContext(options: [kCIContextUseSoftwareRenderer: false])
+            return context
         }()
     }
     /// A type representing a core image context using the real-time rendering with Metal.
+    @available(iOS 9.0, *)
     fileprivate struct _MetalBasedCIContext {
         lazy var context: CIContext! = { () -> CIContext! in
-            let date = Date()
             guard let device = MTLCreateSystemDefaultDevice() else { return _openGLESCIContext.context }
-            print("Context creating cost timing: \(Date().timeIntervalSince(date))")
             return CIContext(mtlDevice: device)
         }()
     }
     /// A type representing a core image context using the real-time rendering with OpenGL ES.
     fileprivate struct _OpenGLESBasedCIContext {
         lazy var context: CIContext! = { () -> CIContext! in
-            let date = Date()
             guard let eaglContext = EAGLContext(api: .openGLES3) else { return nil }
-            print("Context creating cost timing: \(Date().timeIntervalSince(date))")
             return CIContext(eaglContext: eaglContext)
         }()
     }
 }
 
 private var _autoCIContext     = UIImage._AutomaticCIContext()
+private var _gpuCIContext      = UIImage._GPUBasedCIContext()
+@available(iOS 9.0, *)
 private var _metalCIContext    = UIImage._MetalBasedCIContext()
 private var _openGLESCIContext = UIImage._OpenGLESBasedCIContext()
 
+
+/// Initialize the required core image context for the given render destinations.
+///
+/// - Parameter dests: A array of value defined in `UIImage.RenderDestination` used
+///                    to initialze the corresponding render destination context.
+///
+public func CIContextInitialize(_ dests: [UIImage.RenderDestination]) { dests.forEach({ _ciContext(at: $0) }) }
+
 /// Get the context of core image with the given render destination.
-private func _ciContext(of dest: UIImage.RenderDestination) -> CIContext! {
+@discardableResult
+fileprivate func _ciContext(at dest: UIImage.RenderDestination) -> CIContext! {
     switch dest {
     case .auto:
         return _autoCIContext.context
     case .gpu(let gpu):
         switch gpu {
         case .metal:
-            return _metalCIContext.context
+            if #available(iOS 9.0, *) {
+                return _metalCIContext.context
+            } else { return nil }
         case .openGLES:
             return _openGLESCIContext.context
+        case .default:
+            return _gpuCIContext.context
         }
     default: return nil
     }
@@ -1680,7 +1710,7 @@ extension UIImage {
     /// Returns the underlying cg-image if CoreGraphics-Based.
     ///
     /// Otherwise returns the cg-image rendered with the ci image.
-    /// 
+    ///
     /// Otherwise returns the cg-image initialized with the jpeg data.
     fileprivate func _makeCgImage() -> CGImage! {
         var cgImage: CGImage! = nil
