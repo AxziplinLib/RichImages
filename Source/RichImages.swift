@@ -49,21 +49,21 @@ extension CGSize { public func scale(by scale: CGFloat) -> CGSize {  return appl
 
 public extension UIImage {
     /// Get the light-blured image from the original image. Nil if blur failed.
-    public var lightBlur: UIImage? { return _blur(radius: 40.0, tintColor: UIColor(white: 1.0, alpha: 0.3), saturationDeltaFactor: 1.8, mask: nil) }
+    public var lightBlur: UIImage! { return _blur(radius: 40.0, tintColor: UIColor(white: 1.0, alpha: 0.3), saturationDeltaFactor: 1.8, mask: nil) }
     /// Get the extra-light-blured image from the original image. Nil if blur failed.
-    public var extraLightBlur: UIImage? { return _blur(radius: 40.0, tintColor: UIColor(white: 0.97, alpha: 0.82), saturationDeltaFactor: 1.8, mask: nil) }
+    public var extraLightBlur: UIImage! { return _blur(radius: 40.0, tintColor: UIColor(white: 0.97, alpha: 0.82), saturationDeltaFactor: 1.8, mask: nil) }
     /// Get the dark-blured image from the original image. Nil if blur failed.
-    public var darkBlur: UIImage? { return _blur(radius: 40.0, tintColor: UIColor(white: 0.11, alpha: 0.73), saturationDeltaFactor: 1.8, mask: nil) }
+    public var darkBlur: UIImage! { return _blur(radius: 40.0, tintColor: UIColor(white: 0.11, alpha: 0.73), saturationDeltaFactor: 1.8, mask: nil) }
     /// Blur the receive image to an image with the tint color as "mask".
     ///
     /// - Parameter tintColor: The color used to be the "mask".
     /// - Returns: A color-blured image or nil if blur failed.
-    public func blur(tint tintColor: UIColor) -> UIImage? { return _blur(radius: 20.0, tintColor: tintColor.withAlphaComponent(0.6), saturationDeltaFactor: -1.0, mask: nil) }
+    public func blur(tint tintColor: UIColor) -> UIImage! { return _blur(radius: 20.0, tintColor: tintColor.withAlphaComponent(0.6), saturationDeltaFactor: -1.0, mask: nil) }
     /// Blur the receive image to an image with blur radius.
     ///
     /// - Parameter radius: The radius used to blur.
     /// - Returns: A blured image or nil if blur failed.
-    public func blur(radius: CGFloat) -> UIImage? { return _blur(radius: radius, tintColor: nil, saturationDeltaFactor: -1.0, mask: nil) }
+    public func blur(radius: CGFloat) -> UIImage! { return _blur(radius: radius, tintColor: nil, saturationDeltaFactor: -1.0, mask: nil) }
     /// Create a blured image from the original with parameters.
     ///
     /// - Parameter radius: The blur radius.
@@ -75,57 +75,36 @@ public extension UIImage {
     private func _blur(radius: CGFloat, tintColor: UIColor?, saturationDeltaFactor: CGFloat, mask: UIImage?) -> UIImage? {
         // Check pre-conditions.
         guard size.width >= 1.0 && size.height >= 1.0 else { return nil }
-        guard let input = cgImage else { return nil }
-        if let _ = mask { guard let _ = mask?._makeCgImage() else { return nil } }
+        guard let input = self.cgImage else { return nil }
         
-        let hasBlur = radius > .ulpOfOne
-        let hasSaturationChange = fabs(saturationDeltaFactor - 1.0) > .ulpOfOne
-        
-        let inputScale = scale
-        let inputBitmapInfo = input.bitmapInfo
-        let inputAlphaInfo = CGImageAlphaInfo(rawValue: inputBitmapInfo.intersection([.alphaInfoMask]).rawValue)
-        
-        let outputSizeInPoints = size
-        let outputRectInPoints = CGRect(origin: .zero, size: outputSizeInPoints)
-        
+        let hasBlur            : Bool = (radius > CGFloat.ulpOfOne)
+        let hasSaturationChange: Bool = (fabs(saturationDeltaFactor - 1.0) > CGFloat.ulpOfOne)
+        let rect = CGRect(origin: .zero, size: size)
         // Set up output context.
-        var useOpaqueContext: Bool
-        if inputAlphaInfo == .none || inputAlphaInfo == .noneSkipLast || inputAlphaInfo == .noneSkipFirst {
-            useOpaqueContext = true
-        } else {
-            useOpaqueContext = false
-        }
-        UIGraphicsBeginImageContextWithOptions(outputSizeInPoints, useOpaqueContext, inputScale)
+        // let alp = CGImageAlphaInfo(rawValue: input.bitmapInfo.rawValue | CGBitmapInfo.alphaInfoMask.rawValue)
+        // let alps: [CGImageAlphaInfo] = [.none, .noneSkipLast, .noneSkipFirst]
+        // let opaque = alps.contains(alp ?? .alphaOnly)
+        UIGraphicsBeginImageContextWithOptions(rect.size, !hasAlpha, scale)
         defer { UIGraphicsEndImageContext() }
         guard let context = UIGraphicsGetCurrentContext() else { return nil }
         context.scaleBy(x: 1.0, y: -1.0)
-        context.translateBy(x: 0.0, y: -outputSizeInPoints.height)
+        context.translateBy(x: 0.0, y: -rect.size.height)
         
         if hasBlur || hasSaturationChange {
             var effectInBuffer: vImage_Buffer = vImage_Buffer()
             var scratchBuffer1: vImage_Buffer = vImage_Buffer()
-            var inputBuffer: vImage_Buffer
-            var outputBuffer: vImage_Buffer
+            var inputBuffer   : vImage_Buffer
+            var outputBuffer  : vImage_Buffer
+            // (kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little)
+            //  Requests a BGRA buffer.
+            var format = vImage_CGImageFormat(bitsPerComponent: 8, bitsPerPixel: 32, colorSpace: nil, bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue), version: 0, decode: nil, renderingIntent: .defaultIntent)
             
-            var format = vImage_CGImageFormat(
-                bitsPerComponent: 8,
-                bitsPerPixel: 32,
-                colorSpace: nil,
-                // (kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little)
-                // requests a BGRA buffer.
-                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue),
-                version: 0,
-                decode: nil,
-                renderingIntent: .defaultIntent)
-            
-            let e = vImageBuffer_InitWithCGImage(&effectInBuffer, &format, nil, input, vImage_Flags(kvImagePrintDiagnosticsToConsole))
-            if e != kvImageNoError {
-                return nil
-            }
+            let e  = vImageBuffer_InitWithCGImage(&effectInBuffer, &format, nil, input, vImage_Flags(kvImagePrintDiagnosticsToConsole))
+            if  e != kvImageNoError { return nil }
             
             vImageBuffer_Init(&scratchBuffer1, effectInBuffer.height, effectInBuffer.width, format.bitsPerPixel, vImage_Flags(kvImageNoFlags))
             
-            inputBuffer = effectInBuffer
+            inputBuffer  = effectInBuffer
             outputBuffer = scratchBuffer1
             
             if hasBlur {
@@ -141,87 +120,104 @@ public extension UIImage {
                 //
                 // ... if d is odd, use three box-blurs of size 'd', centered on the output pixel.
                 //
-                var inputRadius = radius * inputScale
-                if inputRadius - 2.0 < .ulpOfOne { inputRadius = 2.0 }
+                var inputRadius = radius * scale
+                if  inputRadius - 2.0 < CGFloat.ulpOfOne { inputRadius = 2.0 }
                 let _tmpRadius = floor((Double(inputRadius) * 3.0 * sqrt(Double.pi * 2.0) / 4.0 + 0.5) / 2.0)
-                let _radius = UInt32(_tmpRadius) | 1 // force radius to be odd so that the three box-blur methodology works.
+                // Force radius to be odd so that the three box-blur methodology works.
+                let _radius = UInt32(_tmpRadius) | 1
                 
                 let tempBufferSize = vImageBoxConvolve_ARGB8888(&inputBuffer, &outputBuffer, nil, 0, 0, _radius, _radius, nil, vImage_Flags(kvImageGetTempBufferSize | kvImageEdgeExtend))
                 
                 let tempBuffer = malloc(tempBufferSize)
                 defer { free(tempBuffer) }
                 
-                vImageBoxConvolve_ARGB8888(&inputBuffer, &outputBuffer, tempBuffer, 0, 0, _radius, _radius, nil, vImage_Flags(kvImageEdgeExtend))
-                vImageBoxConvolve_ARGB8888(&outputBuffer, &inputBuffer, tempBuffer, 0, 0, _radius, _radius, nil, vImage_Flags(kvImageEdgeExtend))
-                vImageBoxConvolve_ARGB8888(&inputBuffer, &outputBuffer, tempBuffer, 0, 0, _radius, _radius, nil, vImage_Flags(kvImageEdgeExtend))
+                vImageBoxConvolve_ARGB8888(&inputBuffer,  &outputBuffer, tempBuffer, 0, 0, _radius, _radius, nil, vImage_Flags(kvImageEdgeExtend))
+                vImageBoxConvolve_ARGB8888(&outputBuffer, &inputBuffer,  tempBuffer, 0, 0, _radius, _radius, nil, vImage_Flags(kvImageEdgeExtend))
+                vImageBoxConvolve_ARGB8888(&inputBuffer,  &outputBuffer, tempBuffer, 0, 0, _radius, _radius, nil, vImage_Flags(kvImageEdgeExtend))
                 
                 let tmpBuffer = inputBuffer
-                inputBuffer = outputBuffer
-                outputBuffer = tmpBuffer
+                inputBuffer   = outputBuffer
+                outputBuffer  = tmpBuffer
             }
             
             if hasSaturationChange {
-                let s = saturationDeltaFactor
+                let s: CGFloat = saturationDeltaFactor
                 // These values appear in the W3C Filter Effects spec:
                 // https://dvcs.w3.org/hg/FXTF/raw-file/default/filters/index.html#grayscaleEquivalent
-                //
-                let floatingPointSaturationMatrix: [CGFloat] = [
-                    0.0722 + 0.9278 * s,  0.0722 - 0.0722 * s,  0.0722 - 0.0722 * s,  0.0,
-                    0.7152 - 0.7152 * s,  0.7152 + 0.2848 * s,  0.7152 - 0.7152 * s,  0.0,
-                    0.2126 - 0.2126 * s,  0.2126 - 0.2126 * s,  0.2126 + 0.7873 * s,  0.0,
-                    0.0,                  0.0,                  0.0,                  1.0,
-                    ]
+                // Avoid the long time of type-check of the compiler.
+                /* 0.0722 + 0.9278 * s,  0.0722 - 0.0722 * s,  0.0722 - 0.0722 * s,  0.0,
+                   0.7152 - 0.7152 * s,  0.7152 + 0.2848 * s,  0.7152 - 0.7152 * s,  0.0,
+                   0.2126 - 0.2126 * s,  0.2126 - 0.2126 * s,  0.2126 + 0.7873 * s,  0.0,
+                   0.0,                  0.0,                  0.0,                  1.0
+                 */
+                var floatingPointSaturationMatrix: [CGFloat] = []
+                floatingPointSaturationMatrix.append(0.0722 + 0.9278 * s)
+                floatingPointSaturationMatrix.append(0.0722 - 0.0722 * s)
+                floatingPointSaturationMatrix.append(0.0722 - 0.0722 * s)
+                floatingPointSaturationMatrix.append(0.0)
+                floatingPointSaturationMatrix.append(0.7152 - 0.7152 * s)
+                floatingPointSaturationMatrix.append(0.7152 + 0.2848 * s)
+                floatingPointSaturationMatrix.append(0.7152 - 0.7152 * s)
+                floatingPointSaturationMatrix.append(0.0)
+                floatingPointSaturationMatrix.append(0.2126 - 0.2126 * s)
+                floatingPointSaturationMatrix.append(0.2126 - 0.2126 * s)
+                floatingPointSaturationMatrix.append(0.2126 + 0.7873 * s)
+                floatingPointSaturationMatrix.append(0.0)
+                floatingPointSaturationMatrix.append(0.0)
+                floatingPointSaturationMatrix.append(0.0)
+                floatingPointSaturationMatrix.append(0.0)
+                floatingPointSaturationMatrix.append(1.0)
                 let divisor: Int32 = 256
-                // let matrixSize = MemoryLayout.size(ofValue: floatingPointSaturationMatrix) / MemoryLayout.size(ofValue: floatingPointSaturationMatrix[0])
-                // let matrixSize = floatingPointSaturationMatrix.count
+                
                 var saturationMatrix: [Int16] = []
-                for /*i in 0 ..< matrixSize*/ floatingPointSaturation in floatingPointSaturationMatrix {
-                    saturationMatrix.append(Int16(roundf(Float(/*floatingPointSaturationMatrix[i]*/floatingPointSaturation * CGFloat(divisor)))))
+                for floatingPointSaturation in floatingPointSaturationMatrix {
+                    saturationMatrix.append(Int16(roundf(Float(floatingPointSaturation * CGFloat(divisor)))))
                 }
                 vImageMatrixMultiply_ARGB8888(&inputBuffer, &outputBuffer, saturationMatrix, divisor, nil, nil, vImage_Flags(kvImageNoFlags))
                 
                 let tmpBuffer = inputBuffer
-                inputBuffer = outputBuffer
-                outputBuffer = tmpBuffer
+                inputBuffer   = outputBuffer
+                outputBuffer  = tmpBuffer
             }
             
             func cleanupBuffer(userData: UnsafeMutableRawPointer?, buf_data: UnsafeMutableRawPointer?) {
                 if let buffer = buf_data { free(buffer) }
             }
-            var effectCGImage = vImageCreateCGImageFromBuffer(&inputBuffer, &format, cleanupBuffer, nil, vImage_Flags(kvImageNoAllocate), nil)
-            if effectCGImage == nil {
-                effectCGImage = vImageCreateCGImageFromBuffer(&inputBuffer, &format, nil, nil, vImage_Flags(kvImageNoFlags), nil)
+            var effectCgImage = vImageCreateCGImageFromBuffer(&inputBuffer, &format, cleanupBuffer, nil, vImage_Flags(kvImageNoAllocate), nil)
+            if  effectCgImage == nil {
+                effectCgImage = vImageCreateCGImageFromBuffer(&inputBuffer, &format, nil, nil, vImage_Flags(kvImageNoFlags), nil)
                 free(inputBuffer.data)
             }
             
-            if mask != nil {
+            let maskCgImage = mask?._makeCgImage()
+            if  maskCgImage != nil {
                 // Only need to draw the base image if the effect image will be masked.
-                context.__draw(in: outputRectInPoints, image: input)
+                context.draw(input, in: rect)
             }
             // draw effect image
             context.saveGState()
-            if let maskCGImage = mask?._makeCgImage() {
-                context.clip(to: outputRectInPoints, mask: maskCGImage)
+            if  maskCgImage != nil {
+                context.clip(to: rect, mask: maskCgImage!)
             }
-            if let _cgImage = effectCGImage?.takeUnretainedValue() {
-                context.__draw(in: outputRectInPoints, image: _cgImage)
+            if let _cgImage = effectCgImage?.takeUnretainedValue() {
+                context.draw(_cgImage, in: rect)
             }
             context.restoreGState()
             
             // Cleanup
-            // CGImageRelease(effectCGImage as! CGImage)
-            effectCGImage?.release()
+            // CGImageRelease(effectCgImage as! CGImage)
+            effectCgImage?.release()
             free(outputBuffer.data)
         } else {
-            // draw base image
-            context.__draw(in: outputRectInPoints, image: input)
+            // Draw base image.
+            context.draw(input, in: rect)
         }
         
         // Add in color tint.
-        if tintColor != nil {
+        if let tint = tintColor {
             context.saveGState()
-            context.setFillColor(tintColor!.cgColor)
-            context.fill(outputRectInPoints)
+            context.setFillColor(tint.cgColor)
+            context.fill(rect)
             context.restoreGState()
         }
         // Output image is ready.
