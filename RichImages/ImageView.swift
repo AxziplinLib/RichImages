@@ -10,7 +10,7 @@ import UIKit
 
 class ImageView: UIImageView {
 
-    override var intrinsicContentSize: CGSize { return image?.size ?? .zero }
+    override var intrinsicContentSize: CGSize { return CGSize(width: self.bounds.width, height: image?.size.height ?? 0.0) }
     override var image: UIImage? {
         didSet { invalidateIntrinsicContentSize() }
     }
