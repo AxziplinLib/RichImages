@@ -1,14 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11134" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11106"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="RichImages" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -16,11 +20,44 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" alwaysBounceVertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TRz-H9-1kg">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="375" placeholderIntrinsicHeight="300" translatesAutoresizingMaskIntoConstraints="NO" id="39O-lg-4Vb" customClass="ImageView" customModule="RichImages" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="367" width="375" height="300"/>
+                                    </imageView>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="375" placeholderIntrinsicHeight="367" translatesAutoresizingMaskIntoConstraints="NO" id="Px0-uZ-dXk" customClass="ImageView" customModule="RichImages" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="367"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="39O-lg-4Vb" firstAttribute="leading" secondItem="TRz-H9-1kg" secondAttribute="leading" id="3Qn-ai-v7b"/>
+                                    <constraint firstAttribute="trailing" secondItem="Px0-uZ-dXk" secondAttribute="trailing" id="9vH-3C-tPV"/>
+                                    <constraint firstItem="Px0-uZ-dXk" firstAttribute="top" secondItem="TRz-H9-1kg" secondAttribute="top" id="DjE-61-jQk"/>
+                                    <constraint firstAttribute="trailing" secondItem="39O-lg-4Vb" secondAttribute="trailing" id="PDB-e0-GbK"/>
+                                    <constraint firstAttribute="bottom" secondItem="39O-lg-4Vb" secondAttribute="bottom" id="Xyb-3g-Cc3"/>
+                                    <constraint firstItem="Px0-uZ-dXk" firstAttribute="leading" secondItem="TRz-H9-1kg" secondAttribute="leading" id="Y3M-1I-amE"/>
+                                    <constraint firstItem="39O-lg-4Vb" firstAttribute="top" secondItem="Px0-uZ-dXk" secondAttribute="bottom" id="wOT-0T-eWn"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="TRz-H9-1kg" secondAttribute="trailing" id="Hid-6k-6az"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="TRz-H9-1kg" secondAttribute="bottom" id="Q7b-To-NaI"/>
+                            <constraint firstItem="TRz-H9-1kg" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="k9h-pA-VZc"/>
+                            <constraint firstItem="TRz-H9-1kg" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="zrK-uy-22L"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="imageView0" destination="Px0-uZ-dXk" id="SOm-7z-7o6"/>
+                        <outlet property="imageView1" destination="39O-lg-4Vb" id="Jjb-g1-EmC"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="-79.200000000000003" y="138.98050974512745"/>
         </scene>
     </scenes>
 </document>
