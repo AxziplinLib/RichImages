@@ -137,13 +137,17 @@ extension UIImage {
     public func rotate(by angle: CGFloat, rendering dest: RenderDestination = .cpu) -> UIImage! {
         guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.rotate(by: angle) } }), duration: duration) }
         
+        // Calculate the size of the rotated view's containing box for our drawing space.
+        let transform = CGAffineTransform(rotationAngle: -angle)
+        let rotatedBox = CGRect(origin: .zero, size: size).applying(transform)
+        
         var fallthroughToCpu = false
         switch dest {
         case .auto:
             fallthroughToCpu = true
             fallthrough
         case .gpu(_):
-            guard let ciImage = _makeCiImage()?.applyingFilter("CIStraightenFilter", withInputParameters: ["inputAngle": angle]) else {
+            guard let ciImage = _makeCiImage()?.applying(CGAffineTransform(rotationAngle: angle)) else {
                 return fallthroughToCpu ? rotate(by: angle, rendering: dest) : nil
             }
             guard let ciContext = _ciContext(at: dest) else { return fallthroughToCpu ? rotate(by: angle, rendering: dest): nil }
@@ -151,9 +155,6 @@ extension UIImage {
             
             return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
         default:
-            // Calculate the size of the rotated view's containing box for our drawing space.
-            let transform = CGAffineTransform(rotationAngle: angle)
-            let rotatedBox = CGRect(origin: .zero, size: scaledSize).applying(transform)
             // Create the bitmap context.
             UIGraphicsBeginImageContextWithOptions(rotatedBox.size, false, scale)
             defer { UIGraphicsEndImageContext() }
@@ -161,11 +162,11 @@ extension UIImage {
             // Move the origin to the middle of the image so we will rotate and scale around the center.
             context.translateBy(x: rotatedBox.width * 0.5, y: rotatedBox.height * 0.5)
             // Rotate the image context.
-            context.rotate(by: angle)
+            context.rotate(by: -angle)
             // Now, draw the rotated/scaled image into the context.
             context.scaleBy(x: 1.0, y: -1.0)
             
-            context.draw(cgImage, in: CGRect(x: -scaledWidth * 0.5, y: -scaledHeight * 0.5, width: scaledWidth, height: scaledHeight))
+            context.draw(cgImage, in: CGRect(x: -size.width * 0.5, y: -size.width * 0.5, width: size.width, height: size.width))
             return UIGraphicsGetImageFromCurrentImageContext()
         }
     }
