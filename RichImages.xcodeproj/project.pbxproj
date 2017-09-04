@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DC9D71FA1F5D248700EE2386 /* RichImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9D71F91F5D248700EE2386 /* RichImages.swift */; };
 		DCAD099A1F5CEE25001AF3F0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD09991F5CEE25001AF3F0 /* AppDelegate.swift */; };
 		DCAD099C1F5CEE25001AF3F0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD099B1F5CEE25001AF3F0 /* ViewController.swift */; };
 		DCAD099F1F5CEE25001AF3F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DCAD099D1F5CEE25001AF3F0 /* Main.storyboard */; };
@@ -14,7 +15,6 @@
 		DCAD09A41F5CEE25001AF3F0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DCAD09A21F5CEE25001AF3F0 /* LaunchScreen.storyboard */; };
 		DCAD09AF1F5CEE25001AF3F0 /* RichImagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD09AE1F5CEE25001AF3F0 /* RichImagesTests.swift */; };
 		DCAD09BA1F5CEE25001AF3F0 /* RichImagesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD09B91F5CEE25001AF3F0 /* RichImagesUITests.swift */; };
-		DCAD09C91F5CEE82001AF3F0 /* RichImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD09C81F5CEE82001AF3F0 /* RichImages.swift */; };
 		DCAD09CB1F5CF03E001AF3F0 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD09CA1F5CF03E001AF3F0 /* ImageView.swift */; };
 		DCAD09CD1F5CF0AD001AF3F0 /* Gif.gif in Resources */ = {isa = PBXBuildFile; fileRef = DCAD09CC1F5CF0AD001AF3F0 /* Gif.gif */; };
 		DCAD09CF1F5CF0B2001AF3F0 /* Swift.pdf in Resources */ = {isa = PBXBuildFile; fileRef = DCAD09CE1F5CF0B2001AF3F0 /* Swift.pdf */; };
@@ -38,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DC9D71F91F5D248700EE2386 /* RichImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RichImages.swift; sourceTree = "<group>"; };
 		DCAD09961F5CEE25001AF3F0 /* RichImages.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RichImages.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCAD09991F5CEE25001AF3F0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DCAD099B1F5CEE25001AF3F0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -51,7 +52,6 @@
 		DCAD09B51F5CEE25001AF3F0 /* RichImagesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RichImagesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCAD09B91F5CEE25001AF3F0 /* RichImagesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichImagesUITests.swift; sourceTree = "<group>"; };
 		DCAD09BB1F5CEE25001AF3F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DCAD09C81F5CEE82001AF3F0 /* RichImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RichImages.swift; sourceTree = "<group>"; };
 		DCAD09CA1F5CF03E001AF3F0 /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		DCAD09CC1F5CF0AD001AF3F0 /* Gif.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Gif.gif; sourceTree = "<group>"; };
 		DCAD09CE1F5CF0B2001AF3F0 /* Swift.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Swift.pdf; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 		DCAD09C71F5CEE82001AF3F0 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				DCAD09C81F5CEE82001AF3F0 /* RichImages.swift */,
+				DC9D71F91F5D248700EE2386 /* RichImages.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -285,9 +285,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCAD09CB1F5CF03E001AF3F0 /* ImageView.swift in Sources */,
-				DCAD09C91F5CEE82001AF3F0 /* RichImages.swift in Sources */,
 				DCAD099C1F5CEE25001AF3F0 /* ViewController.swift in Sources */,
 				DCAD099A1F5CEE25001AF3F0 /* AppDelegate.swift in Sources */,
+				DC9D71FA1F5D248700EE2386 /* RichImages.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -441,9 +441,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = TKA48YVS5T;
 				INFOPLIST_FILE = RichImages/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = devedbox.RichImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -454,6 +456,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = TKA48YVS5T;
 				INFOPLIST_FILE = RichImages/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = devedbox.RichImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -538,6 +541,7 @@
 				DCAD09C01F5CEE25001AF3F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DCAD09C11F5CEE25001AF3F0 /* Build configuration list for PBXNativeTarget "RichImagesTests" */ = {
 			isa = XCConfigurationList;
@@ -546,6 +550,7 @@
 				DCAD09C31F5CEE25001AF3F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DCAD09C41F5CEE25001AF3F0 /* Build configuration list for PBXNativeTarget "RichImagesUITests" */ = {
 			isa = XCConfigurationList;
@@ -554,6 +559,7 @@
 				DCAD09C61F5CEE25001AF3F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
