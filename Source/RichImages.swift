@@ -179,7 +179,7 @@ extension UIImage {
     /// A type representing a core image context using the GPU-Based rendering.
     fileprivate struct _GPUBasedCIContext {
         lazy var context: CIContext! = { () -> CIContext! in
-            let context = CIContext(options: [kCIContextUseSoftwareRenderer: false])
+            let context = CIContext(options: [kCIContextUseSoftwareRenderer: false, kCIContextHighQualityDownsample: true])
             return context
         }()
     }
