@@ -32,42 +32,12 @@ extension UIView {
     }
 }
 
-// MARK: - Compressing.
-
 extension UIImage {
-    /// Creates a data stream of the receiver by compressing to the specific max allowed
-    /// bits length and max allowed width of size using `JPEGRepresentation`.
-    ///
-    /// - Parameter length: An integer value indicates the max allowed bits length to compress to.
-    ///                     The length to compress to can not be negative or zero.
-    /// - Parameter width : A float value indicates the max allowed width of the size of the reveiver.
-    ///                     The width to compress to can not be negative or zero.
-    ///
-    /// - Returns: A compressed data stream of the receiver if any.
-    public func compress(toBits length: Int, scalesToFit width: CGFloat? = nil) -> Data! {
-        guard length > 0 else { return nil }
-        // Scales the image to fit the specific size if any.
-        var scaled = self
-        if let maxSize = width {
-            guard maxSize > 0.0 else { return nil }
-            scaled = thumbnail(scalesToFit: maxSize)
-        }
-        // Do compress.
-        var compressionQuality: CGFloat = 0.9
-        var data              : Data?   = UIImageJPEGRepresentation(scaled, compressionQuality)
-        
-        while data?.count ?? 0 > length && compressionQuality > 0.01 {
-            compressionQuality -= 0.02
-            data                = UIImageJPEGRepresentation(scaled, compressionQuality)
-        }
-        
-        return data
-    }
-}
-
-extension UIImage {
+    /// Returns the width of the size of the receiver multiplied by the scale of the image.
     public var scaledWidth : CGFloat { return size.width * scale }
+    /// Returns the height of the size of the receiver multiplied by the scale of the image.
     public var scaledHeight: CGFloat { return size.height * scale }
+    /// Returns the size of the size of the receiver multiplied by the scale of the image.
     public var scaledSize  : CGSize  { return CGSize(width: scaledWidth, height: scaledHeight) }
 }
 
@@ -133,9 +103,39 @@ internal func _correct(bitmapInfo: CGBitmapInfo, `for` colorSpace: CGColorSpace)
     return bitmap
 }
 
+// MARK: - RenderOption.
+
 extension UIImage {
+    /// A type representing the render option for the image processing.
+    /// Clients typically use the static functions `.cpu`, `.auto` or `gpu(:)` to locate the 
+    /// render destination for the processing.
+    public struct RenderOption {
+        /// The render destination of the image processing.
+        let dest: Destination
+    }
+}
+
+extension UIImage.RenderOption {
+    /// Returns an option of `RenderOption` with using `CPU` as the render destination.
+    public static var  cpu: UIImage.RenderOption { return UIImage.RenderOption(dest: .cpu) }
+    /// Returns an option of `RenderOption` with using `AUTO MODE` as the render destination.
+    public static var  auto: UIImage.RenderOption { return UIImage.RenderOption(dest: .auto) }
+    /// Creates an option of `RenderOption` with using `GPU` as the render destination.
+    ///
+    /// - Parameter gpu: A value describ in `Destination.GPU` indicates the gpu device the tec. using
+    ///                  as the target GPU destination.
+    ///
+    /// - Returns: An GPU-Based `RenderOption` with the given gpu device or tec. .
+    public static func gpu(_ gpu: Destination.GPU) -> UIImage.RenderOption {
+        return UIImage.RenderOption(dest: .gpu(gpu))
+    }
+}
+
+// MARK: - RenderDestination.
+
+extension UIImage.RenderOption {
     /// A type representing the rendering destination of the image's cropping and other processing.
-    public enum RenderDestination {
+    public enum Destination {
         /// A type representing the GPU-Based rendering.
         public enum GPU {
             /// Indicates the rendering is based on the default GPU device.
@@ -156,8 +156,9 @@ extension UIImage {
     }
 }
 
-extension UIImage.RenderDestination {
-    public static var availableGPURelatedDestinations: [UIImage.RenderDestination] {
+extension UIImage.RenderOption.Destination {
+    /// Returns the available GPU-Related render destination values.
+    public static var availableGPURelatedDestinations: [UIImage.RenderOption.Destination] {
         if #available(iOS 9.0, *) {
             return [.auto, .gpu(.default), .gpu(.metal), .gpu(.openGLES)]
         } else {
@@ -212,11 +213,11 @@ private var _openGLESCIContext = UIImage._OpenGLESBasedCIContext()
 /// - Parameter dests: A array of value defined in `UIImage.RenderDestination` used
 ///                    to initialze the corresponding render destination context.
 ///
-public func CIContextInitialize(_ dests: [UIImage.RenderDestination]) { dests.forEach({ _ciContext(at: $0) }) }
+public func CIContextInitialize(_ dests: [UIImage.RenderOption.Destination]) { dests.forEach({ _ciContext(at: $0) }) }
 
 /// Get the context of core image with the given render destination.
 @discardableResult
-internal func _ciContext(at dest: UIImage.RenderDestination) -> CIContext! {
+internal func _ciContext(at dest: UIImage.RenderOption.Destination) -> CIContext! {
     switch dest {
     case .auto:
         return _autoCIContext.context
@@ -262,7 +263,7 @@ extension UIImage {
     ///
     /// - Parameter dest: A render destination used by the ci context
     ///                   to generate cg images.
-    internal func _makeCgImage(_ dest: UIImage.RenderDestination = .auto) -> CGImage! {
+    internal func _makeCgImage(_ dest: UIImage.RenderOption.Destination = .auto) -> CGImage! {
         var cgImage: CGImage! = nil
         if let underlyingCgImage = self.cgImage {
             cgImage = underlyingCgImage
