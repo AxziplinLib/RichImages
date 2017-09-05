@@ -13,7 +13,7 @@ class ImageView: UIImageView {
     override var intrinsicContentSize: CGSize {
         var size = CGSize(width: self.bounds.width, height: 0.0)
         if  let img = image {
-            size.height = img.size.height * min(1.0, (size.width / img.size.height))
+            size.height = img.size.height * min(1.0, (size.width / img.size.width))
         } else {
             size.height = 0.5
         }
