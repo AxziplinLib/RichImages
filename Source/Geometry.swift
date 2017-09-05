@@ -220,3 +220,32 @@ extension UIImage {
         }
     }
 }
+
+// MARK: - CoreImage.
+
+extension UIImage {
+    /// Produces a high-quality, scaled version of the receiver image.
+    ///
+    /// Clients typically use this function to scale down an image immediately rather than chainning the filter processings.
+    ///
+    /// - Parameter scale      : A CGFloat value indicates the scale accuracy of the source image reached from `0.0` to `1.0`.
+    /// - Parameter aspectRatio: A CGFloat value indicates the aspect ratio accuracy of the scaling reached from `0.0` to `1.0`.
+    ///                          using `1.0` by default.
+    /// - Parameter option     : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                          Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A scaled, high-quality copy of the recevier.
+    public func scale(to scale: CGFloat, aspectRatio: CGFloat = 1.0, option: RenderOption = .auto) -> UIImage! {
+        switch option.dest {
+        case .auto  : fallthrough
+        case .gpu(_):
+            let inputParameters = ["inputScale": scale, "inputAspectRatio": aspectRatio]
+            guard let ciImage   = _makeCiImage()?.applyingFilter("CILanczosScaleTransform", withInputParameters: inputParameters) else { return nil }
+            guard let ciContext = _ciContext(at: option.dest) else { return nil }
+            guard let cgImage   = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+            
+            return UIImage(cgImage: cgImage, scale: self.scale, orientation: imageOrientation)
+        default: return nil
+        }
+    }
+}
