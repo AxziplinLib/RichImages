@@ -36,25 +36,26 @@ extension UIImage {
     ///
     /// - Parameter rect: The rectangle area coordinates in the receiver. The value
     ///                   of the rectangle must not be zero or negative sizing.
-    /// - Parameter dest: A value of `RenderDestination` indicates the rendering destination of the image cropping processing.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options
+    ///                     of the image cropping processing such as the destination.
     ///
     /// - Returns: An copy of the receiver cropped to the given rectangle.
-    public func crop(to rect: CGRect, rendering dest: RenderDestination = .cpu) -> UIImage! {
-        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.crop(to: rect, rendering: dest) } }), duration: duration) }
+    public func crop(to rect: CGRect, option: RenderOption = .cpu) -> UIImage! {
+        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.crop(to: rect, option: option) } }), duration: duration) }
         // Early fatal checking.
         guard rect.width > 0.0 && rect.height > 0.0 else { return nil }
         // Scales points to pxiels.
         let croppingRect = CGRect(origin: rect.origin, size: rect.size).scale(by: scale)
         
         var fallthroughToCpu = false
-        switch dest {
+        switch option.dest {
         case .auto:
             fallthroughToCpu = true
             fallthrough
         case .gpu(_):
-            guard let ciImage = _makeCiImage()?.cropping(to: croppingRect)             else { return fallthroughToCpu ? crop(to:rect, rendering: .cpu) : nil }
-            guard let ciContext = _ciContext(at: dest)                                 else { return fallthroughToCpu ? crop(to:rect, rendering: .cpu) : nil }
-            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? crop(to:rect, rendering: .cpu) : nil }
+            guard let ciImage = _makeCiImage()?.cropping(to: croppingRect) else { return fallthroughToCpu ? crop(to:rect, option: .cpu) : nil }
+            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? crop(to:rect, option: .cpu) : nil }
+            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? crop(to:rect, option: .cpu) : nil }
             
             return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
         default:
@@ -72,17 +73,19 @@ extension UIImage {
     ///                   the size must not be zero or negative.
     /// - Parameter mode: The resizing mode to decide the rectangle to crop.
     ///                   The value will use `.center` by default.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options
+    ///                     of the image cropping processing such as the destination.
     ///
     /// - Returns: An copy of the receiver cropped to the given size and resizing mode.
-    public func crop(fits size: CGSize, using mode: ResizingMode = .center, rendering dest: RenderDestination = .cpu) -> UIImage! {
+    public func crop(fits size: CGSize, using mode: ResizingMode = .center, option: RenderOption = .cpu) -> UIImage! {
         // Scales points to pxiels.
         var croppingRect = CGRect(origin: .zero, size: size).scale(by: scale)
         switch mode {
         case .scaleToFill:
-            return resize(fills: size, quality: .default)
+            return resize(fills: size, option: option)
         case .scaleAspectFill: fallthrough
         case .scaleAspectFit :
-            return resize(fits: size, using: mode, quality: .default)
+            return resize(fits: size, using: mode, option: option)
         case .center:
             croppingRect.origin.x = (scaledWidth  - croppingRect.width)  * 0.5
             croppingRect.origin.y = (scaledHeight - croppingRect.height) * 0.5
@@ -106,7 +109,7 @@ extension UIImage {
             croppingRect.origin.y = (scaledHeight - croppingRect.height)
         }
         
-        return crop(to: croppingRect.scale(by: 1.0 / scale), rendering: dest)
+        return crop(to: croppingRect.scale(by: 1.0 / scale), option: option)
     }
     /// Creates a copy of this image that is squared to the thumbnail size using `QuartzCore` redrawing in points. Animated image supported.
     ///
@@ -115,27 +118,26 @@ extension UIImage {
     /// of at least one pixel in size has the side-effect of antialiasing the
     /// edges of the image when rotating it using Core Animation.)
     ///
-    /// - Parameter sizet       : A size of thumbnail to fit and square to.
-    /// - Parameter borderWidth : A value indicates the width of the transparent border. Using 0.0 by default.
-    /// - Parameter cornerRadius: A value indicates the radius of rounded corner. Using 0.0 by default.
-    /// - Parameter quality     : An instance of `CGInterpolationQuality` indicates the
-    ///                           interpolation of the receiver. Defaults to `.default.`
+    /// - Parameter sizet : A size of thumbnail to fit and square to.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options
+    ///                     of the image cropping processing such as the destination.
     ///
     /// - Returns: A copy of the receiver that is squared to the thumbnail size.
-    public func thumbnail(squaresTo sizet: CGFloat, borderWidth: CGFloat = 0.0, cornerRadius: CGFloat = 0.0, quality: CGInterpolationQuality = .default) -> UIImage! {
-        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.thumbnail(squaresTo: sizet, borderWidth: borderWidth, cornerRadius: cornerRadius, quality: quality) } }), duration: duration) }
+    public func thumbnail(squaresTo sizet: CGFloat, option: RenderOption = .cpu) -> UIImage! {
+        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.thumbnail(squaresTo: sizet, option: option) } }), duration: duration) }
         
         // Resize the original image.
-        guard let resizedImage = resize(fits: CGSize(width: sizet, height: sizet), using: .scaleAspectFill, quality: quality) else { return nil }
+        guard let resizedImage = resize(fits: CGSize(width: sizet, height: sizet), using: .scaleAspectFill, option: option) else { return nil }
         // Crop out any part of the image that's larger than the thumbnail size
         // The cropped rect must be centered on the resized image
         // Round the origin points so that the size isn't altered when CGRectIntegral is later invoked
         let croppedRect = CGRect(x: ((resizedImage.size.width - sizet) * 0.5).rounded(), y: ((resizedImage.size.width - sizet) * 0.5).rounded(), width: sizet, height: sizet)
         guard let croppedImage = resizedImage.crop(to: croppedRect) else { return nil }
-        var borderedImage = croppedImage
-        if borderWidth > 0.0 { borderedImage = croppedImage.bordered(borderWidth) }
+        // var borderedImage = croppedImage
+        // if borderWidth > 0.0 { borderedImage = croppedImage.bordered(borderWidth) }
         
-        return borderedImage.round(cornerRadius, border: borderWidth)
+        // return borderedImage.round(cornerRadius, border: borderWidth)
+        return croppedImage
     }
     /// Creates a copy of this image that is scale-aspect-fit to the thumbnail size using `ImageIO` in points.
     /// Animated image supported.
@@ -170,11 +172,11 @@ extension UIImage {
     ///
     /// - Parameter size        : A value of `CGSize` indicates the size to draw of the image.
     /// - Parameter resizingMode: An instance of `UIImage.ResizingMode` using to decide the size of the resizing.
-    /// - Parameter quality     : An instance of `CGInterpolationQuality` indicates the
-    ///                           interpolation of the receiver. Defaults to `.default.`
+    /// - Parameter option      : A value of `RenderOption` indicates the rendering options
+    ///                           of the image cropping processing such as the destination.
     ///
     /// - Returns: A copy of the receiver resized to the given size.
-    public func resize(fits size: CGSize, using resizingMode: ResizingMode, quality: CGInterpolationQuality = .default) -> UIImage! {
+    public func resize(fits size: CGSize, using resizingMode: ResizingMode, option: RenderOption = .cpu) -> UIImage! {
         let horizontalRatio = size.width  / self.size.width
         let verticalRatio   = size.height / self.size.width
         var ratio: CGFloat
@@ -185,22 +187,22 @@ extension UIImage {
         case .scaleAspectFit:
             ratio = min(horizontalRatio, verticalRatio)
         default:
-            return resize(fills: size, quality: quality)
+            return resize(fills: size, option: option)
         }
         
         let newSize = CGSize(width: (self.size.width * ratio).rounded(), height: (self.size.width * ratio).rounded())
-        return resize(fills: newSize, quality: quality)
+        return resize(fills: newSize, option: option)
     }
     /// Creates a rescaled copy of the image, taking into account its orientation in points. Animated image supported.
     ///
     /// The image will be scaled disproportionately if necessary to fit the bounds specified by the parameter.
     ///
     /// - Parameter size   : A CGSize object to resize the scaling of the receiver with.
-    /// - Parameter quality: An instance of `CGInterpolationQuality` indicates the
-    ///                      interpolation of the receiver. Defaults to `.default.`
+    /// - Parameter option : A value of `RenderOption` indicates the rendering options
+    ///                      of the image cropping processing such as the destination.
     ///
     /// - Returns: A rescaled copy of the receiver.
-    public func resize(fills size: CGSize, quality: CGInterpolationQuality = .default) -> UIImage! {
+    public func resize(fills size: CGSize, option: RenderOption = .cpu) -> UIImage! {
         var transposed = false
         switch imageOrientation {
         case .left         : fallthrough
@@ -211,7 +213,7 @@ extension UIImage {
         default: break
         }
         
-        return _resize(fills: size, applying: _transform(forOrientation: size.scale(by: scale)), transposed: transposed, quality: quality)
+        return _resize(fills: size, applying: _transform(forOrientation: size.scale(by: scale)), transposed: transposed, option: option)
     }
     /// Returns a copy of the image that has been transformed using the given affine transform and scaled to the new size in points.
     /// Animated image supported.
@@ -219,26 +221,44 @@ extension UIImage {
     /// The new image's orientation will be UIImageOrientationUp, regardless of the current image's orientation
     ///
     /// If the new size is not integral, it will be rounded up.
-    private func _resize(fills newSize: CGSize, applying transform: CGAffineTransform, transposed: Bool, quality: CGInterpolationQuality) -> UIImage! {
-        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img._resize(fills: newSize, applying: transform, transposed: transposed, quality: quality) } }), duration: duration) }
+    private func _resize(fills newSize: CGSize, applying transform: CGAffineTransform, transposed: Bool, option: RenderOption = .cpu) -> UIImage! {
+        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img._resize(fills: newSize, applying: transform, transposed: transposed, option: option) } }), duration: duration) }
         // Scales points to pxiels.
         let newRect        = CGRect(origin: .zero, size: newSize).integral.scale(by: scale)
         let transposedRect = CGRect(origin: .zero, size: CGSize(width: newRect.height, height: newRect.width)).integral.scale(by: scale)
-        guard let cgImage = _makeCgImage(), let colorSpace = cgImage.colorSpace else { return nil }
-        // Build a context that's the same dimensions as the new size
-        // FIXME: How to decide the right alpha info of the bitmap.
-        let bitmap = _correct(bitmapInfo: cgImage.bitmapInfo, for: colorSpace)
         
-        guard let context = CGContext(data: nil, width: Int(newRect.width), height: Int(newRect.height), bitsPerComponent: cgImage.bitsPerComponent, bytesPerRow: 0, space: colorSpace, bitmapInfo: bitmap.rawValue) else { return nil }
-        // Rotate and/or flip the image if required by its orientation
-        context.concatenate(transform)
-        // Set the quality level to use when rescaling
-        context.interpolationQuality = quality
-        // Draw into the context, this scales the image
-        context.draw(cgImage, in: transposed ? transposedRect : newRect)
-        // Get the resized image from the context and a UIImage
-        guard let resized_img = context.makeImage() else { return nil }
-        return UIImage(cgImage: resized_img, scale: scale, orientation: imageOrientation)
+        var fallthroughToCpu = false
+        switch option.dest {
+        case .auto:
+            fallthroughToCpu = true
+            fallthrough
+        case .gpu(_):
+            let extentScale: CGPoint = CGPoint(x: newRect.width / scaledWidth, y: newRect.height / scaledHeight)
+            guard let ciImage = _makeCiImage()?.applying(CGAffineTransform(scaleX: extentScale.x, y: extentScale.y).concatenating(transform)) else {
+                return fallthroughToCpu ? _resize(fills: newSize, applying: transform, transposed: transposed, option: option) : nil
+            }
+            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? _resize(fills: newSize, applying: transform, transposed: transposed, option: option) : nil }
+            guard let cgImage = ciContext.createCGImage(ciImage, from: transposed ? transposedRect : newRect) else { return fallthroughToCpu ? _resize(fills: newSize, applying: transform, transposed: transposed, option: option) : nil }
+            
+            return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+        default:
+            guard let cgImage  = _makeCgImage(), let colorSpace = cgImage.colorSpace else { return nil }
+            // Build a context that's the same dimensions as the new size
+            // FIXME: How to decide the right alpha info of the bitmap.
+            let bitmap = _correct(bitmapInfo: cgImage.bitmapInfo, for: colorSpace)
+            
+            guard let context = CGContext(data: nil, width: Int(newRect.width), height: Int(newRect.height), bitsPerComponent: cgImage.bitsPerComponent, bytesPerRow: 0, space: colorSpace, bitmapInfo: bitmap.rawValue) else { return nil }
+            // Rotate and/or flip the image if required by its orientation
+            context.concatenate(transform)
+            // Set the quality level to use when rescaling
+            context.interpolationQuality = option.quality
+            // Draw into the context, this scales the image
+            context.draw(cgImage, in: transposed ? transposedRect : newRect)
+            // Get the resized image from the context and a UIImage
+            guard let resized_img = context.makeImage() else { return nil }
+            
+            return UIImage(cgImage: resized_img, scale: scale, orientation: imageOrientation)
+        }
     }
     /// Returns an affine transform that takes into account the image orientation when drawing a scaled image.
     private func _transform(forOrientation size: CGSize) -> CGAffineTransform {
@@ -266,5 +286,38 @@ extension UIImage {
         default: break
         }
         return transform
+    }
+}
+
+// MARK: - Compressing.
+
+extension UIImage {
+    /// Creates a data stream of the receiver by compressing to the specific max allowed
+    /// bits length and max allowed width of size using `JPEGRepresentation`.
+    ///
+    /// - Parameter length: An integer value indicates the max allowed bits length to compress to.
+    ///                     The length to compress to can not be negative or zero.
+    /// - Parameter width : A float value indicates the max allowed width of the size of the reveiver.
+    ///                     The width to compress to can not be negative or zero.
+    ///
+    /// - Returns: A compressed data stream of the receiver if any.
+    public func compress(toBits length: Int, scalesToFit width: CGFloat? = nil) -> Data! {
+        guard length > 0 else { return nil }
+        // Scales the image to fit the specific size if any.
+        var scaled = self
+        if let maxSize = width {
+            guard maxSize > 0.0 else { return nil }
+            scaled = thumbnail(scalesToFit: maxSize)
+        }
+        // Do compress.
+        var compressionQuality: CGFloat = 0.9
+        var data              : Data?   = UIImageJPEGRepresentation(scaled, compressionQuality)
+        
+        while data?.count ?? 0 > length && compressionQuality > 0.01 {
+            compressionQuality -= 0.02
+            data                = UIImageJPEGRepresentation(scaled, compressionQuality)
+        }
+        
+        return data
     }
 }
