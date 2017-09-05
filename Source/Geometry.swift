@@ -14,64 +14,81 @@ import CoreGraphics
 
 extension UIImage {
     /// Returns an copy of the receiver with critical rounding in pixels. Animated image supported.
-    public var cornered: UIImage! { return round(min(scaledWidth, scaledHeight) * 0.5, border: 0.0) }
+    public var  cornered: UIImage! { return makeCornered() }
+    /// Craetes an copy of the receiver with critical rounding in points with the given render destination.
+    /// Animated image supported.
+    ///
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rounding processing.
+    /// - Returns: Returns an copy of the receiver with critical rounded.
+    public func makeCornered(_ option: RenderOption = .cpu) -> UIImage! { return round(by: min(scaledWidth, scaledHeight) * 0.5, option: option) }
     /// Creates a copy of this image with rounded corners in points. Animated image supported. Animated image supported.
     ///
-    /// If borderWidth is non-zero, a transparent border of the given size will also be added.
-    ///
-    /// Original author: Björn Sållarp. Used with permission. See: [http://blog.sallarp.com/iphone-uiimage-round-corners/](http://blog.sallarp.com/iphone-uiimage-round-corners/)
-    ///
-    /// - Parameter cornerWidth: The width of the corner drawing. The value must not be negative.
-    /// - Parameter borderWidth: The width of border drawing. The value must not be negative. The value is 0.0 by default.
+    /// - Parameter radius: The width of the corner drawing. The value must not be negative.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rounding processing.
     ///
     /// - Returns: An image with rounded corners.
-    public func round(_ cornerRadius: CGFloat, border borderWidth: CGFloat = 0.0) -> UIImage! {
-        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.round(cornerRadius, border: borderWidth) } }), duration: duration) }
-        
+    public func round(by radius: CGFloat, option: RenderOption = .cpu) -> UIImage! {
+        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.round(by: radius, option: option) } }), duration: duration) }
         // Early fatal checking.
-        guard cornerRadius >= 0.0 && borderWidth >= 0.0 else { return nil }
+        guard radius >= 0.0/* && borderWidth >= 0.0 */else { return nil }
         // Scales points to pxiels.
-        let scaledCornerRadius = cornerRadius * scale
-        let scaledBorderWidth  = borderWidth  * scale
+        let scaledRadius = radius * scale
         
-        // If the image does not have an alpha layer, add one
-        guard let cgImage = self.alpha._makeCgImage(), let colorSpace = cgImage.colorSpace else { return nil }
-        let cgSize  = CGSize(width: CGFloat(cgImage.width), height: CGFloat(cgImage.height))
-        let bitmap  = _correct(bitmapInfo: cgImage.bitmapInfo, for: colorSpace)
-        var rect    = CGRect(origin: .zero, size: cgSize).insetBy(dx: -scaledBorderWidth, dy: -scaledBorderWidth)
-        rect.origin = .zero
-        // Build a context that's the same dimensions as the new size
-        guard let context = CGContext(data: nil, width: Int(rect.width), height: Int(rect.height), bitsPerComponent: cgImage.bitsPerComponent, bytesPerRow: 0, space: colorSpace, bitmapInfo: bitmap.rawValue) else { return nil }
-        // Create a clipping path with rounded corners
-        context.beginPath()
-        let roundedRect = rect.insetBy(dx: scaledBorderWidth, dy: scaledBorderWidth)
-        if scaledCornerRadius == 0 {
-            context.addRect(roundedRect)
-        } else {
-            context.saveGState()
-            context.translateBy(x: roundedRect.minX, y: roundedRect.minY)
-            context.scaleBy(x: scaledCornerRadius, y: scaledCornerRadius)
+        var fallthroughToCpu: Bool = false
+        switch option.dest {
+        case .auto:
+            fallthroughToCpu = true
+            fallthrough
+        case .gpu(_):
+            guard let ciImage = _makeCiImage()?.round(by: scaledRadius) else {
+                return fallthroughToCpu ? round(by: radius, option: option) : nil
+            }
+            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? round(by: radius, option: option): nil }
+            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? round(by: radius, option: option) : nil }
             
-            let wr = roundedRect.width  / scaledCornerRadius
-            let hr = roundedRect.height / scaledCornerRadius
+            return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+        default:
+            let scaledBorderWidth: CGFloat = /*borderWidth  * scale*/ 0.0
             
-            context.move(to: CGPoint(x: wr, y: hr * 0.5))
-            context.addArc(tangent1End: CGPoint(x: wr, y: hr), tangent2End: CGPoint(x: wr * 0.5, y: hr), radius: 1.0)
-            context.addArc(tangent1End: CGPoint(x: 0.0, y: hr), tangent2End: CGPoint(x: 0.0, y: hr * 0.5), radius: 1.0)
-            context.addArc(tangent1End: CGPoint(x: 0.0, y: 0.0), tangent2End: CGPoint(x: wr * 0.5, y: 0.0), radius: 1.0)
-            context.addArc(tangent1End: CGPoint(x: wr, y: 0.0), tangent2End: CGPoint(x: wr, y: hr * 0.5), radius: 1.0)
+            // If the image does not have an alpha layer, add one
+            guard let cgImage = self.alpha._makeCgImage(), let colorSpace = cgImage.colorSpace else { return nil }
+            let cgSize  = CGSize(width: CGFloat(cgImage.width), height: CGFloat(cgImage.height))
+            let bitmap  = _correct(bitmapInfo: cgImage.bitmapInfo, for: colorSpace)
+            var rect    = CGRect(origin: .zero, size: cgSize).insetBy(dx: -scaledBorderWidth, dy: -scaledBorderWidth)
+            rect.origin = .zero
+            // Build a context that's the same dimensions as the new size
+            guard let context = CGContext(data: nil, width: Int(rect.width), height: Int(rect.height), bitsPerComponent: cgImage.bitsPerComponent, bytesPerRow: 0, space: colorSpace, bitmapInfo: bitmap.rawValue) else { return nil }
+            // Create a clipping path with rounded corners
+            context.beginPath()
+            let roundedRect = rect.insetBy(dx: scaledBorderWidth, dy: scaledBorderWidth)
+            if scaledRadius == 0 {
+                context.addRect(roundedRect)
+            } else {
+                context.saveGState()
+                context.translateBy(x: roundedRect.minX, y: roundedRect.minY)
+                context.scaleBy(x: scaledRadius, y: scaledRadius)
+                
+                let wr = roundedRect.width  / scaledRadius
+                let hr = roundedRect.height / scaledRadius
+                
+                context.move(to: CGPoint(x: wr, y: hr * 0.5))
+                context.addArc(tangent1End: CGPoint(x: wr, y: hr), tangent2End: CGPoint(x: wr * 0.5, y: hr), radius: 1.0)
+                context.addArc(tangent1End: CGPoint(x: 0.0, y: hr), tangent2End: CGPoint(x: 0.0, y: hr * 0.5), radius: 1.0)
+                context.addArc(tangent1End: CGPoint(x: 0.0, y: 0.0), tangent2End: CGPoint(x: wr * 0.5, y: 0.0), radius: 1.0)
+                context.addArc(tangent1End: CGPoint(x: wr, y: 0.0), tangent2End: CGPoint(x: wr, y: hr * 0.5), radius: 1.0)
+                context.closePath()
+                context.restoreGState()
+            }
             context.closePath()
-            context.restoreGState()
+            context.clip()
+            // Draw the image to the context; the clipping path will make anything outside the rounded rect transparent
+            context.draw(cgImage, in: rect)
+            // Create a CGImage from the context
+            guard let clippedImage = context.makeImage() else { return nil }
+            
+            // Create a UIImage from the CGImage
+            return UIImage(cgImage: clippedImage, scale: scale, orientation: imageOrientation)
         }
-        context.closePath()
-        context.clip()
-        // Draw the image to the context; the clipping path will make anything outside the rounded rect transparent
-        context.draw(cgImage, in: rect)
-        // Create a CGImage from the context
-        guard let clippedImage = context.makeImage() else { return nil }
-        
-        // Create a UIImage from the CGImage
-        return UIImage(cgImage: clippedImage, scale: scale, orientation: imageOrientation)
     }
 }
 
@@ -123,35 +140,30 @@ extension UIImage {
         
         return UIImage(cgImage: image, scale: scale, orientation: .up)
     }
-    /// Creates and returns a copy of the receiver image with flipped vertically.
-    /// Animated image supported.
-    public var verticallyFlipped: UIImage! { return _flip(horizontally: false) }
-    /// Creates and returns a copy of the receiver image with flipped horizontally.
-    /// Animated image supported.
-    public var horizontallyFlipped: UIImage! { return _flip(horizontally: true) }
     /// Creates a copy of the receiver image by the given angle. Animated image supported.
     ///
     /// - Parameter angle: A float value indicates the angle to rotate by.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rotating processing.
     ///
     /// - Returns: A new image with the given angle rotated.
-    public func rotate(by angle: CGFloat, rendering dest: RenderDestination = .cpu) -> UIImage! {
-        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.rotate(by: angle) } }), duration: duration) }
+    public func rotate(by angle: CGFloat, option: RenderOption = .cpu) -> UIImage! {
+        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.rotate(by: angle, option: option) } }), duration: duration) }
         
         // Calculate the size of the rotated view's containing box for our drawing space.
         let transform = CGAffineTransform(rotationAngle: -angle)
         let rotatedBox = CGRect(origin: .zero, size: size).applying(transform)
         
         var fallthroughToCpu = false
-        switch dest {
+        switch option.dest {
         case .auto:
             fallthroughToCpu = true
             fallthrough
         case .gpu(_):
             guard let ciImage = _makeCiImage()?.applying(CGAffineTransform(rotationAngle: angle)) else {
-                return fallthroughToCpu ? rotate(by: angle, rendering: dest) : nil
+                return fallthroughToCpu ? rotate(by: angle, option: option) : nil
             }
-            guard let ciContext = _ciContext(at: dest) else { return fallthroughToCpu ? rotate(by: angle, rendering: dest): nil }
-            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? rotate(by: angle, rendering: dest) : nil }
+            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? rotate(by: angle, option: option) : nil }
+            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? rotate(by: angle, option: option) : nil }
             
             return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
         default:
@@ -170,20 +182,41 @@ extension UIImage {
             return UIGraphicsGetImageFromCurrentImageContext()
         }
     }
-    
-    private func _flip(horizontally: Bool) -> UIImage! {
-        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img._flip(horizontally: horizontally) } }), duration: duration) }
+    /// Creates and returns a copy of the receiver image with flipped horizontally with a specific render option.
+    /// Animated image supported.
+    ///
+    /// - Parameter horizontally: True to flip horizontally, otherwise vertically.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rotating processing.
+    ///
+    /// - Returns: A copy of the receiver by flipping according to the direction and the given option.
+    public func flip(horizontally: Bool, option: RenderOption = .cpu) -> UIImage! {
+        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.flip(horizontally: horizontally, option: option) } }), duration: duration) }
         
-        let rect = CGRect(origin: .zero, size: scaledSize)
-        UIGraphicsBeginImageContextWithOptions(rect.size, false, scale)
-        defer { UIGraphicsEndImageContext() }
-        guard let cgImage = self._makeCgImage(), let context = UIGraphicsGetCurrentContext() else { return nil }
-        context.clip(to: rect)
-        if horizontally {
-            context.rotate(by: CGFloat.pi)
-            context.translateBy(x: -rect.width, y: -rect.height)
+        var fallthroughToCpu = false
+        switch option.dest {
+        case .auto:
+            fallthroughToCpu = true
+            fallthrough
+        case .gpu(_):
+            guard let ciImage = _makeCiImage()?.applying(CGAffineTransform(scaleX: horizontally ? -1.0 : 1.0, y: horizontally ? 1.0 : -1.0)) else {
+                return fallthroughToCpu ? flip(horizontally: horizontally, option: option) : nil
+            }
+            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? flip(horizontally: horizontally, option: option) : nil }
+            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? flip(horizontally: horizontally, option: option) : nil }
+            
+            return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+        default:
+            let rect = CGRect(origin: .zero, size: scaledSize)
+            UIGraphicsBeginImageContextWithOptions(rect.size, false, scale)
+            defer { UIGraphicsEndImageContext() }
+            guard let cgImage = self._makeCgImage(), let context = UIGraphicsGetCurrentContext() else { return nil }
+            context.clip(to: rect)
+            if horizontally {
+                context.rotate(by: CGFloat.pi)
+                context.translateBy(x: -rect.width, y: -rect.height)
+            }
+            context.draw(cgImage, in: rect)
+            return UIGraphicsGetImageFromCurrentImageContext()
         }
-        context.draw(cgImage, in: rect)
-        return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
