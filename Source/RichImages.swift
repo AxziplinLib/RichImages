@@ -112,12 +112,14 @@ extension UIImage {
     public struct RenderOption {
         /// The render destination of the image processing.
         let dest: Destination
+        /// The interpolation quality for the rescaling in CoreGraphics when using CPU as the render destination.
+        let quality: CGInterpolationQuality = .default
     }
 }
 
 extension UIImage.RenderOption {
     /// Returns an option of `RenderOption` with using `CPU` as the render destination.
-    public static var  cpu: UIImage.RenderOption { return UIImage.RenderOption(dest: .cpu) }
+    public static var  cpu : UIImage.RenderOption { return UIImage.RenderOption(dest: .cpu) }
     /// Returns an option of `RenderOption` with using `AUTO MODE` as the render destination.
     public static var  auto: UIImage.RenderOption { return UIImage.RenderOption(dest: .auto) }
     /// Creates an option of `RenderOption` with using `GPU` as the render destination.
