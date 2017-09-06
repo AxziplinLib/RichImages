@@ -280,4 +280,33 @@ extension UIImage {
         default: return nil
         }
     }
+    /// Alters the geometry of an image to simulate the observer changing viewing position.
+    ///
+    /// Clients typically use this function to skew an the portion of the image defined by extent immediately 
+    /// rather than chainning the filter processings.
+    ///
+    /// - Parameter topLeft    : A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Top Left.
+    /// - Parameter topRight   : A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Top Right.
+    /// - Parameter bottomLeft : A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Bottom Left.
+    /// - Parameter bottomRight: A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Bottom Right.
+    /// - Parameter extent     : A CIVector object whose whose attribute type is CIAttributeTypeRectangle. If you pass [image extent] 
+    ///                          you’ll get the same result as using the CIPerspectiveTransform filter.
+    /// - Parameter option     : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                          Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A perspective corrected copy of the recevier.
+    public func perspectiveTransform(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint, extent: CGRect? = nil, option: RenderOption = .auto) -> UIImage! {
+        switch option.dest {
+        case .auto  : fallthrough
+        case .gpu(_):
+            var inputParameters = ["inputTopLeft": CIVector(cgPoint: topLeft), "inputTopRight": CIVector(cgPoint: topRight), "inputBottomRight": CIVector(cgPoint: bottomRight), "inputBottomLeft": CIVector(cgPoint: bottomLeft)]
+            if let _ext = extent { inputParameters["inputExtent"] = CIVector(cgRect: _ext) }
+            guard let ciImage   = _makeCiImage()?.applyingFilter(extent == nil ? "CIPerspectiveTransform" : "CIPerspectiveTransformWithExtent", withInputParameters: inputParameters) else { return nil }
+            guard let ciContext = _ciContext(at: option.dest) else { return nil }
+            guard let cgImage   = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+            
+            return UIImage(cgImage: cgImage, scale: self.scale, orientation: imageOrientation)
+        default: return nil
+        }
+    }
 }
