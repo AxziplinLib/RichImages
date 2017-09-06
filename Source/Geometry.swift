@@ -175,7 +175,7 @@ extension UIImage {
             // Now, draw the rotated/scaled image into the context.
             context.scaleBy(x: 1.0, y: -1.0)
             
-            context.draw(cgImage, in: CGRect(x: -size.width * 0.5, y: -size.width * 0.5, width: size.width, height: size.width))
+            context.draw(cgImage, in: CGRect(x: -size.width * 0.5, y: -size.height * 0.5, width: size.width, height: size.height))
             return UIGraphicsGetImageFromCurrentImageContext()
         }
     }
