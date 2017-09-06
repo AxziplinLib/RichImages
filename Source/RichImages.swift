@@ -213,15 +213,15 @@ extension UIImage {
     /// Returns a new image created by applying a filter to the original image with the specified name and parameters.
     ///
     /// Calling this method is equivalent to the following sequence of steps:
-    /// - Creating a CIFilter instance.
-    /// - Setting the original image.ciImage as the filter’s inputImage parameter.
-    /// - Setting the remaining filter parameters from the params dictionary.
-    /// - Retrieving the outputImage object from the filter.
+    /// * Creating a CIFilter instance.
+    /// * Setting the original image.ciImage as the filter’s inputImage parameter.
+    /// * Setting the remaining filter parameters from the params dictionary.
+    /// * Retrieving the outputImage object from the filter.
     ///
     /// - Parameter filterName: The name of the filter to apply, as used when creating a CIFilter instance with the init(name:) method.
     /// - Parameter params    : A dictionary whose key-value pairs are set as input values to the filter. Each key is a constant that
-    //                          specifies the name of an input parameter for the filter, and the corresponding value is the value for 
-    //                          that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
+    ///                         specifies the name of an input parameter for the filter, and the corresponding value is the value for
+    ///                         that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
     /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image scaling processing.
     ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: An image object representing the result of applying the filter.
@@ -245,6 +245,32 @@ extension UIImage {
 ///                    to initialze the corresponding render destination context.
 ///
 public func CIContextInitialize(_ dests: [UIImage.RenderOption.Destination]) { dests.forEach({ _ciContext(at: $0) }) }
+/// Update the cached CIContext with the given context for the specific render destination.
+///
+/// - Note: This updation will not check the render destination of the given context. So be
+///         careful with the updating context because the unckecking of the updation.
+///
+/// - Parameter context: A CIContext for the specific render destination used to update the default context
+/// - Parameter dest   : The render destination whose context need to be updated.
+///
+/// - Returns: A boolean result indicates whether the updation is successful.
+public func CIContextUpdate(_ context: CIContext, `for` dest: UIImage.RenderOption.Destination) -> Bool {
+    switch dest {
+    case .auto:
+        _autoCIContext.context = context
+    case .gpu(let gpu):
+        switch gpu {
+        case .metal:
+            _metalCIContext.context = context
+        case .openGLES:
+            _openGLESCIContext.context = context
+        default:
+            _gpuCIContext.context = context
+        }
+    default: return false
+    }
+    return true
+}
 
 /// Get the context of core image with the given render destination.
 @discardableResult
