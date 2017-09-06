@@ -285,7 +285,7 @@ extension UIImage {
         case .auto  : fallthrough
         case .gpu(_):
             var input: CIImage!
-            if CIFilter.filterNames(inCategory: kCICategoryFilterGenerator).contains(filterName) {// The filter is generator. The image is not needed.
+            if CIFilter.filterNames(inCategory: kCICategoryGenerator).contains(filterName) {// The filter is generator. The image is not needed.
                 input = CIFilter(name: filterName, withInputParameters: params)?.outputImage
                 // Some of the generator filters need to be cropped before they can be displayed. 
                 /// Crop the input to the given rect if any.
