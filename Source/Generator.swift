@@ -206,3 +206,35 @@ extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
+
+// MARK: - CoreImage.
+
+extension UIImage {
+    /// Generates an Aztec code (two-dimensional barcode) from input data.
+    ///
+    /// Generates an output image representing the input data according to the ISO/IEC 24778:2008 standard. The width and height
+    /// of each module (square dot) of the code in the output image is one pixel. To create an Aztec code from a string or URL, 
+    /// convert it to an NSData object using the NSISOLatin1StringEncoding string encoding. The output image also includes two 
+    /// pixels of padding on each side (for example, a 15 x 15 code creates a 19 x 19 image).
+    ///
+    /// - Parameter data           : The data to be encoded as an Aztec code. An NSData object whose display name is Message.
+    /// - Parameter correctionLevel: The percentage of redundancy to add to the message data in the barcode encoding. 
+    ///                              A higher correction level allows a barcode to be correctly read even when partially damaged.
+    ///                              The value is  available in [5.0, 95.0]. Using 23.0 as default.
+    /// - Parameter layers         : The number of concentric squares (with a width of two pixels each) encoding the barcode data.
+    ///                              When this parameter is set to zero, Core Image automatically determines the appropriate number of layers to 
+    ///                              encode the message at the specified correction level. The value is available in [1.00, 32.00]. Using 0.00 as
+    ///                              default.
+    /// - Parameter compactStyle   : A Boolean value that determines whether to use the compact or full-size Aztec barcode format. 
+    ///                              The compact format can store up to 44 bytes of message data (including data added for correction) 
+    ///                              in up to 4 layers, producing a barcode image sized between 15 x 15 and 27 x 27 pixels. 
+    ///                              The full-size format can store up to 1914 bytes of message data (including correction) in up to 32 layers,
+    ///                              producing a barcode image sized no larger than 151 x 151 pixels. Using false as default.
+    /// - Parameter option         : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                              Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: An Aztec code image object.
+    public class func generateAztecCode(_ data: Data, correctionLevel: CGFloat = 23.0, layers: CGFloat = 0.0, compactStyle: Bool = false, option: RenderOption = .auto) -> UIImage! {
+        return generate("CIAztecCodeGenerator", inputParameters: ["inputMessage": data, "inputCorrectionLevel": correctionLevel, "inputLayers": layers, "inputCompactStyle": compactStyle], option: option)
+    }
+}
