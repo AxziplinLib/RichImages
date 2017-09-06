@@ -159,13 +159,10 @@ extension UIImage {
             fallthroughToCpu = true
             fallthrough
         case .gpu(_):
-            guard let ciImage = _makeCiImage()?.applying(CGAffineTransform(rotationAngle: angle)) else {
-                return fallthroughToCpu ? rotate(by: angle, option: option) : nil
+            if let image = applying("CIAffineTransform", inputParameters: ["inputTransform": CGAffineTransform(rotationAngle: angle)], option: option) {
+                return image
             }
-            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? rotate(by: angle, option: option) : nil }
-            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? rotate(by: angle, option: option) : nil }
-            
-            return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+            return fallthroughToCpu ? rotate(by: angle, option: option) : nil
         default:
             // Create the bitmap context.
             UIGraphicsBeginImageContextWithOptions(rotatedBox.size, false, scale)
@@ -198,13 +195,10 @@ extension UIImage {
             fallthroughToCpu = true
             fallthrough
         case .gpu(_):
-            guard let ciImage = _makeCiImage()?.applying(CGAffineTransform(scaleX: horizontally ? -1.0 : 1.0, y: horizontally ? 1.0 : -1.0)) else {
-                return fallthroughToCpu ? flip(horizontally: horizontally, option: option) : nil
+            if let image = applying("CIAffineTransform", inputParameters: ["inputTransform": CGAffineTransform(scaleX: horizontally ? -1.0 : 1.0, y: horizontally ? 1.0 : -1.0)], option: option) {
+                return image
             }
-            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? flip(horizontally: horizontally, option: option) : nil }
-            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? flip(horizontally: horizontally, option: option) : nil }
-            
-            return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+            return fallthroughToCpu ? flip(horizontally: horizontally, option: option) : nil
         default:
             let rect = CGRect(origin: .zero, size: scaledSize)
             UIGraphicsBeginImageContextWithOptions(rect.size, false, scale)
@@ -236,17 +230,7 @@ extension UIImage {
     ///
     /// - Returns: A scaled, high-quality copy of the recevier.
     public func scale(to scale: CGFloat, aspectRatio: CGFloat = 1.0, option: RenderOption = .auto) -> UIImage! {
-        switch option.dest {
-        case .auto  : fallthrough
-        case .gpu(_):
-            let inputParameters = ["inputScale": scale, "inputAspectRatio": aspectRatio]
-            guard let ciImage   = _makeCiImage()?.applyingFilter("CILanczosScaleTransform", withInputParameters: inputParameters) else { return nil }
-            guard let ciContext = _ciContext(at: option.dest) else { return nil }
-            guard let cgImage   = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-            
-            return UIImage(cgImage: cgImage, scale: self.scale, orientation: imageOrientation)
-        default: return nil
-        }
+        return applying("CILanczosScaleTransform", inputParameters: ["inputScale": scale, "inputAspectRatio": aspectRatio], option: option)
     }
 }
 
@@ -268,17 +252,7 @@ extension UIImage {
     ///
     /// - Returns: A perspective corrected copy of the recevier.
     public func perspectiveCorrect(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint, option: RenderOption = .auto) -> UIImage! {
-        switch option.dest {
-        case .auto  : fallthrough
-        case .gpu(_):
-            let inputParameters = ["inputTopLeft": CIVector(cgPoint: topLeft), "inputTopRight": CIVector(cgPoint: topRight), "inputBottomRight": CIVector(cgPoint: bottomRight), "inputBottomLeft": CIVector(cgPoint: bottomLeft)]
-            guard let ciImage   = _makeCiImage()?.applyingFilter("CIPerspectiveCorrection", withInputParameters: inputParameters) else { return nil }
-            guard let ciContext = _ciContext(at: option.dest) else { return nil }
-            guard let cgImage   = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-            
-            return UIImage(cgImage: cgImage, scale: self.scale, orientation: imageOrientation)
-        default: return nil
-        }
+        return applying("CIPerspectiveCorrection", inputParameters: ["inputTopLeft": CIVector(cgPoint: topLeft), "inputTopRight": CIVector(cgPoint: topRight), "inputBottomRight": CIVector(cgPoint: bottomRight), "inputBottomLeft": CIVector(cgPoint: bottomLeft)], option: option)
     }
     /// Alters the geometry of an image to simulate the observer changing viewing position.
     ///
@@ -296,17 +270,23 @@ extension UIImage {
     ///
     /// - Returns: A perspective corrected copy of the recevier.
     public func perspectiveTransform(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint, extent: CGRect? = nil, option: RenderOption = .auto) -> UIImage! {
-        switch option.dest {
-        case .auto  : fallthrough
-        case .gpu(_):
-            var inputParameters = ["inputTopLeft": CIVector(cgPoint: topLeft), "inputTopRight": CIVector(cgPoint: topRight), "inputBottomRight": CIVector(cgPoint: bottomRight), "inputBottomLeft": CIVector(cgPoint: bottomLeft)]
-            if let _ext = extent { inputParameters["inputExtent"] = CIVector(cgRect: _ext) }
-            guard let ciImage   = _makeCiImage()?.applyingFilter(extent == nil ? "CIPerspectiveTransform" : "CIPerspectiveTransformWithExtent", withInputParameters: inputParameters) else { return nil }
-            guard let ciContext = _ciContext(at: option.dest) else { return nil }
-            guard let cgImage   = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-            
-            return UIImage(cgImage: cgImage, scale: self.scale, orientation: imageOrientation)
-        default: return nil
-        }
+        var inputParameters = ["inputTopLeft": CIVector(cgPoint: topLeft), "inputTopRight": CIVector(cgPoint: topRight), "inputBottomRight": CIVector(cgPoint: bottomRight), "inputBottomLeft": CIVector(cgPoint: bottomLeft)]
+        if let _ext = extent { inputParameters["inputExtent"] = CIVector(cgRect: _ext) }
+        return applying(extent == nil ? "CIPerspectiveTransform" : "CIPerspectiveTransformWithExtent", inputParameters: inputParameters, option: option)
+    }
+}
+
+extension UIImage {
+    /// Rotates the source image by the specified angle in radians.
+    ///
+    /// The image is scaled and cropped so that the rotated image fits the extent of the input image.
+    ///
+    /// - Parameter angle : An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Angle.
+    ///                     Default value is 0.0.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: An image scaled and cropped to fit the extent of the input image.
+    public func straightenRotate(by angle: CGFloat, option: RenderOption = .auto) -> UIImage! {
+        return applying("CIStraightenFilter", inputParameters: ["inputAngle": angle], option: option)
     }
 }
