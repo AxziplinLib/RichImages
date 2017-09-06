@@ -111,9 +111,13 @@ extension UIImage {
     /// render destination for the processing.
     public struct RenderOption {
         /// The render destination of the image processing.
-        let dest: Destination
+        var dest: Destination
         /// The interpolation quality for the rescaling in CoreGraphics when using CPU as the render destination.
-        let quality: CGInterpolationQuality = .default
+        var quality: CGInterpolationQuality = .default
+        
+        init(dest: Destination) {
+            self.dest = dest
+        }
     }
 }
 
