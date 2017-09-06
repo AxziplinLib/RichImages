@@ -249,3 +249,35 @@ extension UIImage {
         }
     }
 }
+
+extension UIImage {
+    /// Applies a perspective correction, transforming an arbitrary quadrilateral region in the source image to a rectangular output image.
+    ///
+    /// Clients typically use this function to perspective correct an image immediately rather than chainning the filter processings.
+    ///
+    /// - Parameter topLeft    : The point in the input image to be mapped to the top left corner of the output image.
+    ///                          A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Top Left.
+    /// - Parameter topRight   : The point in the input image to be mapped to the top right corner of the output image.
+    ///                          A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Top Right.
+    /// - Parameter bottomLeft : The point in the input image to be mapped to the bottom left corner of the output image.
+    ///                          A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Bottom Left.
+    /// - Parameter bottomRight: The point in the input image to be mapped to the bottom right corner of the output image.
+    ///                          A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Bottom Right.
+    /// - Parameter option     : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                          Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A perspective corrected copy of the recevier.
+    public func perspectiveCorrect(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint, option: RenderOption = .auto) -> UIImage! {
+        switch option.dest {
+        case .auto  : fallthrough
+        case .gpu(_):
+            let inputParameters = ["inputTopLeft": CIVector(cgPoint: topLeft), "inputTopRight": CIVector(cgPoint: topRight), "inputBottomRight": CIVector(cgPoint: bottomRight), "inputBottomLeft": CIVector(cgPoint: bottomLeft)]
+            guard let ciImage   = _makeCiImage()?.applyingFilter("CIPerspectiveCorrection", withInputParameters: inputParameters) else { return nil }
+            guard let ciContext = _ciContext(at: option.dest) else { return nil }
+            guard let cgImage   = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+            
+            return UIImage(cgImage: cgImage, scale: self.scale, orientation: imageOrientation)
+        default: return nil
+        }
+    }
+}
