@@ -209,6 +209,35 @@ private var _gpuCIContext      = UIImage._GPUBasedCIContext()
 private var _metalCIContext    = UIImage._MetalBasedCIContext()
 private var _openGLESCIContext = UIImage._OpenGLESBasedCIContext()
 
+extension UIImage {
+    /// Returns a new image created by applying a filter to the original image with the specified name and parameters.
+    ///
+    /// Calling this method is equivalent to the following sequence of steps:
+    /// - Creating a CIFilter instance.
+    /// - Setting the original image.ciImage as the filter’s inputImage parameter.
+    /// - Setting the remaining filter parameters from the params dictionary.
+    /// - Retrieving the outputImage object from the filter.
+    ///
+    /// - Parameter filterName: The name of the filter to apply, as used when creating a CIFilter instance with the init(name:) method.
+    /// - Parameter params    : A dictionary whose key-value pairs are set as input values to the filter. Each key is a constant that
+    //                          specifies the name of an input parameter for the filter, and the corresponding value is the value for 
+    //                          that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
+    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: An image object representing the result of applying the filter.
+    public func applying(_ filterName:String, inputParameters params: [String: Any]?, option: RenderOption = .auto) -> UIImage! {
+        switch option.dest {
+        case .auto  : fallthrough
+        case .gpu(_):
+            guard let ciImage   = _makeCiImage()?.applyingFilter(filterName, withInputParameters: params) else { return nil }
+            guard let ciContext = _ciContext(at: option.dest) else { return nil }
+            guard let cgImage   = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+            
+            return UIImage(cgImage: cgImage, scale: self.scale, orientation: imageOrientation)
+        default: return nil
+        }
+    }
+}
 
 /// Initialize the required core image context for the given render destinations.
 ///
