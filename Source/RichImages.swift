@@ -135,6 +135,16 @@ extension UIImage.RenderOption {
     public static func gpu(_ gpu: Destination.GPU) -> UIImage.RenderOption {
         return UIImage.RenderOption(dest: .gpu(gpu))
     }
+    /// Creates an option of `RenderOption` with using `CPU` as the render destination and the specific interpolation quality.
+    ///
+    /// - Parameter quality: The interpolation quality for the rescaling in CoreGraphics when using CPU as the render destination.
+    ///
+    /// - Returns: An CPU-Based `RenderOption` with the given interpolation quality.
+    public static func cpu(_ quality: CGInterpolationQuality) -> UIImage.RenderOption {
+        var option = UIImage.RenderOption(dest: .cpu)
+        option.quality = quality
+        return option
+    }
 }
 
 // MARK: - RenderDestination.
