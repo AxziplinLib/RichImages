@@ -308,8 +308,8 @@ extension UIImage {
     }
     /// Generates a solid color image.
     ///
-    /// - Parameter color : A CIColor object whose display name is Color..
-    /// - Parameter size  : The size of the image in points.
+    /// - Parameter color : A CIColor object whose display name is Color to fill the result image.
+    /// - Parameter size  : The size of the image in pxiels.
     /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
