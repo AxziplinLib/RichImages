@@ -317,4 +317,31 @@ extension UIImage {
     public class func generateConstantColor(_ color: UIColor, size: CGSize = CGSize(width: 1.0, height: 1.0), option: RenderOption = .auto) -> UIImage! {
         return generate("CIConstantColorGenerator", inputParameters: ["inputColor": CIColor(color: color)], cropTo: CGRect(origin: .zero, size: size), option: option)
     }
+    /// Use this function to simulates a lens flare and creates a lens flare image.
+    ///
+    /// - Parameter center           : The center of the lens flare. A CIVector object whose attribute type is
+    ///                                CIAttributeTypePosition and whose display name is Center. Default value: [150 150].
+    /// - Parameter color            : Controls the proportion of red, green, and blue halos. A CIColor object whose display name is Color.
+    /// - Parameter haloRadius       : Controls the size of the lens flare. An NSNumber object whose attribute type is
+    ///                                CIAttributeTypeDistance and whose display name is Halo Radius. Default value: 70.00.
+    /// - Parameter haloWidth        : Controls the width of the lens flare, that is, the distance between the inner flare and the outer flare.
+    ///                                An NSNumber object whose attribute type is CIAttributeTypeDistance and whose display name is Halo Width.
+    ///                                Default value: 87.00.
+    /// - Parameter haloOverlap      : Controls how much the red, green, and blue halos overlap. A value of 0 means no overlap (a lot of separation).
+    ///                                A value of 1 means full overlap (white halos). An NSNumber object whose attribute type is CIAttributeTypeScalar
+    ///                                and whose display name is Halo Overlap. Default value: 0.77.
+    /// - Parameter striationStrength: Controls the brightness of the rainbow-colored halo area. An NSNumber object whose attribute type is 
+    ///                                CIAttributeTypeScalar and whose display name is Striation Strength. Default value: 0.50.
+    /// - Parameter striationContrast: Controls the contrast of the rainbow-colored halo area. An NSNumber object whose attribute type is
+    ///                                CIAttributeTypeScalar and whose display name is Striation Contrast. Default value: 1.00.
+    /// - Parameter time             : Adds a randomness to the lens flare; it causes the flare to "sparkle" as it changes through various 
+    ///                                time values. An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name 
+    ///                                is Time. Default value: 0.00.
+    /// - Parameter option           : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                                Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A lens flare effects image.
+    public class func generateLenticularHalo(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, haloRadius: CGFloat = 70.0, haloWidth: CGFloat = 87.0, haloOverlap: CGFloat = 0.77, striationStrength: CGFloat = 0.50, striationContrast: CGFloat = 1.0, time: TimeInterval = 0.0, option: RenderOption = .auto) -> UIImage! {
+        return generate("CILenticularHaloGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor": CIColor(color: color), "inputHaloRadius": haloRadius, "inputHaloWidth": haloWidth, "inputHaloOverlap": haloOverlap, "inputStriationStrength": striationStrength, "inputStriationContrast": striationContrast, "inputTime": time], option: option)
+    }
 }
