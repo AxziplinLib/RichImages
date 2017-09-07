@@ -264,6 +264,28 @@ extension UIImage {
     public class func generateQRCode(_ data: Data, correctionLevel: String = "M", option: RenderOption = .auto) -> UIImage! {
         return generate("CIQRCodeGenerator", inputParameters: ["inputMessage": data, "inputCorrectionLevel": correctionLevel], option: option)
     }
+    /// Generates a Code 128 one-dimensional barcode from input data.
+    ///
+    /// Generates an output image representing the input data according to the ISO/IEC 15417:2007 standard.
+    /// The width of each module (vertical line) of the barcode in the output image is one pixel. The height of the barcode is 32 pixels. 
+    /// To create a barcode from a string or URL, convert it to an NSData object using the NSASCIIStringEncoding string encoding.
+    ///
+    /// - Note: When you create a qr code image, you may need to resize the image to an expected size to display using:
+    ///
+    ///         image.resize(fits: expectedSizer, using: .scaleAspectFit, option: .cpu(.none))
+    ///
+    /// - Parameter data: The data to be encoded as a Code 128 barcode. Must not contain non-ASCII characters.
+    ///                   An Data object whose display name is Message.
+    /// - Parameter quietSpace: The number of pixels of added white space on each side of the barcode.
+    ///                         A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name is QuietSpace.
+    ///                         The value is available in [0.0, 20.0], using 7.0 as default.
+    /// - Parameter option         : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                              Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// 
+    /// - Returns: An image containing code 128 barcode info.
+    public class func generateCode128Barcode(_ data: Data, quietSpace: CGFloat = 7.0, option: RenderOption = .auto) -> UIImage! {
+        return generate("CICode128BarcodeGenerator", inputParameters: ["inputMessage": data, "inputQuietSpace": quietSpace], option: option)
+    }
 }
 
 extension UIImage {
