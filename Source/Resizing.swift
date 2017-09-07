@@ -190,7 +190,7 @@ extension UIImage {
             return resize(fills: size, option: option)
         }
         
-        let newSize = CGSize(width: (self.size.width * ratio).rounded(), height: (self.size.width * ratio).rounded())
+        let newSize = CGSize(width: (self.size.width * ratio).rounded(), height: (self.size.height * ratio).rounded())
         return resize(fills: newSize, option: option)
     }
     /// Creates a rescaled copy of the image, taking into account its orientation in points. Animated image supported.
