@@ -279,8 +279,8 @@ extension UIImage {
     /// - Parameter quietSpace: The number of pixels of added white space on each side of the barcode.
     ///                         A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name is QuietSpace.
     ///                         The value is available in [0.0, 20.0], using 7.0 as default.
-    /// - Parameter option         : A value of `RenderOption` indicates the rendering options of the image scaling processing.
-    ///                              Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// 
     /// - Returns: An image containing code 128 barcode info.
     public class func generateCode128Barcode(_ data: Data, quietSpace: CGFloat = 7.0, option: RenderOption = .auto) -> UIImage! {
@@ -305,5 +305,16 @@ extension UIImage {
     /// - Returns: A checkerboard pattern image.
     public class func generateCheckerboard(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, inputWidth: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
         return generate("CICheckerboardGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1), "inputWidth": inputWidth, "inputSharpness": sharpness], cropTo: CGRect(origin: .zero, size: size), option: option)
+    }
+    /// Generates a solid color image.
+    ///
+    /// - Parameter color : A CIColor object whose display name is Color..
+    /// - Parameter size  : The size of the image in points.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: An solid color image with the given size.
+    public class func generateConstantColor(_ color: UIColor, size: CGSize = CGSize(width: 1.0, height: 1.0), option: RenderOption = .auto) -> UIImage! {
+        return generate("CIConstantColorGenerator", inputParameters: ["inputColor": CIColor(color: color)], cropTo: CGRect(origin: .zero, size: size), option: option)
     }
 }
