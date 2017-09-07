@@ -237,4 +237,51 @@ extension UIImage {
     public class func generateAztecCode(_ data: Data, correctionLevel: CGFloat = 23.0, layers: CGFloat = 0.0, compactStyle: Bool = false, option: RenderOption = .auto) -> UIImage! {
         return generate("CIAztecCodeGenerator", inputParameters: ["inputMessage": data, "inputCorrectionLevel": correctionLevel, "inputLayers": layers, "inputCompactStyle": compactStyle], option: option)
     }
+    /// Generates a Quick Response code (two-dimensional barcode) from input data.
+    ///
+    /// Generates an output image representing the input data according to the ISO/IEC 18004:2006 standard. 
+    /// The width and height of each module (square dot) of the code in the output image is one point. 
+    /// To create a QR code from a string or URL, convert it to an NSData object using the NSISOLatin1StringEncoding string encoding.
+    /// The inputCorrectionLevel parameter controls the amount of additional data encoded in the output image to 
+    /// provide error correction. Higher levels of error correction result in larger output images but allow larger areas 
+    /// of the code to be damaged or obscured without. There are four possible correction modes (with corresponding error resilience levels):
+    /// * L: 7%
+    /// * M: 15%
+    /// * Q: 25%
+    /// * H: 30%
+    ///
+    /// - Note: When you create a qr code image, you may need to resize the image to an expected size to display using:
+    ///
+    ///         image.resize(fills: expectedSize), option: .cpu(.none))
+    ///
+    /// - Parameter data           : The data to be encoded as a QR code. An NSData object whose display name is Message.
+    /// - Parameter correctionLevel: A single letter specifying the error correction format. An NSString object whose display name is CorrectionLevel.
+    ///                              Default value: M
+    /// - Parameter option         : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                              Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: An image containing QRCode infos.
+    public class func generateQRCode(_ data: Data, correctionLevel: String = "M", option: RenderOption = .auto) -> UIImage! {
+        return generate("CIQRCodeGenerator", inputParameters: ["inputMessage": data, "inputCorrectionLevel": correctionLevel], option: option)
+    }
+}
+
+extension UIImage {
+    /// Generates a checkerboard pattern image.
+    ///
+    /// You can specify the checkerboard size and colors, and the sharpness of the pattern.
+    ///
+    /// - Parameter center    : A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Center.
+    ///                         Default value: [150 150].
+    /// - Parameter color0    : A CIColor object whose display name is Color 1.
+    /// - Parameter color1    : A CIColor object whose display name is Color 2.
+    /// - Parameter inputWidth: An NSNumber object whose attribute type is CIAttributeTypeDistance and whose display name is Width.
+    ///                         Default value: 80.00.
+    /// - Parameter sharpness : An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Sharpness.
+    ///                         Default value: 1.00
+    /// 
+    /// - Returns: A checkerboard pattern image.
+    public class func generateCheckerboard(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, inputWidth: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
+        return generate("CICheckerboardGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1), "inputWidth": inputWidth, "inputSharpness": sharpness], cropTo: CGRect(origin: .zero, size: size), option: option)
+    }
 }
