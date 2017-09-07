@@ -20,7 +20,7 @@ extension UIImage {
     ///
     /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rounding processing.
     /// - Returns: Returns an copy of the receiver with critical rounded.
-    public func makeCornered(_ option: RenderOption = .cpu) -> UIImage! { return round(by: min(scaledWidth, scaledHeight) * 0.5, option: option) }
+    public func makeCornered(_ option: RenderOption = .cpu) -> UIImage! { return round(by: min(size.width, size.height) * 0.5, option: option) }
     /// Creates a copy of this image with rounded corners in points. Animated image supported. Animated image supported.
     ///
     /// - Parameter radius: The width of the corner drawing. The value must not be negative.
