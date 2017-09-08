@@ -295,25 +295,25 @@ extension UIImage {
     /// an NSData object using the NSISOLatin1StringEncoding string encoding.
     /// 
     /// - Parameter data                   : The data to be encoded as a barcode. An NSData object whose display name is Message.
-    /// - Parameter minWidth               : The minimum width of the barcode’s data area, in pixels. An NSNumber object whose display name
+    /// - Parameter minWidth               : The minimum width of the barcode’s data area, in pixels. A CGFloat value whose display name
     ///                                      is MinWidth. The value is available in [56.0, 583.0]. Using 56.0 as default.
-    /// - Parameter maxWidth               : The maximum width of the barcode’s data area, in pixels. An NSNumber object whose display name
+    /// - Parameter maxWidth               : The maximum width of the barcode’s data area, in pixels. A CGFloat value whose display name
     ///                                      is MaxWidth. The value is available in [56.0, 583.0]. Using 56.0 * 2.0 as default.
-    /// - Parameter minHeight              : The minimum height of the barcode’s data area, in pixels. An NSNumber object whose display name
+    /// - Parameter minHeight              : The minimum height of the barcode’s data area, in pixels. A CGFloat value whose display name
     ///                                      is MinHeight. The value is available in [13.00, 283.00]. Using 13.0 as default.
-    /// - Parameter maxHeight              : The maximum height of the barcode’s data area, in pixels. An NSNumber object whose display name
+    /// - Parameter maxHeight              : The maximum height of the barcode’s data area, in pixels. A CGFloat value whose display name
     ///                                      is MaxHeight. The value is available in [13.00, 283.00]. Using 13.0 * 2.0 as default.
     /// - Parameter dataColumns            : The number of data columns in the generated code. If zero, the generator uses a number of columns
-    ///                                      based on the width, height, and aspect ratio. An NSNumber object whose display name is DataColumns. 
+    ///                                      based on the width, height, and aspect ratio. A CGFloat value whose display name is DataColumns. 
     ///                                      The value is available in [1, 30]. Using 30 as default.
     /// - Parameter rows                   : The number of data rows in the generated code. If zero, the generator uses a number of rows
-    ///                                      based on the width, height, and aspect ratio. An NSNumber object whose display name is Rows.
+    ///                                      based on the width, height, and aspect ratio. A CGFloat value whose display name is Rows.
     ///                                      The value is available in [3, 90]. Using 3 as default.
     /// - Parameter preferredAspectRatio   : The preferred ratio of width over height for the generated barcode. The generator approximates
     ///                                      this with an actual aspect ratio based on the data and other parameters you specify. An NSNumber 
     ///                                      object whose display name is PreferredAspectRatio. The value is available in [0.00, 922337203685
     ///                                      4775808.00]. Using 3.0 as default.
-    /// - Parameter compactionMode         : An option that determines which method the generator uses to compress data. An NSNumber object
+    /// - Parameter compactionMode         : An option that determines which method the generator uses to compress data. A CGFloat value
     ///                                      whose display name is CompactionMode. The value is available in [0, 1, 2, 3]. Using 0 as default.
     ///   - 0, Automatic. The generator automatically chooses a compression method. This option is the default.
     ///   - 1, Numeric. Valid only when the message is an ASCII-encoded string of digits, achieving optimal compression for that type of data.
@@ -321,15 +321,15 @@ extension UIImage {
     ///     achieving optimal compression for that type of data.
     ///   - 3, Byte. Valid for any data, but least compact.
     /// - Parameter compactStyle           : A Boolean value that determines whether to omit redundant elements to make the generated barcode
-    ///                                      more compact. An NSNumber object whose display name is CompactStyle. Using false as default.
+    ///                                      more compact. A CGFloat value whose display name is CompactStyle. Using false as default.
     /// - Parameter correctionLevel        : An integer between 0 and 8, inclusive, that determines the amount of redundancy to include
     ///                                      in the barcode’s data to prevent errors when the barcode is read. If unspecified, the generator
-    ///                                      chooses a correction level based on the size of the message data. An NSNumber object whose
+    ///                                      chooses a correction level based on the size of the message data. A CGFloat value whose
     ///                                      display name is CorrectionLevel. The value is available in [0, 8]. Using 4 as default.
     /// - Parameter alwaysSpecifyCompaction: A Boolean value that determines whether to include information about the compaction mode 
     ///                                      in the barcode even when such information is redundant. (If a PDF417 barcode does not 
     ///                                      contain compaction mode information, a reader assumes text-based compaction. Some barcodes
-    ///                                      include this information even when using text-based compaction.). An NSNumber object whose 
+    ///                                      include this information even when using text-based compaction.). A CGFloat value whose 
     ///                                      display name is AlwaysSpecifyCompaction. Using false as default.
     /// - Parameter option                 : A value of `RenderOption` indicates the rendering options of the image scaling processing.
     ///                                      Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
@@ -345,18 +345,20 @@ extension UIImage {
     ///
     /// You can specify the checkerboard size and colors, and the sharpness of the pattern.
     ///
-    /// - Parameter center    : A CGPoint object whose attribute type is CIAttributeTypePosition and whose display name is Center.
+    /// - Parameter center    : A CGPoint value whose attribute type is CIAttributeTypePosition and whose display name is Center.
     ///                         Default value: [150 150].
     /// - Parameter color0    : A UIColor object whose display name is Color 1.
     /// - Parameter color1    : A UIColor object whose display name is Color 2.
-    /// - Parameter inputWidth: An NSNumber object whose attribute type is CIAttributeTypeDistance and whose display name is Width.
+    /// - Parameter inputWidth: A CGFloat value whose attribute type is CIAttributeTypeDistance and whose display name is Width.
     ///                         Default value: 80.00.
-    /// - Parameter sharpness : An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Sharpness.
+    /// - Parameter sharpness : A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name is Sharpness.
     ///                         Default value: 1.00
-    /// 
+    /// - Parameter size      : The size of the generated checkerboard pattern image.
+    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A checkerboard pattern image.
     public class func generateCheckerboard(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, inputWidth: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
-        return generate("CICheckerboardGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1), "inputWidth": inputWidth, "inputSharpness": sharpness], cropTo: CGRect(origin: .zero, size: size), option: option)
+        return generate("CICheckerboardGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1), "inputWidth": inputWidth, "inputSharpness": sharpness], cropTo: CGRect(origin: CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5), size: size), option: option)
     }
     /// Generates a solid color image.
     ///
@@ -371,23 +373,23 @@ extension UIImage {
     }
     /// Use this function to simulates a lens flare and creates a lens flare image.
     ///
-    /// - Parameter center           : The center of the lens flare. A CGPoint object whose attribute type is
+    /// - Parameter center           : The center of the lens flare. A CGPoint value whose attribute type is
     ///                                CIAttributeTypePosition and whose display name is Center. Default value: [150 150].
     /// - Parameter color            : Controls the proportion of red, green, and blue halos. A UIColor object whose display name is Color.
-    /// - Parameter haloRadius       : Controls the size of the lens flare. An NSNumber object whose attribute type is
+    /// - Parameter haloRadius       : Controls the size of the lens flare. A CGFloat value whose attribute type is
     ///                                CIAttributeTypeDistance and whose display name is Halo Radius. Default value: 70.00.
     /// - Parameter haloWidth        : Controls the width of the lens flare, that is, the distance between the inner flare and the outer flare.
-    ///                                An NSNumber object whose attribute type is CIAttributeTypeDistance and whose display name is Halo Width.
+    ///                                A CGFloat value whose attribute type is CIAttributeTypeDistance and whose display name is Halo Width.
     ///                                Default value: 87.00.
     /// - Parameter haloOverlap      : Controls how much the red, green, and blue halos overlap. A value of 0 means no overlap (a lot of separation).
-    ///                                A value of 1 means full overlap (white halos). An NSNumber object whose attribute type is CIAttributeTypeScalar
+    ///                                A value of 1 means full overlap (white halos). A CGFloat value whose attribute type is CIAttributeTypeScalar
     ///                                and whose display name is Halo Overlap. Default value: 0.77.
-    /// - Parameter striationStrength: Controls the brightness of the rainbow-colored halo area. An NSNumber object whose attribute type is 
+    /// - Parameter striationStrength: Controls the brightness of the rainbow-colored halo area. A CGFloat value whose attribute type is 
     ///                                CIAttributeTypeScalar and whose display name is Striation Strength. Default value: 0.50.
-    /// - Parameter striationContrast: Controls the contrast of the rainbow-colored halo area. An NSNumber object whose attribute type is
+    /// - Parameter striationContrast: Controls the contrast of the rainbow-colored halo area. A CGFloat value whose attribute type is
     ///                                CIAttributeTypeScalar and whose display name is Striation Contrast. Default value: 1.00.
     /// - Parameter time             : Adds a randomness to the lens flare; it causes the flare to "sparkle" as it changes through various 
-    ///                                time values. An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name 
+    ///                                time values. A TimeInterval value whose attribute type is CIAttributeTypeScalar and whose display name
     ///                                is Time. Default value: 0.00.
     /// - Parameter option           : A value of `RenderOption` indicates the rendering options of the image scaling processing.
     ///                                Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
@@ -409,22 +411,23 @@ extension UIImage {
     }
     /// Generates a starburst pattern that is similar to a supernova; can be used to simulate a lens flare.
     ///
-    /// - Parameter center      : The center of the flare. A CGPoint object whose attribute type is CIAttributeTypePosition
+    /// - Parameter center      : The center of the flare. A CGPoint value whose attribute type is CIAttributeTypePosition
     ///                           and whose display name is Center. Default value: [150 150].
     /// - Parameter color       : The color of the flare. A UIColor object whose display name is Color.
-    /// - Parameter radius      : Controls the size of the flare. An NSNumber object whose attribute type is CIAttributeTypeDistance
+    /// - Parameter radius      : Controls the size of the flare. A CGFloat value whose attribute type is CIAttributeTypeDistance
     ///                           and whose display name is Radius. Default value: 50.00.
     /// - Parameter crossScale  : Controls the ratio of the cross flare size relative to the round central flare. An NSNumber
     ///                           object whose attribute type is CIAttributeTypeScalar and whose display name is Cross Scale.
     ///                           Default value: 15.00.
-    /// - Parameter crossAngle  : Controls the angle of the flare. An NSNumber object whose attribute type is CIAttributeTypeAngle
+    /// - Parameter crossAngle  : Controls the angle of the flare. A CGFloat value whose attribute type is CIAttributeTypeAngle
     ///                           and whose display name is Cross Angle. Default value: 0.60.
-    /// - Parameter crossOpacity: Controls the thickness of the cross flare. An NSNumber object whose attribute type is 
+    /// - Parameter crossOpacity: Controls the thickness of the cross flare. A CGFloat value whose attribute type is 
     ///                           CIAttributeTypeScalar and whose display name is Cross Opacity. Default value: -2.00.
-    /// - Parameter crossWidth  : Has the same overall effect as the inputCrossOpacity parameter. An NSNumber object whose
+    /// - Parameter crossWidth  : Has the same overall effect as the inputCrossOpacity parameter. A CGFloat value whose
     ///                           attribute type is CIAttributeTypeDistance and whose display name is Cross Width. Default value: 2.50
-    /// - Parameter epsilon     : An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Epsilon.
+    /// - Parameter epsilon     : A NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Epsilon.
     ///                           Default value: -2.00.
+    /// - Parameter size        : The size of the generated starburst pattern image.
     /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
     ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
@@ -436,17 +439,42 @@ extension UIImage {
     ///
     /// You can control the color of the stripes, the spacing, and the contrast.
     ///
-    /// - Parameter center   : A CGPoint object whose attribute type is CIAttributeTypePosition and whose display name
+    /// - Parameter center   : A CGPoint value whose attribute type is CIAttributeTypePosition and whose display name
     ///                        is Center. Default value: [150 150].
     /// - Parameter color0   : A UIColor object whose display name is Color 1.
     /// - Parameter color1   : A UIColor object whose display name is Color 2.
-    /// - Parameter width    : An NSNumber object whose attribute type is CIAttributeTypeDistance and whose display name
+    /// - Parameter width    : A CGFloat value whose attribute type is CIAttributeTypeDistance and whose display name
     ///                        is Width. Default value: 80.00.
-    /// - Parameter sharpness: An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name 
+    /// - Parameter sharpness: A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name
     ///                        is Sharpness. Default value: 1.00.
+    /// - Parameter size     : The size of the generated stripe pattern image. Default value [300.0, 300.0].
     /// - Parameter option   : A value of `RenderOption` indicates the rendering options of the image scaling processing.
     ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
-    public class func generateStripes(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, width: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
+    /// 
+    /// - Returns: A stripe pattern image.
+    public class func generateStripes(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, width: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize = CGSize(width: 300.0, height: 300.0), option: RenderOption = .auto) -> UIImage! {
         return generate("CIStripesGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1), "inputWidth": width], cropTo: CGRect(origin: CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5), size: size), option: option)
+    }
+    /// Generates a sun effect.
+    ///
+    /// - Parameter center            : A CGPoint value whose attribute type is CIAttributeTypePosition and whose display name
+    ///                                 is Center. Default value: [150 150].
+    /// - Parameter color             : A UIColor object whose display name is Color.
+    /// - Parameter sunRadius         : A CGFloat value whose attribute type is CIAttributeTypeDistance and whose display name
+    ///                                 is Sun Radius. Default value: 40.00.
+    /// - Parameter maxStriationRadius: A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display
+    ///                                 name is Maximum Striation Radius. Default value: 2.58.
+    /// - Parameter striationStrength : A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display
+    /// - Parameter striationContrast : A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display
+    ///                                 name is Striation Contrast. Default value: 1.38.
+    ///                                 name is Striation Strength. Default value: 0.50.
+    /// - Parameter time              : A TimeInterval value whose attribute type is CIAttributeTypeScalar and whose display name
+    ///                                 is Time. Default value: 0.00.
+    /// - Parameter option            : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                                 Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A sun effect image.
+    public class func generateSunbeams(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, sunRadius: CGFloat = 40.0, maxStriationRadius: CGFloat = 2.58, striationStrength: CGFloat = 0.5, striationContrast: CGFloat = 1.38, time: TimeInterval = 0.0, option: RenderOption = .auto) -> UIImage! {
+        return generate("CISunbeamsGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor": CIColor(color: color), "inputSunRadius": sunRadius, "inputMaxStriationRadius": maxStriationRadius, "inputStriationStrength": striationStrength, "inputStriationContrast": striationContrast, "inputTime": time], cropTo: nil, option: option)
     }
 }
