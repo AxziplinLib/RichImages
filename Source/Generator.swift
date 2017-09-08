@@ -345,10 +345,10 @@ extension UIImage {
     ///
     /// You can specify the checkerboard size and colors, and the sharpness of the pattern.
     ///
-    /// - Parameter center    : A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Center.
+    /// - Parameter center    : A CGPoint object whose attribute type is CIAttributeTypePosition and whose display name is Center.
     ///                         Default value: [150 150].
-    /// - Parameter color0    : A CIColor object whose display name is Color 1.
-    /// - Parameter color1    : A CIColor object whose display name is Color 2.
+    /// - Parameter color0    : A UIColor object whose display name is Color 1.
+    /// - Parameter color1    : A UIColor object whose display name is Color 2.
     /// - Parameter inputWidth: An NSNumber object whose attribute type is CIAttributeTypeDistance and whose display name is Width.
     ///                         Default value: 80.00.
     /// - Parameter sharpness : An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Sharpness.
@@ -360,7 +360,7 @@ extension UIImage {
     }
     /// Generates a solid color image.
     ///
-    /// - Parameter color : A CIColor object whose display name is Color to fill the result image.
+    /// - Parameter color : A UIColor object whose display name is Color to fill the result image.
     /// - Parameter size  : The size of the image in pxiels.
     /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
@@ -371,9 +371,9 @@ extension UIImage {
     }
     /// Use this function to simulates a lens flare and creates a lens flare image.
     ///
-    /// - Parameter center           : The center of the lens flare. A CIVector object whose attribute type is
+    /// - Parameter center           : The center of the lens flare. A CGPoint object whose attribute type is
     ///                                CIAttributeTypePosition and whose display name is Center. Default value: [150 150].
-    /// - Parameter color            : Controls the proportion of red, green, and blue halos. A CIColor object whose display name is Color.
+    /// - Parameter color            : Controls the proportion of red, green, and blue halos. A UIColor object whose display name is Color.
     /// - Parameter haloRadius       : Controls the size of the lens flare. An NSNumber object whose attribute type is
     ///                                CIAttributeTypeDistance and whose display name is Halo Radius. Default value: 70.00.
     /// - Parameter haloWidth        : Controls the width of the lens flare, that is, the distance between the inner flare and the outer flare.
@@ -409,9 +409,9 @@ extension UIImage {
     }
     /// Generates a starburst pattern that is similar to a supernova; can be used to simulate a lens flare.
     ///
-    /// - Parameter center      : The center of the flare. A CIVector object whose attribute type is CIAttributeTypePosition
+    /// - Parameter center      : The center of the flare. A CGPoint object whose attribute type is CIAttributeTypePosition
     ///                           and whose display name is Center. Default value: [150 150].
-    /// - Parameter color       : The color of the flare. A CIColor object whose display name is Color.
+    /// - Parameter color       : The color of the flare. A UIColor object whose display name is Color.
     /// - Parameter radius      : Controls the size of the flare. An NSNumber object whose attribute type is CIAttributeTypeDistance
     ///                           and whose display name is Radius. Default value: 50.00.
     /// - Parameter crossScale  : Controls the ratio of the cross flare size relative to the round central flare. An NSNumber
@@ -431,5 +431,22 @@ extension UIImage {
     /// - Returns: A starburst pattern image that is similar to a supernova.
     public class func generateStarShine(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, radius: CGFloat = 50.0, crossScale: CGFloat = 15.0, crossAngle: CGFloat = 0.60, crossOpacity: CGFloat = -2.0, crossWidth: CGFloat = 2.5, epsilon: CGFloat = -2.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
         return generate("CIStarShineGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor": CIColor(color: color), "inputRadius": radius, "inputCrossScale": crossScale, "inputCrossAngle": crossAngle, "inputCrossOpacity": crossOpacity, "inputCrossWidth": crossWidth, "inputEpsilon": epsilon], cropTo: CGRect(origin: CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5), size: size), option: option)
+    }
+    /// Generates a stripe pattern.
+    ///
+    /// You can control the color of the stripes, the spacing, and the contrast.
+    ///
+    /// - Parameter center   : A CGPoint object whose attribute type is CIAttributeTypePosition and whose display name
+    ///                        is Center. Default value: [150 150].
+    /// - Parameter color0   : A UIColor object whose display name is Color 1.
+    /// - Parameter color1   : A UIColor object whose display name is Color 2.
+    /// - Parameter width    : An NSNumber object whose attribute type is CIAttributeTypeDistance and whose display name
+    ///                        is Width. Default value: 80.00.
+    /// - Parameter sharpness: An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name 
+    ///                        is Sharpness. Default value: 1.00.
+    /// - Parameter option   : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    public class func generateStripes(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, width: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
+        return generate("CIStripesGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1), "inputWidth": width], cropTo: CGRect(origin: CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5), size: size), option: option)
     }
 }
