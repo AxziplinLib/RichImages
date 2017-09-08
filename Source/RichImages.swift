@@ -299,7 +299,7 @@ extension UIImage {
         case .auto  : fallthrough
         case .gpu(_):
             var input: CIImage!
-            if CIFilter.filterNames(inCategory: kCICategoryGenerator).contains(filterName) {// The filter is generator. The image is not needed.
+            if CIFilter.filterNames(inCategory: kCICategoryGenerator).contains(filterName) && image == nil {// The filter is generator. And the image is not needed.
                 input = CIFilter(name: filterName, withInputParameters: params)?.outputImage
                 // Some of the generator filters need to be cropped before they can be displayed. 
                 /// Crop the input to the given rect if any.
@@ -310,12 +310,31 @@ extension UIImage {
                 input = image?._makeCiImage()?.applyingFilter(filterName, withInputParameters: params)
             }
             guard let ciImage   = input else { return nil }
-            guard let ciContext = _ciContext(at: option.dest) else { return nil }
-            guard let cgImage   = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return nil }
             
-            return UIImage(cgImage: cgImage, scale: image?.scale ?? scale, orientation: image?.imageOrientation ?? orientation)
+            return make(ciImage, scale: image?.scale ?? scale, orientation: image?.imageOrientation ?? orientation, option: option)
         default: return nil
         }
+    }
+    /// Creates the UIImage instance from a given CIImage with the given scale, orientation and redner option.
+    ///
+    /// - Note: The CIImage is rendered using the render destination in the render option and `.cpu` mode is not supported.
+    ///
+    /// - Parameter ciImage     : The core image to be rendered to the UIImage.
+    /// - Parameter scale       : A float value indicates the scale of the image mapping from pxiels to points. The `scale` of the given
+    ///                           image will be used as the result image's scale and this given value will be ignored if the given image
+    ///                           is not nil. Default using the scale of the main screen.
+    /// - Parameter orientation : A value of `UIImageOrientation` indicates the orientation of  the result UIImage. The `orientation` of
+    ///                           the given image will be used as the result image's scale and this given value will be ignored if the
+    ///                           given image is not nil. Default using `.up`.
+    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: An UIImage object contains bitmap(CGImage-Based) data rather than core image data.
+    public class func make(_ ciImage: CIImage, from extent: CGRect? = nil, scale: CGFloat = UIScreen.main.scale, orientation: UIImageOrientation = .up, option: RenderOption) -> UIImage! {
+        guard let ciContext = _ciContext(at: option.dest)                                      else { return nil }
+        guard let cgImage   = ciContext.createCGImage(ciImage, from: extent ?? ciImage.extent) else { return nil }
+        
+        return UIImage(cgImage: cgImage, scale: scale, orientation: orientation)
     }
 }
 
