@@ -310,8 +310,8 @@ extension UIImage {
     ///                                      based on the width, height, and aspect ratio. A CGFloat value whose display name is Rows.
     ///                                      The value is available in [3, 90]. Using 3 as default.
     /// - Parameter preferredAspectRatio   : The preferred ratio of width over height for the generated barcode. The generator approximates
-    ///                                      this with an actual aspect ratio based on the data and other parameters you specify. An NSNumber 
-    ///                                      object whose display name is PreferredAspectRatio. The value is available in [0.00, 922337203685
+    ///                                      this with an actual aspect ratio based on the data and other parameters you specify. A CGPoint 
+    ///                                      value whose display name is PreferredAspectRatio. The value is available in [0.00, 922337203685
     ///                                      4775808.00]. Using 3.0 as default.
     /// - Parameter compactionMode         : An option that determines which method the generator uses to compress data. A CGFloat value
     ///                                      whose display name is CompactionMode. The value is available in [0, 1, 2, 3]. Using 0 as default.
@@ -416,8 +416,8 @@ extension UIImage {
     /// - Parameter color       : The color of the flare. A UIColor object whose display name is Color.
     /// - Parameter radius      : Controls the size of the flare. A CGFloat value whose attribute type is CIAttributeTypeDistance
     ///                           and whose display name is Radius. Default value: 50.00.
-    /// - Parameter crossScale  : Controls the ratio of the cross flare size relative to the round central flare. An NSNumber
-    ///                           object whose attribute type is CIAttributeTypeScalar and whose display name is Cross Scale.
+    /// - Parameter crossScale  : Controls the ratio of the cross flare size relative to the round central flare. A CGPoint
+    ///                           value whose attribute type is CIAttributeTypeScalar and whose display name is Cross Scale.
     ///                           Default value: 15.00.
     /// - Parameter crossAngle  : Controls the angle of the flare. A CGFloat value whose attribute type is CIAttributeTypeAngle
     ///                           and whose display name is Cross Angle. Default value: 0.60.
@@ -425,7 +425,7 @@ extension UIImage {
     ///                           CIAttributeTypeScalar and whose display name is Cross Opacity. Default value: -2.00.
     /// - Parameter crossWidth  : Has the same overall effect as the inputCrossOpacity parameter. A CGFloat value whose
     ///                           attribute type is CIAttributeTypeDistance and whose display name is Cross Width. Default value: 2.50
-    /// - Parameter epsilon     : A NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Epsilon.
+    /// - Parameter epsilon     : A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name is Epsilon.
     ///                           Default value: -2.00.
     /// - Parameter size        : The size of the generated starburst pattern image.
     /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
