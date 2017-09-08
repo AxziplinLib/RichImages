@@ -338,16 +338,6 @@ extension UIImage {
     public class func generatePDF417Barcode(_ data: Data, minWidth: CGFloat = 56.00, maxWidth: CGFloat = 56.00 * 2.0, minHeight: CGFloat = 13.00, maxHeight: CGFloat = 13.00 * 2.0, dataColumns: Int = 30, rows: Int = 3, preferredAspectRatio: CGFloat = 3.0, compactionMode: Int = 0, compactStyle: Bool = false, correctionLevel: Int = 4, alwaysSpecifyCompaction: Bool = false, option: RenderOption = .auto) -> UIImage! {
         return generate("CIPDF417BarcodeGenerator", inputParameters: ["inputMessage": data, "inputMinWidth": minWidth, "inputMaxWidth": maxWidth, "inputMinHeight": minHeight, "inputMaxHeight": maxHeight, "inputDataColumns": dataColumns, "inputRows": rows, "inputPreferredAspectRatio": preferredAspectRatio, "inputCompactionMode": compactionMode, "inputCompactStyle": compactStyle, "inputCorrectionLevel": correctionLevel, "inputAlwaysSpecifyCompaction": alwaysSpecifyCompaction], cropTo: nil, option: option)
     }
-    /// Generates an image of infinite extent whose pixel values are made up of four independent, uniformly-distributed 
-    /// random numbers in the 0 to 1 range.
-    ///
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
-    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
-    ///
-    /// - Returns: A random pixels image.
-    public class func generateRandom(size: CGSize, option: RenderOption = .auto) -> UIImage! {
-        return generate("CIRandomGenerator", inputParameters: nil, cropTo: CGRect(origin: .zero, size: size), option: option)
-    }
 }
 
 extension UIImage {
@@ -405,5 +395,41 @@ extension UIImage {
     /// - Returns: A lens flare effects image.
     public class func generateLenticularHalo(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, haloRadius: CGFloat = 70.0, haloWidth: CGFloat = 87.0, haloOverlap: CGFloat = 0.77, striationStrength: CGFloat = 0.50, striationContrast: CGFloat = 1.0, time: TimeInterval = 0.0, option: RenderOption = .auto) -> UIImage! {
         return generate("CILenticularHaloGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor": CIColor(color: color), "inputHaloRadius": haloRadius, "inputHaloWidth": haloWidth, "inputHaloOverlap": haloOverlap, "inputStriationStrength": striationStrength, "inputStriationContrast": striationContrast, "inputTime": time], option: option)
+    }
+    /// Generates an image of infinite extent whose pixel values are made up of four independent, uniformly-distributed
+    /// random numbers in the 0 to 1 range.
+    ///
+    /// - Parameter size  : The size of the target image to displat in pxiels.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A random pixels image.
+    public class func generateRandom(size: CGSize, option: RenderOption = .auto) -> UIImage! {
+        return generate("CIRandomGenerator", inputParameters: nil, cropTo: CGRect(origin: .zero, size: size), option: option)
+    }
+    /// Generates a starburst pattern that is similar to a supernova; can be used to simulate a lens flare.
+    ///
+    /// - Parameter center      : The center of the flare. A CIVector object whose attribute type is CIAttributeTypePosition
+    ///                           and whose display name is Center. Default value: [150 150].
+    /// - Parameter color       : The color of the flare. A CIColor object whose display name is Color.
+    /// - Parameter radius      : Controls the size of the flare. An NSNumber object whose attribute type is CIAttributeTypeDistance
+    ///                           and whose display name is Radius. Default value: 50.00.
+    /// - Parameter crossScale  : Controls the ratio of the cross flare size relative to the round central flare. An NSNumber
+    ///                           object whose attribute type is CIAttributeTypeScalar and whose display name is Cross Scale.
+    ///                           Default value: 15.00.
+    /// - Parameter crossAngle  : Controls the angle of the flare. An NSNumber object whose attribute type is CIAttributeTypeAngle
+    ///                           and whose display name is Cross Angle. Default value: 0.60.
+    /// - Parameter crossOpacity: Controls the thickness of the cross flare. An NSNumber object whose attribute type is 
+    ///                           CIAttributeTypeScalar and whose display name is Cross Opacity. Default value: -2.00.
+    /// - Parameter crossWidth  : Has the same overall effect as the inputCrossOpacity parameter. An NSNumber object whose
+    ///                           attribute type is CIAttributeTypeDistance and whose display name is Cross Width. Default value: 2.50
+    /// - Parameter epsilon     : An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Epsilon.
+    ///                           Default value: -2.00.
+    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A starburst pattern image that is similar to a supernova.
+    public class func generateStarShine(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, radius: CGFloat = 50.0, crossScale: CGFloat = 15.0, crossAngle: CGFloat = 0.60, crossOpacity: CGFloat = -2.0, crossWidth: CGFloat = 2.5, epsilon: CGFloat = -2.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
+        return generate("CIStarShineGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor": CIColor(color: color), "inputRadius": radius, "inputCrossScale": crossScale, "inputCrossAngle": crossAngle, "inputCrossOpacity": crossOpacity, "inputCrossWidth": crossWidth, "inputEpsilon": epsilon], cropTo: CGRect(origin: CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5), size: size), option: option)
     }
 }
