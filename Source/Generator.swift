@@ -286,6 +286,58 @@ extension UIImage {
     public class func generateCode128Barcode(_ data: Data, quietSpace: CGFloat = 7.0, option: RenderOption = .auto) -> UIImage! {
         return generate("CICode128BarcodeGenerator", inputParameters: ["inputMessage": data, "inputQuietSpace": quietSpace], option: option)
     }
+    /// Generates a PDF417 code (two-dimensional barcode) from input data.
+    ///
+    /// Generates an output image representing the input data according to the ISO 15438 standard. 
+    /// PDF417 codes are commonly used in postage, package tracking, personal identification documents, 
+    /// and coffeeshop membership cards. The width and height of each module (square dot) of the code 
+    /// in the output image is one point. To create a PDF417 code from a string or URL, convert it to
+    /// an NSData object using the NSISOLatin1StringEncoding string encoding.
+    /// 
+    /// - Parameter data                   : The data to be encoded as a barcode. An NSData object whose display name is Message.
+    /// - Parameter minWidth               : The minimum width of the barcode’s data area, in pixels. An NSNumber object whose display name
+    ///                                      is MinWidth. The value is available in [56.0, 583.0]. Using 56.0 as default.
+    /// - Parameter maxWidth               : The maximum width of the barcode’s data area, in pixels. An NSNumber object whose display name
+    ///                                      is MaxWidth. The value is available in [56.0, 583.0]. Using 56.0 * 2.0 as default.
+    /// - Parameter minHeight              : The minimum height of the barcode’s data area, in pixels. An NSNumber object whose display name
+    ///                                      is MinHeight. The value is available in [13.00, 283.00]. Using 13.0 as default.
+    /// - Parameter maxHeight              : The maximum height of the barcode’s data area, in pixels. An NSNumber object whose display name
+    ///                                      is MaxHeight. The value is available in [13.00, 283.00]. Using 13.0 * 2.0 as default.
+    /// - Parameter dataColumns            : The number of data columns in the generated code. If zero, the generator uses a number of columns
+    ///                                      based on the width, height, and aspect ratio. An NSNumber object whose display name is DataColumns. 
+    ///                                      The value is available in [1, 30]. Using 30 as default.
+    /// - Parameter rows                   : The number of data rows in the generated code. If zero, the generator uses a number of rows
+    ///                                      based on the width, height, and aspect ratio. An NSNumber object whose display name is Rows.
+    ///                                      The value is available in [3, 90]. Using 3 as default.
+    /// - Parameter preferredAspectRatio   : The preferred ratio of width over height for the generated barcode. The generator approximates
+    ///                                      this with an actual aspect ratio based on the data and other parameters you specify. An NSNumber 
+    ///                                      object whose display name is PreferredAspectRatio. The value is available in [0.00, 922337203685
+    ///                                      4775808.00]. Using 3.0 as default.
+    /// - Parameter compactionMode         : An option that determines which method the generator uses to compress data. An NSNumber object
+    ///                                      whose display name is CompactionMode. The value is available in [0, 1, 2, 3]. Using 0 as default.
+    ///   - 0, Automatic. The generator automatically chooses a compression method. This option is the default.
+    ///   - 1, Numeric. Valid only when the message is an ASCII-encoded string of digits, achieving optimal compression for that type of data.
+    ///   - 2, Text. Valid only when the message is all ASCII-encoded alphanumeric and punctuation characters, 
+    ///     achieving optimal compression for that type of data.
+    ///   - 3, Byte. Valid for any data, but least compact.
+    /// - Parameter compactStyle           : A Boolean value that determines whether to omit redundant elements to make the generated barcode
+    ///                                      more compact. An NSNumber object whose display name is CompactStyle. Using false as default.
+    /// - Parameter correctionLevel        : An integer between 0 and 8, inclusive, that determines the amount of redundancy to include
+    ///                                      in the barcode’s data to prevent errors when the barcode is read. If unspecified, the generator
+    ///                                      chooses a correction level based on the size of the message data. An NSNumber object whose
+    ///                                      display name is CorrectionLevel. The value is available in [0, 8]. Using 4 as default.
+    /// - Parameter alwaysSpecifyCompaction: A Boolean value that determines whether to include information about the compaction mode 
+    ///                                      in the barcode even when such information is redundant. (If a PDF417 barcode does not 
+    ///                                      contain compaction mode information, a reader assumes text-based compaction. Some barcodes
+    ///                                      include this information even when using text-based compaction.). An NSNumber object whose 
+    ///                                      display name is AlwaysSpecifyCompaction. Using false as default.
+    /// - Parameter option                 : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                                      Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A PDF417 code (two-dimensional barcode) from input data.
+    public class func generatePDF417Barcode(_ data: Data, minWidth: CGFloat = 56.00, maxWidth: CGFloat = 56.00 * 2.0, minHeight: CGFloat = 13.00, maxHeight: CGFloat = 13.00 * 2.0, dataColumns: Int = 30, rows: Int = 3, preferredAspectRatio: CGFloat = 3.0, compactionMode: Int = 0, compactStyle: Bool = false, correctionLevel: Int = 4, alwaysSpecifyCompaction: Bool = false, option: RenderOption = .auto) -> UIImage! {
+        return generate("CIPDF417BarcodeGenerator", inputParameters: ["inputMessage": data, "inputMinWidth": minWidth, "inputMaxWidth": maxWidth, "inputMinHeight": minHeight, "inputMaxHeight": maxHeight, "inputDataColumns": dataColumns, "inputRows": rows, "inputPreferredAspectRatio": preferredAspectRatio, "inputCompactionMode": compactionMode, "inputCompactStyle": compactStyle, "inputCorrectionLevel": correctionLevel, "inputAlwaysSpecifyCompaction": alwaysSpecifyCompaction], cropTo: nil, option: option)
+    }
 }
 
 extension UIImage {
