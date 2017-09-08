@@ -338,6 +338,16 @@ extension UIImage {
     public class func generatePDF417Barcode(_ data: Data, minWidth: CGFloat = 56.00, maxWidth: CGFloat = 56.00 * 2.0, minHeight: CGFloat = 13.00, maxHeight: CGFloat = 13.00 * 2.0, dataColumns: Int = 30, rows: Int = 3, preferredAspectRatio: CGFloat = 3.0, compactionMode: Int = 0, compactStyle: Bool = false, correctionLevel: Int = 4, alwaysSpecifyCompaction: Bool = false, option: RenderOption = .auto) -> UIImage! {
         return generate("CIPDF417BarcodeGenerator", inputParameters: ["inputMessage": data, "inputMinWidth": minWidth, "inputMaxWidth": maxWidth, "inputMinHeight": minHeight, "inputMaxHeight": maxHeight, "inputDataColumns": dataColumns, "inputRows": rows, "inputPreferredAspectRatio": preferredAspectRatio, "inputCompactionMode": compactionMode, "inputCompactStyle": compactStyle, "inputCorrectionLevel": correctionLevel, "inputAlwaysSpecifyCompaction": alwaysSpecifyCompaction], cropTo: nil, option: option)
     }
+    /// Generates an image of infinite extent whose pixel values are made up of four independent, uniformly-distributed 
+    /// random numbers in the 0 to 1 range.
+    ///
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A random pixels image.
+    public class func generateRandom(size: CGSize, option: RenderOption = .auto) -> UIImage! {
+        return generate("CIRandomGenerator", inputParameters: nil, cropTo: CGRect(origin: .zero, size: size), option: option)
+    }
 }
 
 extension UIImage {
