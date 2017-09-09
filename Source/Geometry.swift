@@ -40,13 +40,10 @@ extension UIImage {
             fallthroughToCpu = true
             fallthrough
         case .gpu(_):
-            guard let ciImage = _makeCiImage()?.round(by: scaledRadius) else {
-                return fallthroughToCpu ? round(by: radius, option: option) : nil
+            if let ciImage = _makeCiImage()?.round(by: scaledRadius), let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option) {
+                return image
             }
-            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? round(by: radius, option: option): nil }
-            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? round(by: radius, option: option) : nil }
-            
-            return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+            return fallthroughToCpu ? round(by: radius, option: .cpu(option.quality)) : nil
         default:
             let scaledBorderWidth: CGFloat = /*borderWidth  * scale*/ 0.0
             
@@ -147,37 +144,7 @@ extension UIImage {
     ///
     /// - Returns: A new image with the given angle rotated.
     public func rotate(by angle: CGFloat, option: RenderOption = .cpu) -> UIImage! {
-        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.rotate(by: angle, option: option) } }), duration: duration) }
-        
-        // Calculate the size of the rotated view's containing box for our drawing space.
-        let transform = CGAffineTransform(rotationAngle: -angle)
-        let rotatedBox = CGRect(origin: .zero, size: size).applying(transform)
-        
-        var fallthroughToCpu = false
-        switch option.dest {
-        case .auto:
-            fallthroughToCpu = true
-            fallthrough
-        case .gpu(_):
-            if let image = applying("CIAffineTransform", inputParameters: ["inputTransform": CGAffineTransform(rotationAngle: angle)], option: option) {
-                return image
-            }
-            return fallthroughToCpu ? rotate(by: angle, option: option) : nil
-        default:
-            // Create the bitmap context.
-            UIGraphicsBeginImageContextWithOptions(rotatedBox.size, false, scale)
-            defer { UIGraphicsEndImageContext() }
-            guard let cgImage = self._makeCgImage(), let context = UIGraphicsGetCurrentContext() else { return nil }
-            // Move the origin to the middle of the image so we will rotate and scale around the center.
-            context.translateBy(x: rotatedBox.width * 0.5, y: rotatedBox.height * 0.5)
-            // Rotate the image context.
-            context.rotate(by: -angle)
-            // Now, draw the rotated/scaled image into the context.
-            context.scaleBy(x: 1.0, y: -1.0)
-            
-            context.draw(cgImage, in: CGRect(x: -size.width * 0.5, y: -size.height * 0.5, width: size.width, height: size.height))
-            return UIGraphicsGetImageFromCurrentImageContext()
-        }
+        return applying(CGAffineTransform(rotationAngle: angle), option: option)
     }
     /// Creates and returns a copy of the receiver image with flipped horizontally with a specific render option.
     /// Animated image supported.
@@ -187,36 +154,12 @@ extension UIImage {
     ///
     /// - Returns: A copy of the receiver by flipping according to the direction and the given option.
     public func flip(horizontally: Bool, option: RenderOption = .cpu) -> UIImage! {
-        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.flip(horizontally: horizontally, option: option) } }), duration: duration) }
-        
-        var fallthroughToCpu = false
-        switch option.dest {
-        case .auto:
-            fallthroughToCpu = true
-            fallthrough
-        case .gpu(_):
-            if let image = applying("CIAffineTransform", inputParameters: ["inputTransform": CGAffineTransform(scaleX: horizontally ? -1.0 : 1.0, y: horizontally ? 1.0 : -1.0)], option: option) {
-                return image
-            }
-            return fallthroughToCpu ? flip(horizontally: horizontally, option: option) : nil
-        default:
-            let rect = CGRect(origin: .zero, size: scaledSize)
-            UIGraphicsBeginImageContextWithOptions(rect.size, false, scale)
-            defer { UIGraphicsEndImageContext() }
-            guard let cgImage = self._makeCgImage(), let context = UIGraphicsGetCurrentContext() else { return nil }
-            context.clip(to: rect)
-            if horizontally {
-                context.rotate(by: CGFloat.pi)
-                context.translateBy(x: -rect.width, y: -rect.height)
-            }
-            context.draw(cgImage, in: rect)
-            return UIGraphicsGetImageFromCurrentImageContext()
-        }
+        return applying(CGAffineTransform(scaleX: horizontally ? -1.0 : 1.0, y: horizontally ? 1.0 : -1.0), option: option)
     }
 }
 
 extension UIImage {
-    /// Creates a copy of the receiver by applying the given transform matrix and render option.
+    /// Creates a copy of the receiver by applying the given transform matrix and render option. Animated image supported.
     ///
     /// The copy image by applying the transform matrix will be rendered into the same bounds as the recevier image.
     ///
@@ -232,6 +175,8 @@ extension UIImage {
     ///
     /// - Returns: A copy of the receiver by applying the given tranform matrix.
     public func applying(_ matrix: CGAffineTransform, option: RenderOption = .cpu) -> UIImage! {
+        guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.applying(matrix, option: option) } }), duration: duration) }
+        
         let rect           = CGRect(origin: .zero, size: size)
         let transformedBox = rect.applying(matrix)
         
@@ -244,7 +189,7 @@ extension UIImage {
             if let image = applying("CIAffineTransform", inputParameters: ["inputTransform": matrix], option: option) {
                 return image
             }
-            return fallthroughToCpu ? applying(matrix, option: .cpu) : nil
+            return fallthroughToCpu ? applying(matrix, option: .cpu(option.quality)) : nil
         default:
             // Create the bitmap context.
             UIGraphicsBeginImageContextWithOptions(transformedBox.size, false, scale)
