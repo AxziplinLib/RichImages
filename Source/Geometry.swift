@@ -215,6 +215,56 @@ extension UIImage {
     }
 }
 
+extension UIImage {
+    /// Creates a copy of the receiver by applying the given transform matrix and render option.
+    ///
+    /// The copy image by applying the transform matrix will be rendered into the same bounds as the recevier image.
+    ///
+    /// - Note: Clients may get the diffrent result between `.cpu` and `gpu` when applying some transform such as 
+    ///         translation because of the different principle of the `.cpu` and `.gpu`. So be careful with the
+    ///         render option to get the result image.
+    /// - scale      : Same results of using `.cpu` or `gpu`.
+    /// - rotation   : Same results of using `.cpu` or `gpu`.
+    /// - translation: Affect `.cpu` only.
+    ///
+    /// - Parameter matrix: A value of `CGAffineTransform` to define the transform of the copy of the receiver image.
+    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image render processing.
+    ///
+    /// - Returns: A copy of the receiver by applying the given tranform matrix.
+    public func applying(_ matrix: CGAffineTransform, option: RenderOption = .cpu) -> UIImage! {
+        let rect           = CGRect(origin: .zero, size: size)
+        let transformedBox = rect.applying(matrix)
+        
+        var fallthroughToCpu = false
+        switch option.dest {
+        case .auto:
+            fallthroughToCpu = true
+            fallthrough
+        case .gpu(_):
+            if let image = applying("CIAffineTransform", inputParameters: ["inputTransform": matrix], option: option) {
+                return image
+            }
+            return fallthroughToCpu ? applying(matrix, option: .cpu) : nil
+        default:
+            // Create the bitmap context.
+            UIGraphicsBeginImageContextWithOptions(transformedBox.size, false, scale)
+            defer { UIGraphicsEndImageContext() }
+            guard let cgImage = self._makeCgImage(), let context = UIGraphicsGetCurrentContext() else { return nil }
+            // Move the origin to the middle of the image so we will transform around the center.
+            context.translateBy(x: transformedBox.width * 0.5, y: transformedBox.height * 0.5)
+            // Change the ctm's position.
+            context.scaleBy(x: 1.0, y: -1.0)
+            // Transform the image context.
+            context.concatenate(matrix)
+            // Set the interpolation quality with the value in the option.
+            context.interpolationQuality = option.quality
+            // Now, draw the rotated/scaled image into the context.
+            context.draw(cgImage, in: CGRect(x: -rect.width * 0.5, y: -rect.height * 0.5, width: rect.width, height: rect.height))
+            return UIGraphicsGetImageFromCurrentImageContext()
+        }
+    }
+}
+
 // MARK: - CoreImage.
 
 extension UIImage {
