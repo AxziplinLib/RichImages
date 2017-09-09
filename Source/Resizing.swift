@@ -53,11 +53,10 @@ extension UIImage {
             fallthroughToCpu = true
             fallthrough
         case .gpu(_):
-            guard let ciImage = _makeCiImage()?.cropping(to: croppingRect) else { return fallthroughToCpu ? crop(to:rect, option: .cpu) : nil }
-            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? crop(to:rect, option: .cpu) : nil }
-            guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return fallthroughToCpu ? crop(to:rect, option: .cpu) : nil }
-            
-            return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+            if let ciImage = _makeCiImage()?.cropping(to: croppingRect), let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option) {
+                return image
+            }
+            return fallthroughToCpu ? crop(to:rect, option: .cpu(option.quality)) : nil
         default:
             guard let cgImage = _makeCgImage()?.cropping(to: croppingRect) else { return nil }
             return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
@@ -234,13 +233,10 @@ extension UIImage {
             fallthrough
         case .gpu(_):
             let extentScale: CGPoint = CGPoint(x: newRect.width / scaledWidth, y: newRect.height / scaledHeight)
-            guard let ciImage = _makeCiImage()?.applying(CGAffineTransform(scaleX: extentScale.x, y: extentScale.y).concatenating(transform)) else {
-                return fallthroughToCpu ? _resize(fills: newSize, applying: transform, transposed: transposed, option: option) : nil
+            if let ciImage = _makeCiImage()?.applying(CGAffineTransform(scaleX: extentScale.x, y: extentScale.y).concatenating(transform)), let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option) {
+                return image
             }
-            guard let ciContext = _ciContext(at: option.dest) else { return fallthroughToCpu ? _resize(fills: newSize, applying: transform, transposed: transposed, option: option) : nil }
-            guard let cgImage = ciContext.createCGImage(ciImage, from: transposed ? transposedRect : newRect) else { return fallthroughToCpu ? _resize(fills: newSize, applying: transform, transposed: transposed, option: option) : nil }
-            
-            return UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+            return fallthroughToCpu ? _resize(fills: newSize, applying: transform, transposed: transposed, option: .cpu(option.quality)) : nil
         default:
             guard let cgImage  = _makeCgImage(), let colorSpace = cgImage.colorSpace else { return nil }
             // Build a context that's the same dimensions as the new size
