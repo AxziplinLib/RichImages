@@ -8,3 +8,7 @@
 
 import UIKit
 import CoreImage
+
+extension UIImage {
+//    public func clampColor(min: )
+}

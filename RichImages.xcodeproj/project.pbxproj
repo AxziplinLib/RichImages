@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DC2AB76A1F5D5556004095FF /* vImageBluring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7691F5D5556004095FF /* vImageBluring.swift */; };
+		DC2AB76C1F5D571C004095FF /* Resizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76B1F5D571C004095FF /* Resizing.swift */; };
+		DC2AB76E1F5D5813004095FF /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76D1F5D5813004095FF /* Merging.swift */; };
+		DC2AB7701F5D587B004095FF /* Generator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76F1F5D587B004095FF /* Generator.swift */; };
+		DC2AB7721F5D58F3004095FF /* ColorSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7711F5D58F3004095FF /* ColorSpace.swift */; };
+		DC2AB7741F5D5952004095FF /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7731F5D5952004095FF /* Gif.swift */; };
+		DC2AB7761F5D5A16004095FF /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7751F5D5A16004095FF /* Geometry.swift */; };
+		DC2AB7781F5E404E004095FF /* Filters.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7771F5E404E004095FF /* Filters.swift */; };
+		DC376B861F63DF97002D47A1 /* Bluring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC376B851F63DF97002D47A1 /* Bluring.swift */; };
+		DC376B881F64216E002D47A1 /* ColorAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC376B871F64216E002D47A1 /* ColorAdjustment.swift */; };
 		DC9D71FA1F5D248700EE2386 /* RichImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9D71F91F5D248700EE2386 /* RichImages.swift */; };
 		DCAD099A1F5CEE25001AF3F0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD09991F5CEE25001AF3F0 /* AppDelegate.swift */; };
 		DCAD099C1F5CEE25001AF3F0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD099B1F5CEE25001AF3F0 /* ViewController.swift */; };
@@ -38,6 +48,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DC2AB7691F5D5556004095FF /* vImageBluring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vImageBluring.swift; sourceTree = "<group>"; };
+		DC2AB76B1F5D571C004095FF /* Resizing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resizing.swift; sourceTree = "<group>"; };
+		DC2AB76D1F5D5813004095FF /* Merging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Merging.swift; sourceTree = "<group>"; };
+		DC2AB76F1F5D587B004095FF /* Generator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Generator.swift; sourceTree = "<group>"; };
+		DC2AB7711F5D58F3004095FF /* ColorSpace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorSpace.swift; sourceTree = "<group>"; };
+		DC2AB7731F5D5952004095FF /* Gif.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
+		DC2AB7751F5D5A16004095FF /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
+		DC2AB7771F5E404E004095FF /* Filters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filters.swift; sourceTree = "<group>"; };
+		DC376B851F63DF97002D47A1 /* Bluring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bluring.swift; sourceTree = "<group>"; };
+		DC376B871F64216E002D47A1 /* ColorAdjustment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorAdjustment.swift; sourceTree = "<group>"; };
 		DC9D71F91F5D248700EE2386 /* RichImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RichImages.swift; sourceTree = "<group>"; };
 		DCAD09961F5CEE25001AF3F0 /* RichImages.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RichImages.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCAD09991F5CEE25001AF3F0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -141,6 +161,16 @@
 			isa = PBXGroup;
 			children = (
 				DC9D71F91F5D248700EE2386 /* RichImages.swift */,
+				DC2AB7691F5D5556004095FF /* vImageBluring.swift */,
+				DC376B851F63DF97002D47A1 /* Bluring.swift */,
+				DC2AB76B1F5D571C004095FF /* Resizing.swift */,
+				DC2AB76D1F5D5813004095FF /* Merging.swift */,
+				DC2AB76F1F5D587B004095FF /* Generator.swift */,
+				DC2AB7711F5D58F3004095FF /* ColorSpace.swift */,
+				DC376B871F64216E002D47A1 /* ColorAdjustment.swift */,
+				DC2AB7731F5D5952004095FF /* Gif.swift */,
+				DC2AB7751F5D5A16004095FF /* Geometry.swift */,
+				DC2AB7771F5E404E004095FF /* Filters.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -285,9 +315,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCAD09CB1F5CF03E001AF3F0 /* ImageView.swift in Sources */,
+				DC2AB7721F5D58F3004095FF /* ColorSpace.swift in Sources */,
+				DC2AB7701F5D587B004095FF /* Generator.swift in Sources */,
+				DC2AB7761F5D5A16004095FF /* Geometry.swift in Sources */,
 				DCAD099C1F5CEE25001AF3F0 /* ViewController.swift in Sources */,
+				DC2AB7741F5D5952004095FF /* Gif.swift in Sources */,
+				DC2AB76A1F5D5556004095FF /* vImageBluring.swift in Sources */,
 				DCAD099A1F5CEE25001AF3F0 /* AppDelegate.swift in Sources */,
+				DC2AB76C1F5D571C004095FF /* Resizing.swift in Sources */,
+				DC2AB7781F5E404E004095FF /* Filters.swift in Sources */,
+				DC376B881F64216E002D47A1 /* ColorAdjustment.swift in Sources */,
+				DC2AB76E1F5D5813004095FF /* Merging.swift in Sources */,
 				DC9D71FA1F5D248700EE2386 /* RichImages.swift in Sources */,
+				DC376B861F63DF97002D47A1 /* Bluring.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,10 +483,12 @@
 				INFOPLIST_FILE = RichImages/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-Xfrontend -warn-long-function-bodies=20000";
 				PRODUCT_BUNDLE_IDENTIFIER = devedbox.RichImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
+				SWIFT_WHOLE_MODULE_OPTIMIZATION = YES;
 			};
 			name = Debug;
 		};
@@ -461,6 +503,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = devedbox.RichImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				SWIFT_WHOLE_MODULE_OPTIMIZATION = YES;
 			};
 			name = Release;
 		};

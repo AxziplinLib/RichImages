@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreImage
 
 class ViewController: UIViewController {
 
@@ -21,15 +22,38 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // Make sure all the core image contexts are initialized.
-        CIContextInitialize(UIImage.RenderDestination.availableGPURelatedDestinations)
+        CIContextInitialize(UIImage.RenderOption.Destination.availableGPURelatedDestinations)
         // let gif = UIImage.gif(named: "Gif")!
         let date = Date()
+        let data = "https://www.baidu.com".data(using: .isoLatin1)!
         let image = #imageLiteral(resourceName: "image_to_merge")
-        // let bordered = image.bordered(24.0)
-        // let rounded = image.round(40.0, border: 30.0)
+        // let bordered = image.bordered(100.0)
+        // let rounded = image.makeCornered(.gpu(.default))
+        // let size = CGSize(width: image.size.width * 0.5, height: image.size.height * 0.8)
+        // let resizing = UIImage.ResizingMode.center
+        // let result = image.perspectiveCorrect(topLeft    : CGPoint(x: 0.0, y: image.size.height * 0.7),
+        //                                      topRight   : CGPoint(x: image.size.width, y: image.size.height),
+        //                                      bottomLeft : CGPoint(x: 0.0, y: image.size.height * 0.3),
+        //                                     bottomRight: CGPoint(x: image.size.width, y: 0.0))
+        // let result = image.scale(to: 0.5).flip(horizontally: true, option: .gpu(.default))
+        // let result = image.straightenRotate(by: CGFloat.pi / 6.0, option: .gpu(.default))
+        // let result = UIImage.generateAztecCode(data, layers: 32.0).resize(fills: CGSize(width: 300, height: 300), option: .cpu(.none))
+        // let result = UIImage.generateCode128Barcode(data).resize(fits: UIScreen.main.bounds.size, using: .scaleAspectFit, option: .cpu(.none))
+        // let result = UIImage.generateConstantColor(.orange).resize(fills: CGSize(width: 300, height: 300), option: .cpu(.none)).makeCornered(.gpu(.default))
+        // let result = UIImage.generateLenticularHalo(color: .green)
+        // let result = UIImage.generatePDF417Barcode(data)
+        // let result = UIImage.generateRandom(size: CGSize(width: 300, height: 300))
+        // let result = UIImage.generateStarShine(color: .orange, size: CGSize(width: 1600, height: 1600))
+        // let result = UIImage.generateStripes(color0: .white, color1: .black, size: CGSize(width: 1600, height: 1600))
+        // let result = UIImage.generateSunbeams(color: .orange)
+        // let result = UIImage.generateCheckerboard(color0: .black, color1: .white, size: CGSize(width: 500, height: 500))
+        // let result = UIImage.generateQRCode(data).resize(fills: CGSize(width: 300, height: 300), option: .cpu(.none))
         // let cornered = image.cornered
         // let cropped = image.crop(to: CGRect(origin: .zero, size: image.size).insetBy(dx: 0.0, dy: fabs(image.size.height - image.size.width) * 0.5))
-        let cropped = image.crop(fits: image.size.scale(by: 0.5), using: .center, rendering: .gpu(.metal))
+        let result = image.blur(.box(radius: 100.0), option: .auto)
+        // let transform = CGAffineTransform(rotationAngle: CGFloat.pi / 6.0).scaledBy(x: 1.0, y: 3.0)
+        // let result = image.applying(transform, option: .cpu(.none))
+        // let cropped = image.crop(fits: image.size.scale(by: 0.5), using: .center, rendering: .cpu).lightBlur
         // let resized = image.resize(fits: CGSize(width: image.size.height, height: image.size.height), quality: .high)
         // let croppingSize = CGSize(width: image.size.width * 0.5, height: image.size.width * 0.5)
         // let cropped = image.crop(fits: croppingSize, using: .bottomRight)
@@ -47,15 +71,19 @@ class ViewController: UIViewController {
         // let handled1 = image1.resize(fits: CGSize(width: 120, height: 120), using: .center)
         // let image2 = #imageLiteral(resourceName: "image_to_merge")
         // let handled2 = image2.resize(fits: CGSize(width: 120, height: 80), using: .center)
-        imageView0.image = cropped
         print("Cost timing: \(Date().timeIntervalSince(date))")
+        imageView1.image = result
+        // imageView1.backgroundColor = .black
+        imageView0.image = image
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
 }
 
+extension ViewController {
+    override var prefersStatusBarHidden: Bool { return true }
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation { return .fade }
+}

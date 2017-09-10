@@ -22,5 +22,4 @@ class ImageView: UIImageView {
     override var image: UIImage? {
         didSet { invalidateIntrinsicContentSize() }
     }
-
 }
