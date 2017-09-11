@@ -155,7 +155,7 @@ extension UIImage {
     ///                            Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the receiver image with applying a blur effect.
-    public func blur(_ bluringOption: BluringOption, option: RenderOption) -> UIImage! {
+    public func blur(_ bluringOption: BluringOption, option: RenderOption = .auto) -> UIImage! {
         if  let filter = bluringOption.mode.filter,
             let ciImage = _makeCiImage()?.applyingFilter(filter.name, withInputParameters: filter.inputParameters),
             let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option)
