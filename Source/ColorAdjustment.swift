@@ -57,4 +57,34 @@ extension UIImage {
         }
         return image
     }
+    /// Adjusts saturation, brightness, and contrast values.
+    ///
+    /// To calculate saturation, this filter linearly interpolates between a grayscale image (saturation = 0.0)
+    /// and the original image (saturation = 1.0). The filter supports extrapolation: For values large than 1.0, 
+    /// it increases saturation.
+    ///
+    /// To calculate contrast, this filter uses the following formula:
+    /// ```
+    /// (color.rgb - vec3(0.5)) * contrast + vec3(0.5)
+    /// ```
+    /// This filter calculates brightness by adding a bias value:
+    /// ```
+    /// color.rgb + vec3(brightness)
+    /// ```
+    ///
+    /// - Parameter saturation: The saturation component of the color of the receiver image. Default value: 1.0.
+    /// - Parameter brightness: The brightness component of the color of the receiver image. Default value: 1.0.
+    /// - Parameter contrast  : The contrast component of the color of the receiver image. Default value: 1.0.
+    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image blurring processing.
+    ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the receiver by adjusting the color components of the receiver image.
+    public func adjust(saturation: CGFloat = 1.0, brightness: CGFloat = 1.0, contrast: CGFloat = 1.0, option: RenderOption = .auto) -> UIImage! {
+        guard let ciImage = _makeCiImage()?.applyingFilter("CIColorControls", withInputParameters: ["inputSaturation": saturation, "inputBrightness": brightness, "inputContrast": contrast]),
+            let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
+            else {
+                return nil
+        }
+        return image
+    }
 }
