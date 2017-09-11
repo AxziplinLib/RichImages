@@ -25,7 +25,7 @@ class ViewController: UIViewController {
         CIContextInitialize(UIImage.RenderOption.Destination.availableGPURelatedDestinations)
         // let gif = UIImage.gif(named: "Gif")!
         let date = Date()
-        let data = "https://www.baidu.com".data(using: .isoLatin1)!
+        // let data = "https://www.baidu.com".data(using: .isoLatin1)!
         let image = #imageLiteral(resourceName: "image_to_merge")
         // let bordered = image.bordered(100.0)
         // let rounded = image.makeCornered(.gpu(.default))
@@ -50,7 +50,8 @@ class ViewController: UIViewController {
         // let result = UIImage.generateQRCode(data).resize(fills: CGSize(width: 300, height: 300), option: .cpu(.none))
         // let cornered = image.cornered
         // let cropped = image.crop(to: CGRect(origin: .zero, size: image.size).insetBy(dx: 0.0, dy: fabs(image.size.height - image.size.width) * 0.5))
-        let result = image.blur(.box(radius: 100.0), option: .auto)
+        // let result = image.blur(.box(radius: 100.0), option: .auto)
+        let result = image.clampColor(min: UIImage.ColorComponents(r: 0.2, g: 0.2, b: 0.2, a: 0.2), max: UIImage.ColorComponents(r: 0.8, g: 0.8, b: 0.8, a: 0.8))
         // let transform = CGAffineTransform(rotationAngle: CGFloat.pi / 6.0).scaledBy(x: 1.0, y: 3.0)
         // let result = image.applying(transform, option: .cpu(.none))
         // let cropped = image.crop(fits: image.size.scale(by: 0.5), using: .center, rendering: .cpu).lightBlur
