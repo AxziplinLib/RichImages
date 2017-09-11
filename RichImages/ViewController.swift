@@ -51,7 +51,8 @@ class ViewController: UIViewController {
         // let cornered = image.cornered
         // let cropped = image.crop(to: CGRect(origin: .zero, size: image.size).insetBy(dx: 0.0, dy: fabs(image.size.height - image.size.width) * 0.5))
         // let result = image.blur(.box(radius: 100.0), option: .auto)
-        let result = image.clampColor(min: UIImage.ColorComponents(r: 0.2, g: 0.2, b: 0.2, a: 0.2), max: UIImage.ColorComponents(r: 0.8, g: 0.8, b: 0.8, a: 0.8))
+        // let result = image.clampColor(min: UIImage.ColorComponents(r: 0.2, g: 0.2, b: 0.2, a: 0.2), max: UIImage.ColorComponents(r: 0.8, g: 0.8, b: 0.8, a: 0.8))
+        let result = image.adjust(saturation: 2.0, brightness: 0.5, contrast: 1.5)
         // let transform = CGAffineTransform(rotationAngle: CGFloat.pi / 6.0).scaledBy(x: 1.0, y: 3.0)
         // let result = image.applying(transform, option: .cpu(.none))
         // let cropped = image.crop(fits: image.size.scale(by: 0.5), using: .center, rendering: .cpu).lightBlur
