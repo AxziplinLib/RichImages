@@ -12,6 +12,225 @@ import OpenGLES
 import CoreImage
 import CoreGraphics
 
+// MARK: - RichImagable.
+
+/// A type that can processing the UIImage object by resizing, bluring, adjusting color 
+/// and generate other UIImage object and so on.
+///
+/// The `RichImagable` protocol is used to access the complex extensions of UIImage by
+/// a simple coding, you can simply apply a core image filter, resize to a target rectangle
+/// or generate a qrcode with conformance implement the less-than property `image`.
+///
+/// To add `RichImagable` conformance to your custom types, define `image` property and 
+/// return an UIImage object.
+public protocol RichImagable {
+    var image: UIImage { get }
+}
+/// Added conformance to UIImage.
+extension UIImage: RichImagable {
+    public var image: UIImage { return self }
+}
+
+// MARK: - RichImage.
+
+/// Rich image module field.
+public struct RichImage { /* Rich image module field. */ }
+
+// MARK: - RenderOption.
+
+extension RichImage {
+    /// A type representing the render option for the image processing.
+    /// Clients typically use the static functions `.cpu`, `.auto` or `gpu(:)` to locate the
+    /// render destination for the processing.
+    public struct RenderOption {
+        /// The render destination of the image processing.
+        var dest: Destination
+        /// The interpolation quality for the rescaling in CoreGraphics when using CPU as the render destination.
+        var quality: CGInterpolationQuality = .default
+        
+        init(dest: Destination) {
+            self.dest = dest
+        }
+    }
+}
+
+extension RichImage.RenderOption {
+    /// Returns an option of `RenderOption` with using `CPU` as the render destination.
+    public static var  cpu : RichImage.RenderOption { return RichImage.RenderOption(dest: .cpu) }
+    /// Returns an option of `RenderOption` with using `AUTO MODE` as the render destination.
+    public static var  auto: RichImage.RenderOption { return RichImage.RenderOption(dest: .auto) }
+    /// Creates an option of `RenderOption` with using `GPU` as the render destination.
+    ///
+    /// - Parameter gpu: A value describ in `Destination.GPU` indicates the gpu device the tec. using
+    ///                  as the target GPU destination.
+    ///
+    /// - Returns: An GPU-Based `RenderOption` with the given gpu device or tec. .
+    public static func gpu(_ gpu: Destination.GPU) -> RichImage.RenderOption {
+        return RichImage.RenderOption(dest: .gpu(gpu))
+    }
+    /// Creates an option of `RenderOption` with using `CPU` as the render destination and the specific interpolation quality.
+    ///
+    /// - Parameter quality: The interpolation quality for the rescaling in CoreGraphics when using CPU as the render destination.
+    ///
+    /// - Returns: An CPU-Based `RenderOption` with the given interpolation quality.
+    public static func cpu(_ quality: CGInterpolationQuality) -> RichImage.RenderOption {
+        var option = RichImage.RenderOption(dest: .cpu)
+        option.quality = quality
+        return option
+    }
+}
+
+// MARK: - Destination.
+
+extension RichImage.RenderOption {
+    /// A type representing the rendering destination of the image's cropping and other processing.
+    public enum Destination {
+        /// A type representing the GPU-Based rendering.
+        public enum GPU {
+            /// Indicates the rendering is based on the default GPU device.
+            case `default`
+            /// Indicates the rendering is based on a `MTLDevice`. The GPU-Based contex for this value
+            /// will automatic fallthrough to the OpenGL ES-Based if the Metal device is not available.
+            @available(iOS 9.0, *)
+            case metal
+            /// Indicates the rendering is based on the api of `OpenGL ES`.
+            case openGLES
+        }
+        /// Indicates the rendering using the automatic context in `CoreImage`.
+        case auto
+        /// Indicates the rendering using the cg context in `CoreGraphics`.
+        case cpu
+        /// Indicates the rendering using the GPU-Based context in `CoreImage`.
+        case gpu(GPU)
+    }
+}
+
+extension RichImage.RenderOption.Destination {
+    /// Returns the available GPU-Related render destination values.
+    public static var availableGPURelatedDestinations: [RichImage.RenderOption.Destination] {
+        if #available(iOS 9.0, *) {
+            return [.auto, .gpu(.default), .gpu(.metal), .gpu(.openGLES)]
+        } else {
+            return [.auto, .gpu(.default), .gpu(.openGLES)]
+        }
+    }
+}
+
+extension RichImagable {
+    /// Returns a new image created by applying a filter to the original image with the specified name and parameters.
+    ///
+    /// Calling this method is equivalent to the following sequence of steps:
+    /// * Creating a CIFilter instance.
+    /// * Setting the original image.ciImage as the filter’s inputImage parameter.
+    /// * Setting the remaining filter parameters from the params dictionary.
+    /// * Retrieving the outputImage object from the filter.
+    /// * Using the context from the given render option to create a cgImage.
+    /// * Creating a UIImage object with the cgImage, scale and orientation.
+    ///
+    /// - Parameter filterName: The name of the filter to apply, as used when creating a CIFilter instance with the init(name:) method.
+    /// - Parameter params    : A dictionary whose key-value pairs are set as input values to the filter. Each key is a constant that
+    ///                         specifies the name of an input parameter for the filter, and the corresponding value is the value for
+    ///                         that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
+    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: An image object representing the result of applying the filter.
+    public func applying(_ filterName:String, inputParameters params: [String: Any]?, option: RichImage.RenderOption = .auto) -> UIImage! {
+        return type(of: self).filter(image, with: filterName, inputParameters: params, option: option)
+    }
+    /// Returns a new image created by making a generator filter with the specified name and parameters.
+    ///
+    /// Calling this method is equivalent to the following sequence of steps:
+    /// * Creating a CIFilter instance.
+    /// * Setting the necesary filter parameters from the params dictionary.
+    /// * Retrieving the outputImage object from the filter.
+    /// * Using the context from the given render option to create a cgImage.
+    /// * Creating a UIImage object with the cgImage, scale and orientation.
+    ///
+    /// - Parameter filterName  : The name of the filter to apply, as used when creating a CIFilter instance with the init(name:) method.
+    /// - Parameter params      : A dictionary whose key-value pairs are set as input values to the filter. Each key is a constant that
+    ///                           specifies the name of an input parameter for the filter, and the corresponding value is the value for
+    ///                           that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
+    /// - Parameter croppingRect: A rect for the generator filter to crop to because some of the generator filters need to be cropped
+    ///                           before they can be displayed like "CICheckerboardGenerator". Defaults to nil.
+    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: An image object representing the result of generator filter.
+    public static func generate(_ filterName: String, inputParameters params: [String: Any]?, cropTo croppingRect: CGRect? = nil, option: RichImage.RenderOption = .auto) -> UIImage! {
+        if params?["inputImage"] != nil { fatalError("Using \(#function) to apply a generator filter which is not an input image parameter. Please using instance function 'applying(_:inputParameters:option:)' instead because a normal filter's result should using the same scale or orientation as the original image.") }
+        return filter(nil, with: filterName, inputParameters: params, croppingRect: croppingRect, scale: UIScreen.main.scale, orientation: .up, option: option)
+    }
+    /// Returns a new image created by applying a filter to the given image or making a generator filter if the image is nil
+    /// with the specified name and parameters.
+    ///
+    /// Calling this method is equivalent to the following sequence of steps:
+    /// * Creating a CIFilter instance.
+    /// * Setting the original image as the filter’s inputImage parameter.
+    /// * Setting the remaining filter parameters from the params dictionary.
+    /// * Retrieving the outputImage object from the filter.
+    /// * Using the context from the given render option to create a cgImage.
+    /// * Creating a UIImage object with the cgImage, scale and orientation.
+    ///
+    /// - Parameter image       : The image to apply filter to. Pass nil if you want to create a filter with unnecessary image parameter
+    ///                           like generator filter.
+    /// - Parameter filterName  : The name of the filter to apply, as used when creating a CIFilter instance with the init(name:) method.
+    /// - Parameter params      : A dictionary whose key-value pairs are set as input values to the filter. Each key is a constant that
+    ///                           specifies the name of an input parameter for the filter, and the corresponding value is the value for
+    ///                           that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
+    /// - Parameter croppingRect: A rect for the generator filter to crop to because some of the generator filters need to be cropped
+    ///                           before they can be displayed like "CICheckerboardGenerator". Defaults to nil.
+    /// - Parameter scale       : A float value indicates the scale of the image mapping from pxiels to points. The `scale` of the given
+    ///                           image will be used as the result image's scale and this given value will be ignored if the given image
+    ///                           is not nil. Default using the scale of the main screen.
+    /// - Parameter orientation : A value of `UIImageOrientation` indicates the orientation of  the result UIImage. The `orientation` of
+    ///                           the given image will be used as the result image's scale and this given value will be ignored if the
+    ///                           given image is not nil. Default using `.up`.
+    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: An image object representing the result of applying the filter.
+    public static func filter(_ image: UIImage?, with filterName: String, inputParameters params: [String: Any]?, croppingRect: CGRect? = nil, scale: CGFloat = UIScreen.main.scale, orientation: UIImageOrientation = .up, option: RichImage.RenderOption = .auto) -> UIImage! {
+        switch option.dest {
+        case .auto  : fallthrough
+        case .gpu(_):
+            var input: CIImage!
+            if CIFilter.filterNames(inCategory: kCICategoryGenerator).contains(filterName) && image == nil {// The filter is generator. And the image is not needed.
+                input = CIFilter(name: filterName, withInputParameters: params)?.outputImage
+                // Some of the generator filters need to be cropped before they can be displayed.
+                /// Crop the input to the given rect if any.
+                if let crop = croppingRect {
+                    input = input.cropping(to: crop)
+                }
+            } else {
+                input = image?._makeCiImage()?.applyingFilter(filterName, withInputParameters: params)
+            }
+            guard let ciImage   = input else { return nil }
+            
+            return make(ciImage, scale: image?.scale ?? scale, orientation: image?.imageOrientation ?? orientation, option: option)
+        default: return nil
+        }
+    }
+    /// Creates the UIImage instance from a given CIImage with the given scale, orientation and redner option.
+    ///
+    /// - Note: The CIImage is rendered using the render destination in the render option and `.cpu` mode is not supported.
+    ///
+    /// - Parameter ciImage     : The core image to be rendered to the UIImage.
+    /// - Parameter scale       : A float value indicates the scale of the image mapping from pxiels to points. The `scale` of the given
+    ///                           image will be used as the result image's scale and this given value will be ignored if the given image
+    ///                           is not nil. Default using the scale of the main screen.
+    /// - Parameter orientation : A value of `UIImageOrientation` indicates the orientation of  the result UIImage. The `orientation` of
+    ///                           the given image will be used as the result image's scale and this given value will be ignored if the
+    ///                           given image is not nil. Default using `.up`.
+    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: An UIImage object contains bitmap(CGImage-Based) data rather than core image data.
+    public static func make(_ ciImage: CIImage, from extent: CGRect? = nil, scale: CGFloat = UIScreen.main.scale, orientation: UIImageOrientation = .up, option: RichImage.RenderOption) -> UIImage! {
+        guard let ciContext = _ciContext(at: option.dest)                                      else { return nil }
+        guard let cgImage   = ciContext.createCGImage(ciImage, from: extent ?? ciImage.extent) else { return nil }
+        
+        return UIImage(cgImage: cgImage, scale: scale, orientation: orientation)
+    }
+}
+
 // MARK: - General.
 
 extension UIView {
@@ -103,89 +322,9 @@ internal func _correct(bitmapInfo: CGBitmapInfo, `for` colorSpace: CGColorSpace)
     return bitmap
 }
 
-// MARK: - RenderOption.
+// MARK: - Context Manager.
 
-extension UIImage {
-    /// A type representing the render option for the image processing.
-    /// Clients typically use the static functions `.cpu`, `.auto` or `gpu(:)` to locate the 
-    /// render destination for the processing.
-    public struct RenderOption {
-        /// The render destination of the image processing.
-        var dest: Destination
-        /// The interpolation quality for the rescaling in CoreGraphics when using CPU as the render destination.
-        var quality: CGInterpolationQuality = .default
-        
-        init(dest: Destination) {
-            self.dest = dest
-        }
-    }
-}
-
-extension UIImage.RenderOption {
-    /// Returns an option of `RenderOption` with using `CPU` as the render destination.
-    public static var  cpu : UIImage.RenderOption { return UIImage.RenderOption(dest: .cpu) }
-    /// Returns an option of `RenderOption` with using `AUTO MODE` as the render destination.
-    public static var  auto: UIImage.RenderOption { return UIImage.RenderOption(dest: .auto) }
-    /// Creates an option of `RenderOption` with using `GPU` as the render destination.
-    ///
-    /// - Parameter gpu: A value describ in `Destination.GPU` indicates the gpu device the tec. using
-    ///                  as the target GPU destination.
-    ///
-    /// - Returns: An GPU-Based `RenderOption` with the given gpu device or tec. .
-    public static func gpu(_ gpu: Destination.GPU) -> UIImage.RenderOption {
-        return UIImage.RenderOption(dest: .gpu(gpu))
-    }
-    /// Creates an option of `RenderOption` with using `CPU` as the render destination and the specific interpolation quality.
-    ///
-    /// - Parameter quality: The interpolation quality for the rescaling in CoreGraphics when using CPU as the render destination.
-    ///
-    /// - Returns: An CPU-Based `RenderOption` with the given interpolation quality.
-    public static func cpu(_ quality: CGInterpolationQuality) -> UIImage.RenderOption {
-        var option = UIImage.RenderOption(dest: .cpu)
-        option.quality = quality
-        return option
-    }
-}
-
-// MARK: - RenderDestination.
-
-extension UIImage.RenderOption {
-    /// A type representing the rendering destination of the image's cropping and other processing.
-    public enum Destination {
-        /// A type representing the GPU-Based rendering.
-        public enum GPU {
-            /// Indicates the rendering is based on the default GPU device.
-            case `default`
-            /// Indicates the rendering is based on a `MTLDevice`. The GPU-Based contex for this value
-            /// will automatic fallthrough to the OpenGL ES-Based if the Metal device is not available.
-            @available(iOS 9.0, *)
-            case metal
-            /// Indicates the rendering is based on the api of `OpenGL ES`.
-            case openGLES
-        }
-        /// Indicates the rendering using the automatic context in `CoreImage`.
-        case auto
-        /// Indicates the rendering using the cg context in `CoreGraphics`.
-        case cpu
-        /// Indicates the rendering using the GPU-Based context in `CoreImage`.
-        case gpu(GPU)
-    }
-}
-
-extension UIImage.RenderOption.Destination {
-    /// Returns the available GPU-Related render destination values.
-    public static var availableGPURelatedDestinations: [UIImage.RenderOption.Destination] {
-        if #available(iOS 9.0, *) {
-            return [.auto, .gpu(.default), .gpu(.metal), .gpu(.openGLES)]
-        } else {
-            return [.auto, .gpu(.default), .gpu(.openGLES)]
-        }
-    }
-}
-
-// MARK: - CoreImage.
-
-extension UIImage {
+extension RichImage {
     /// A type representing a core image context using automatic rendering by choosing the appropriate or best available CPU or GPU rendering technology based on the current device.
     fileprivate struct _AutomaticCIContext {
         lazy var context: CIContext! = { () -> CIContext! in
@@ -217,133 +356,18 @@ extension UIImage {
     }
 }
 
-private var _autoCIContext     = UIImage._AutomaticCIContext()
-private var _gpuCIContext      = UIImage._GPUBasedCIContext()
+private var _autoCIContext     = RichImage._AutomaticCIContext()
+private var _gpuCIContext      = RichImage._GPUBasedCIContext()
 @available(iOS 9.0, *)
-private var _metalCIContext    = UIImage._MetalBasedCIContext()
-private var _openGLESCIContext = UIImage._OpenGLESBasedCIContext()
-
-extension UIImage {
-    /// Returns a new image created by applying a filter to the original image with the specified name and parameters.
-    ///
-    /// Calling this method is equivalent to the following sequence of steps:
-    /// * Creating a CIFilter instance.
-    /// * Setting the original image.ciImage as the filter’s inputImage parameter.
-    /// * Setting the remaining filter parameters from the params dictionary.
-    /// * Retrieving the outputImage object from the filter.
-    /// * Using the context from the given render option to create a cgImage.
-    /// * Creating a UIImage object with the cgImage, scale and orientation.
-    ///
-    /// - Parameter filterName: The name of the filter to apply, as used when creating a CIFilter instance with the init(name:) method.
-    /// - Parameter params    : A dictionary whose key-value pairs are set as input values to the filter. Each key is a constant that
-    ///                         specifies the name of an input parameter for the filter, and the corresponding value is the value for
-    ///                         that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
-    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image scaling processing.
-    ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
-    /// - Returns: An image object representing the result of applying the filter.
-    public func applying(_ filterName:String, inputParameters params: [String: Any]?, option: RenderOption = .auto) -> UIImage! {
-        return type(of: self).filter(self, with: filterName, inputParameters: params, option: option)
-    }
-    /// Returns a new image created by making a generator filter with the specified name and parameters.
-    ///
-    /// Calling this method is equivalent to the following sequence of steps:
-    /// * Creating a CIFilter instance.
-    /// * Setting the necesary filter parameters from the params dictionary.
-    /// * Retrieving the outputImage object from the filter.
-    /// * Using the context from the given render option to create a cgImage.
-    /// * Creating a UIImage object with the cgImage, scale and orientation.
-    ///
-    /// - Parameter filterName  : The name of the filter to apply, as used when creating a CIFilter instance with the init(name:) method.
-    /// - Parameter params      : A dictionary whose key-value pairs are set as input values to the filter. Each key is a constant that
-    ///                           specifies the name of an input parameter for the filter, and the corresponding value is the value for
-    ///                           that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
-    /// - Parameter croppingRect: A rect for the generator filter to crop to because some of the generator filters need to be cropped
-    ///                           before they can be displayed like "CICheckerboardGenerator". Defaults to nil.
-    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
-    ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
-    /// - Returns: An image object representing the result of generator filter.
-    public class func generate(_ filterName: String, inputParameters params: [String: Any]?, cropTo croppingRect: CGRect? = nil, option: RenderOption = .auto) -> UIImage! {
-        if params?["inputImage"] != nil { fatalError("Using \(#function) to apply a generator filter which is not an input image parameter. Please using instance function 'applying(_:inputParameters:option:)' instead because a normal filter's result should using the same scale or orientation as the original image.") }
-        return filter(nil, with: filterName, inputParameters: params, croppingRect: croppingRect, scale: UIScreen.main.scale, orientation: .up, option: option)
-    }
-    /// Returns a new image created by applying a filter to the given image or making a generator filter if the image is nil
-    /// with the specified name and parameters.
-    ///
-    /// Calling this method is equivalent to the following sequence of steps:
-    /// * Creating a CIFilter instance.
-    /// * Setting the original image as the filter’s inputImage parameter.
-    /// * Setting the remaining filter parameters from the params dictionary.
-    /// * Retrieving the outputImage object from the filter.
-    /// * Using the context from the given render option to create a cgImage.
-    /// * Creating a UIImage object with the cgImage, scale and orientation.
-    ///
-    /// - Parameter image       : The image to apply filter to. Pass nil if you want to create a filter with unnecessary image parameter
-    ///                           like generator filter.
-    /// - Parameter filterName  : The name of the filter to apply, as used when creating a CIFilter instance with the init(name:) method.
-    /// - Parameter params      : A dictionary whose key-value pairs are set as input values to the filter. Each key is a constant that
-    ///                           specifies the name of an input parameter for the filter, and the corresponding value is the value for
-    ///                           that parameter. See `Core Image Filter Reference` for built-in filters and their allowed parameters.
-    /// - Parameter croppingRect: A rect for the generator filter to crop to because some of the generator filters need to be cropped
-    ///                           before they can be displayed like "CICheckerboardGenerator". Defaults to nil.
-    /// - Parameter scale       : A float value indicates the scale of the image mapping from pxiels to points. The `scale` of the given
-    ///                           image will be used as the result image's scale and this given value will be ignored if the given image
-    ///                           is not nil. Default using the scale of the main screen.
-    /// - Parameter orientation : A value of `UIImageOrientation` indicates the orientation of  the result UIImage. The `orientation` of
-    ///                           the given image will be used as the result image's scale and this given value will be ignored if the
-    ///                           given image is not nil. Default using `.up`.
-    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
-    ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
-    /// - Returns: An image object representing the result of applying the filter.
-    public class func filter(_ image: UIImage?, with filterName: String, inputParameters params: [String: Any]?, croppingRect: CGRect? = nil, scale: CGFloat = UIScreen.main.scale, orientation: UIImageOrientation = .up, option: RenderOption = .auto) -> UIImage! {
-        switch option.dest {
-        case .auto  : fallthrough
-        case .gpu(_):
-            var input: CIImage!
-            if CIFilter.filterNames(inCategory: kCICategoryGenerator).contains(filterName) && image == nil {// The filter is generator. And the image is not needed.
-                input = CIFilter(name: filterName, withInputParameters: params)?.outputImage
-                // Some of the generator filters need to be cropped before they can be displayed. 
-                /// Crop the input to the given rect if any.
-                if let crop = croppingRect {
-                    input = input.cropping(to: crop)
-                }
-            } else {
-                input = image?._makeCiImage()?.applyingFilter(filterName, withInputParameters: params)
-            }
-            guard let ciImage   = input else { return nil }
-            
-            return make(ciImage, scale: image?.scale ?? scale, orientation: image?.imageOrientation ?? orientation, option: option)
-        default: return nil
-        }
-    }
-    /// Creates the UIImage instance from a given CIImage with the given scale, orientation and redner option.
-    ///
-    /// - Note: The CIImage is rendered using the render destination in the render option and `.cpu` mode is not supported.
-    ///
-    /// - Parameter ciImage     : The core image to be rendered to the UIImage.
-    /// - Parameter scale       : A float value indicates the scale of the image mapping from pxiels to points. The `scale` of the given
-    ///                           image will be used as the result image's scale and this given value will be ignored if the given image
-    ///                           is not nil. Default using the scale of the main screen.
-    /// - Parameter orientation : A value of `UIImageOrientation` indicates the orientation of  the result UIImage. The `orientation` of
-    ///                           the given image will be used as the result image's scale and this given value will be ignored if the
-    ///                           given image is not nil. Default using `.up`.
-    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
-    ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
-    ///
-    /// - Returns: An UIImage object contains bitmap(CGImage-Based) data rather than core image data.
-    public class func make(_ ciImage: CIImage, from extent: CGRect? = nil, scale: CGFloat = UIScreen.main.scale, orientation: UIImageOrientation = .up, option: RenderOption) -> UIImage! {
-        guard let ciContext = _ciContext(at: option.dest)                                      else { return nil }
-        guard let cgImage   = ciContext.createCGImage(ciImage, from: extent ?? ciImage.extent) else { return nil }
-        
-        return UIImage(cgImage: cgImage, scale: scale, orientation: orientation)
-    }
-}
+private var _metalCIContext    = RichImage._MetalBasedCIContext()
+private var _openGLESCIContext = RichImage._OpenGLESBasedCIContext()
 
 /// Initialize the required core image context for the given render destinations.
 ///
 /// - Parameter dests: A array of value defined in `UIImage.RenderDestination` used
 ///                    to initialze the corresponding render destination context.
 ///
-public func CIContextInitialize(_ dests: [UIImage.RenderOption.Destination]) { dests.forEach({ _ciContext(at: $0) }) }
+public func CIContextInitialize(_ dests: [RichImage.RenderOption.Destination]) { dests.forEach({ _ciContext(at: $0) }) }
 /// Update the cached CIContext with the given context for the specific render destination.
 ///
 /// - Note: This updation will not check the render destination of the given context. So be
@@ -353,7 +377,7 @@ public func CIContextInitialize(_ dests: [UIImage.RenderOption.Destination]) { d
 /// - Parameter dest   : The render destination whose context need to be updated.
 ///
 /// - Returns: A boolean result indicates whether the updation is successful.
-public func CIContextUpdate(_ context: CIContext, `for` dest: UIImage.RenderOption.Destination) -> Bool {
+public func CIContextUpdate(_ context: CIContext, `for` dest: RichImage.RenderOption.Destination) -> Bool {
     switch dest {
     case .auto:
         _autoCIContext.context = context
@@ -373,7 +397,7 @@ public func CIContextUpdate(_ context: CIContext, `for` dest: UIImage.RenderOpti
 
 /// Get the context of core image with the given render destination.
 @discardableResult
-internal func _ciContext(at dest: UIImage.RenderOption.Destination) -> CIContext! {
+internal func _ciContext(at dest: RichImage.RenderOption.Destination) -> CIContext! {
     switch dest {
     case .auto:
         return _autoCIContext.context
@@ -419,7 +443,7 @@ extension UIImage {
     ///
     /// - Parameter dest: A render destination used by the ci context
     ///                   to generate cg images.
-    internal func _makeCgImage(_ dest: UIImage.RenderOption.Destination = .auto) -> CGImage! {
+    internal func _makeCgImage(_ dest: RichImage.RenderOption.Destination = .auto) -> CGImage! {
         var cgImage: CGImage! = nil
         if let underlyingCgImage = self.cgImage {
             cgImage = underlyingCgImage
