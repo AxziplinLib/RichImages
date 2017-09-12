@@ -143,10 +143,14 @@ extension RichImage.BluringOption {
         return RichImage.BluringOption(.zoom(center: center, amount: amount))
     }
 }
+/// A type that can process the UIImage object by add core image bluring filter or using Accelerate.vImage.
+///
+/// To add `Blurrable` conformance to your custom types, define `image` property and return an UIImage object.
+public protocol Blurrable: RichImagable {}
 
-extension UIImage {
+extension Blurrable {
     /// Creates a copy of the receiver by applying a blur filter with the bluring option and render with the given render option.
-    /// 
+    ///
     /// Typically use this function to produce an image with the core image's filter. Use vImageBluring if you want creates an
     /// CPU-Based and more efficiently blured image.
     ///
@@ -156,12 +160,14 @@ extension UIImage {
     ///
     /// - Returns: A copy of the receiver image with applying a blur effect.
     public func blur(_ bluringOption: RichImage.BluringOption, option: RichImage.RenderOption = .auto) -> UIImage! {
-        if  let filter = bluringOption.mode.filter,
-            let ciImage = _makeCiImage()?.applyingFilter(filter.name, withInputParameters: filter.inputParameters),
-            let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option)
+        if  let filter  = bluringOption.mode.filter,
+            let ciImage = image._makeCiImage()?.applyingFilter(filter.name, withInputParameters: filter.inputParameters),
+            let uiImage = type(of: self).make(ciImage, scale: image.scale, orientation: image.imageOrientation, option: option)
         {
-            return image
+            return uiImage
         }
         return nil
     }
 }
+/// Added Blurrable comformance.
+extension UIImage: Blurrable {}
