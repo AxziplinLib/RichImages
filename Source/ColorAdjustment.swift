@@ -34,6 +34,17 @@ extension UIColor.Components {
     public static var max: UIColor.Components { return UIColor.Components(r: 1.0, g: 1.0, b: 1.0, a: 1.0) }
 }
 
+extension CIVector {
+    /// Initializes a vector that is initialized with values provided by a UIColor.Components structure.
+    /// The UIColor.Components structure’s r, g, b and a values are stored in the vector’s x, y, z and w properties.
+    ///
+    /// - Parameters r: A color component.
+    /// - Returns: A CIVector object with the values in the given color component.
+    public convenience init(colorComponent: UIColor.Components) {
+        self.init(x: colorComponent.r, y: colorComponent.g, z: colorComponent.b, w: colorComponent.a)
+    }
+}
+
 extension UIImage {
     /// Modifies color values to keep them within a specified range.
     ///
@@ -81,6 +92,35 @@ extension UIImage {
     /// - Returns: A copy of the receiver by adjusting the color components of the receiver image.
     public func adjust(saturation: CGFloat = 1.0, brightness: CGFloat = 1.0, contrast: CGFloat = 1.0, option: RenderOption = .auto) -> UIImage! {
         guard let ciImage = _makeCiImage()?.applyingFilter("CIColorControls", withInputParameters: ["inputSaturation": saturation, "inputBrightness": brightness, "inputContrast": contrast]),
+            let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
+            else {
+                return nil
+        }
+        return image
+    }
+    /// Multiplies source color values and adds a bias factor to each color component.
+    ///
+    /// This filter performs a matrix multiplication, as follows, to transform the color vector:
+    ///
+    /// - s.r = dot(s, redVector)
+    /// - s.g = dot(s, greenVector)
+    /// - s.b = dot(s, blueVector)
+    /// - s.a = dot(s, alphaVector)
+    /// - s = s + bias
+    ///
+    ///
+    ///- Note: As with all color filters, this operation is performed in the working color space of the Core Image context 
+    ///        (CIContext) executing the filter, using unpremultiplied pixel color values. If you see unexpected results, 
+    ///        verify that your output and working color spaces are set up as intended.
+    ///
+    /// - Parameter component: The color component to be multiplied by the color of the receiver. Using `UIColor.Components.max` as default.
+    /// - Parameter bias     : The color component to be added by the color of the receiver. Using `UIColor.Components.min` as default.
+    /// - Parameter option   : A value of `RenderOption` indicates the rendering options of the image blurring processing.
+    ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the receiver by multiplying and adding the given color components.
+    public func multiply(_ component: UIColor.Components = .max, bias: UIColor.Components = .min, option: RenderOption = .auto) -> UIImage! {
+        guard let ciImage = _makeCiImage()?.applyingFilter("CIColorMatrix", withInputParameters: ["inputRVector": CIVector(x: component.r, y: 0.0, z: 0.0, w: 0.0), "inputGVector": CIVector(x: 0.0, y: component.g, z: 0.0, w: 0.0), "inputBVector": CIVector(x: 0.0, y: 0.0, z: component.b, w: 0.0), "inputAVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: component.a), "inputBiasVector": CIVector(colorComponent: bias)]),
             let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
             else {
                 return nil
