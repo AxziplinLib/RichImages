@@ -9,9 +9,9 @@
 import UIKit
 import CoreImage
 
-extension UIImage {
+extension UIColor {
     /// A type representing the rgba components of color object.
-    public struct ColorComponents {
+    public struct Components {
         let r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat
         init(r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
             self.r = r
@@ -27,11 +27,11 @@ extension UIImage {
     }
 }
 
-extension UIImage.ColorComponents {
+extension UIColor.Components {
     /// Returns a min values of the color component.
-    public static var min: UIImage.ColorComponents { return UIImage.ColorComponents(r: 0.0, g: 0.0, b: 0.0, a: 0.0) }
+    public static var min: UIColor.Components { return UIColor.Components(r: 0.0, g: 0.0, b: 0.0, a: 0.0) }
     /// Returns a max values of the color component.
-    public static var max: UIImage.ColorComponents { return UIImage.ColorComponents(r: 1.0, g: 1.0, b: 1.0, a: 1.0) }
+    public static var max: UIColor.Components { return UIColor.Components(r: 1.0, g: 1.0, b: 1.0, a: 1.0) }
 }
 
 extension UIImage {
@@ -49,7 +49,7 @@ extension UIImage {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// 
     /// - Returns: A copy of the recevier clampped to the given range of color components.
-    public func clampColor(min: ColorComponents = .min, max: ColorComponents = .max, option: RenderOption = .auto) -> UIImage! {
+    public func clampColor(min: UIColor.Components = .min, max: UIColor.Components = .max, option: RenderOption = .auto) -> UIImage! {
         guard let ciImage = _makeCiImage()?.applyingFilter("CIColorClamp", withInputParameters: ["inputMinComponents": CIVector(x: min.r, y: min.g, z: min.b, w: min.a), "inputMaxComponents": CIVector(x: max.r, y: max.g, z: max.b, w:  max.a)]),
               let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
         else {
