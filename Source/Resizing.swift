@@ -36,11 +36,11 @@ extension UIImage {
     ///
     /// - Parameter rect: The rectangle area coordinates in the receiver. The value
     ///                   of the rectangle must not be zero or negative sizing.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options
     ///                     of the image cropping processing such as the destination.
     ///
     /// - Returns: An copy of the receiver cropped to the given rectangle.
-    public func crop(to rect: CGRect, option: RenderOption = .cpu) -> UIImage! {
+    public func crop(to rect: CGRect, option: RichImage.RenderOption = .cpu) -> UIImage! {
         guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.crop(to: rect, option: option) } }), duration: duration) }
         // Early fatal checking.
         guard rect.width > 0.0 && rect.height > 0.0 else { return nil }
@@ -72,11 +72,11 @@ extension UIImage {
     ///                   the size must not be zero or negative.
     /// - Parameter mode: The resizing mode to decide the rectangle to crop.
     ///                   The value will use `.center` by default.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options
     ///                     of the image cropping processing such as the destination.
     ///
     /// - Returns: An copy of the receiver cropped to the given size and resizing mode.
-    public func crop(fits size: CGSize, using mode: ResizingMode = .center, option: RenderOption = .cpu) -> UIImage! {
+    public func crop(fits size: CGSize, using mode: ResizingMode = .center, option: RichImage.RenderOption = .cpu) -> UIImage! {
         // Scales points to pxiels.
         var croppingRect = CGRect(origin: .zero, size: size).scale(by: scale)
         switch mode {
@@ -118,11 +118,11 @@ extension UIImage {
     /// edges of the image when rotating it using Core Animation.)
     ///
     /// - Parameter sizet : A size of thumbnail to fit and square to.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options
     ///                     of the image cropping processing such as the destination.
     ///
     /// - Returns: A copy of the receiver that is squared to the thumbnail size.
-    public func thumbnail(squaresTo sizet: CGFloat, option: RenderOption = .cpu) -> UIImage! {
+    public func thumbnail(squaresTo sizet: CGFloat, option: RichImage.RenderOption = .cpu) -> UIImage! {
         guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.thumbnail(squaresTo: sizet, option: option) } }), duration: duration) }
         
         // Resize the original image.
@@ -171,11 +171,11 @@ extension UIImage {
     ///
     /// - Parameter size        : A value of `CGSize` indicates the size to draw of the image.
     /// - Parameter resizingMode: An instance of `UIImage.ResizingMode` using to decide the size of the resizing.
-    /// - Parameter option      : A value of `RenderOption` indicates the rendering options
+    /// - Parameter option      : A value of `RichImage.RenderOption` indicates the rendering options
     ///                           of the image cropping processing such as the destination.
     ///
     /// - Returns: A copy of the receiver resized to the given size.
-    public func resize(fits size: CGSize, using resizingMode: ResizingMode, option: RenderOption = .cpu) -> UIImage! {
+    public func resize(fits size: CGSize, using resizingMode: ResizingMode, option: RichImage.RenderOption = .cpu) -> UIImage! {
         let horizontalRatio = size.width  / self.size.width
         let verticalRatio   = size.height / self.size.width
         var ratio: CGFloat
@@ -197,11 +197,11 @@ extension UIImage {
     /// The image will be scaled disproportionately if necessary to fit the bounds specified by the parameter.
     ///
     /// - Parameter size   : A CGSize object to resize the scaling of the receiver with.
-    /// - Parameter option : A value of `RenderOption` indicates the rendering options
+    /// - Parameter option : A value of `RichImage.RenderOption` indicates the rendering options
     ///                      of the image cropping processing such as the destination.
     ///
     /// - Returns: A rescaled copy of the receiver.
-    public func resize(fills size: CGSize, option: RenderOption = .cpu) -> UIImage! {
+    public func resize(fills size: CGSize, option: RichImage.RenderOption = .cpu) -> UIImage! {
         var transposed = false
         switch imageOrientation {
         case .left         : fallthrough
@@ -220,7 +220,7 @@ extension UIImage {
     /// The new image's orientation will be UIImageOrientationUp, regardless of the current image's orientation
     ///
     /// If the new size is not integral, it will be rounded up.
-    private func _resize(fills newSize: CGSize, applying transform: CGAffineTransform, transposed: Bool, option: RenderOption = .cpu) -> UIImage! {
+    private func _resize(fills newSize: CGSize, applying transform: CGAffineTransform, transposed: Bool, option: RichImage.RenderOption = .cpu) -> UIImage! {
         guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img._resize(fills: newSize, applying: transform, transposed: transposed, option: option) } }), duration: duration) }
         // Scales points to pxiels.
         let newRect        = CGRect(origin: .zero, size: newSize).integral.scale(by: scale)

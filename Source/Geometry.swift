@@ -18,16 +18,16 @@ extension UIImage {
     /// Craetes an copy of the receiver with critical rounding in points with the given render destination.
     /// Animated image supported.
     ///
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rounding processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image rounding processing.
     /// - Returns: Returns an copy of the receiver with critical rounded.
-    public func makeCornered(_ option: RenderOption = .cpu) -> UIImage! { return round(by: min(size.width, size.height) * 0.5, option: option) }
+    public func makeCornered(_ option: RichImage.RenderOption = .cpu) -> UIImage! { return round(by: min(size.width, size.height) * 0.5, option: option) }
     /// Creates a copy of this image with rounded corners in points. Animated image supported. Animated image supported.
     ///
     /// - Parameter radius: The width of the corner drawing. The value must not be negative.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rounding processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image rounding processing.
     ///
     /// - Returns: An image with rounded corners.
-    public func round(by radius: CGFloat, option: RenderOption = .cpu) -> UIImage! {
+    public func round(by radius: CGFloat, option: RichImage.RenderOption = .cpu) -> UIImage! {
         guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.round(by: radius, option: option) } }), duration: duration) }
         // Early fatal checking.
         guard radius >= 0.0/* && borderWidth >= 0.0 */else { return nil }
@@ -140,20 +140,20 @@ extension UIImage {
     /// Creates a copy of the receiver image by the given angle. Animated image supported.
     ///
     /// - Parameter angle: A float value indicates the angle to rotate by.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rotating processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image rotating processing.
     ///
     /// - Returns: A new image with the given angle rotated.
-    public func rotate(by angle: CGFloat, option: RenderOption = .cpu) -> UIImage! {
+    public func rotate(by angle: CGFloat, option: RichImage.RenderOption = .cpu) -> UIImage! {
         return applying(CGAffineTransform(rotationAngle: angle), option: option)
     }
     /// Creates and returns a copy of the receiver image with flipped horizontally with a specific render option.
     /// Animated image supported.
     ///
     /// - Parameter horizontally: True to flip horizontally, otherwise vertically.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image rotating processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image rotating processing.
     ///
     /// - Returns: A copy of the receiver by flipping according to the direction and the given option.
-    public func flip(horizontally: Bool, option: RenderOption = .cpu) -> UIImage! {
+    public func flip(horizontally: Bool, option: RichImage.RenderOption = .cpu) -> UIImage! {
         return applying(CGAffineTransform(scaleX: horizontally ? -1.0 : 1.0, y: horizontally ? 1.0 : -1.0), option: option)
     }
 }
@@ -171,10 +171,10 @@ extension UIImage {
     /// - translation: Affect `.cpu` only.
     ///
     /// - Parameter matrix: A value of `CGAffineTransform` to define the transform of the copy of the receiver image.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image render processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image render processing.
     ///
     /// - Returns: A copy of the receiver by applying the given tranform matrix.
-    public func applying(_ matrix: CGAffineTransform, option: RenderOption = .cpu) -> UIImage! {
+    public func applying(_ matrix: CGAffineTransform, option: RichImage.RenderOption = .cpu) -> UIImage! {
         guard !animatable else { return UIImage.animatedImage(with: self.images!.flatMap({ _img in autoreleasepool{ _img.applying(matrix, option: option) } }), duration: duration) }
         
         let rect           = CGRect(origin: .zero, size: size)
@@ -220,11 +220,11 @@ extension UIImage {
     /// - Parameter scale      : A CGFloat value indicates the scale accuracy of the source image reached from `0.0` to `1.0`.
     /// - Parameter aspectRatio: A CGFloat value indicates the aspect ratio accuracy of the scaling reached from `0.0` to `1.0`.
     ///                          using `1.0` by default.
-    /// - Parameter option     : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option     : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                          Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A scaled, high-quality copy of the recevier.
-    public func scale(to scale: CGFloat, aspectRatio: CGFloat = 1.0, option: RenderOption = .auto) -> UIImage! {
+    public func scale(to scale: CGFloat, aspectRatio: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
         return applying("CILanczosScaleTransform", inputParameters: ["inputScale": scale, "inputAspectRatio": aspectRatio], option: option)
     }
 }
@@ -242,11 +242,11 @@ extension UIImage {
     ///                          A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Bottom Left.
     /// - Parameter bottomRight: The point in the input image to be mapped to the bottom right corner of the output image.
     ///                          A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Bottom Right.
-    /// - Parameter option     : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option     : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                          Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A perspective corrected copy of the recevier.
-    public func perspectiveCorrect(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint, option: RenderOption = .auto) -> UIImage! {
+    public func perspectiveCorrect(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint, option: RichImage.RenderOption = .auto) -> UIImage! {
         return applying("CIPerspectiveCorrection", inputParameters: ["inputTopLeft": CIVector(cgPoint: topLeft), "inputTopRight": CIVector(cgPoint: topRight), "inputBottomRight": CIVector(cgPoint: bottomRight), "inputBottomLeft": CIVector(cgPoint: bottomLeft)], option: option)
     }
     /// Alters the geometry of an image to simulate the observer changing viewing position.
@@ -260,11 +260,11 @@ extension UIImage {
     /// - Parameter bottomRight: A CIVector object whose attribute type is CIAttributeTypePosition and whose display name is Bottom Right.
     /// - Parameter extent     : A CIVector object whose whose attribute type is CIAttributeTypeRectangle. If you pass [image extent] 
     ///                          you’ll get the same result as using the CIPerspectiveTransform filter.
-    /// - Parameter option     : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option     : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                          Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A perspective corrected copy of the recevier.
-    public func perspectiveTransform(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint, extent: CGRect? = nil, option: RenderOption = .auto) -> UIImage! {
+    public func perspectiveTransform(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint, extent: CGRect? = nil, option: RichImage.RenderOption = .auto) -> UIImage! {
         var inputParameters = ["inputTopLeft": CIVector(cgPoint: topLeft), "inputTopRight": CIVector(cgPoint: topRight), "inputBottomRight": CIVector(cgPoint: bottomRight), "inputBottomLeft": CIVector(cgPoint: bottomLeft)]
         if let _ext = extent { inputParameters["inputExtent"] = CIVector(cgRect: _ext) }
         return applying(extent == nil ? "CIPerspectiveTransform" : "CIPerspectiveTransformWithExtent", inputParameters: inputParameters, option: option)
@@ -278,10 +278,10 @@ extension UIImage {
     ///
     /// - Parameter angle : An NSNumber object whose attribute type is CIAttributeTypeScalar and whose display name is Angle.
     ///                     Default value is 0.0.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: An image scaled and cropped to fit the extent of the input image.
-    public func straightenRotate(by angle: CGFloat, option: RenderOption = .auto) -> UIImage! {
+    public func straightenRotate(by angle: CGFloat, option: RichImage.RenderOption = .auto) -> UIImage! {
         return applying("CIStraightenFilter", inputParameters: ["inputAngle": angle], option: option)
     }
 }

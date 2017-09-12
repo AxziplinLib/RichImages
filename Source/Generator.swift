@@ -230,11 +230,11 @@ extension UIImage {
     ///                              in up to 4 layers, producing a barcode image sized between 15 x 15 and 27 x 27 pixels. 
     ///                              The full-size format can store up to 1914 bytes of message data (including correction) in up to 32 layers,
     ///                              producing a barcode image sized no larger than 151 x 151 pixels. Using false as default.
-    /// - Parameter option         : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option         : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                              Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: An Aztec code image object.
-    public class func generateAztecCode(_ data: Data, correctionLevel: CGFloat = 23.0, layers: CGFloat = 0.0, compactStyle: Bool = false, option: RenderOption = .auto) -> UIImage! {
+    public class func generateAztecCode(_ data: Data, correctionLevel: CGFloat = 23.0, layers: CGFloat = 0.0, compactStyle: Bool = false, option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CIAztecCodeGenerator", inputParameters: ["inputMessage": data, "inputCorrectionLevel": correctionLevel, "inputLayers": layers, "inputCompactStyle": compactStyle], option: option)
     }
     /// Generates a Quick Response code (two-dimensional barcode) from input data.
@@ -257,11 +257,11 @@ extension UIImage {
     /// - Parameter data           : The data to be encoded as a QR code. An NSData object whose display name is Message.
     /// - Parameter correctionLevel: A single letter specifying the error correction format. An NSString object whose display name is CorrectionLevel.
     ///                              Default value: M
-    /// - Parameter option         : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option         : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                              Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: An image containing QRCode infos.
-    public class func generateQRCode(_ data: Data, correctionLevel: String = "M", option: RenderOption = .auto) -> UIImage! {
+    public class func generateQRCode(_ data: Data, correctionLevel: String = "M", option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CIQRCodeGenerator", inputParameters: ["inputMessage": data, "inputCorrectionLevel": correctionLevel], option: option)
     }
     /// Generates a Code 128 one-dimensional barcode from input data.
@@ -279,11 +279,11 @@ extension UIImage {
     /// - Parameter quietSpace: The number of pixels of added white space on each side of the barcode.
     ///                         A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name is QuietSpace.
     ///                         The value is available in [0.0, 20.0], using 7.0 as default.
-    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option    : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// 
     /// - Returns: An image containing code 128 barcode info.
-    public class func generateCode128Barcode(_ data: Data, quietSpace: CGFloat = 7.0, option: RenderOption = .auto) -> UIImage! {
+    public class func generateCode128Barcode(_ data: Data, quietSpace: CGFloat = 7.0, option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CICode128BarcodeGenerator", inputParameters: ["inputMessage": data, "inputQuietSpace": quietSpace], option: option)
     }
     /// Generates a PDF417 code (two-dimensional barcode) from input data.
@@ -331,11 +331,11 @@ extension UIImage {
     ///                                      contain compaction mode information, a reader assumes text-based compaction. Some barcodes
     ///                                      include this information even when using text-based compaction.). A CGFloat value whose 
     ///                                      display name is AlwaysSpecifyCompaction. Using false as default.
-    /// - Parameter option                 : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option                 : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                                      Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A PDF417 code (two-dimensional barcode) from input data.
-    public class func generatePDF417Barcode(_ data: Data, minWidth: CGFloat = 56.00, maxWidth: CGFloat = 56.00 * 2.0, minHeight: CGFloat = 13.00, maxHeight: CGFloat = 13.00 * 2.0, dataColumns: Int = 30, rows: Int = 3, preferredAspectRatio: CGFloat = 3.0, compactionMode: Int = 0, compactStyle: Bool = false, correctionLevel: Int = 4, alwaysSpecifyCompaction: Bool = false, option: RenderOption = .auto) -> UIImage! {
+    public class func generatePDF417Barcode(_ data: Data, minWidth: CGFloat = 56.00, maxWidth: CGFloat = 56.00 * 2.0, minHeight: CGFloat = 13.00, maxHeight: CGFloat = 13.00 * 2.0, dataColumns: Int = 30, rows: Int = 3, preferredAspectRatio: CGFloat = 3.0, compactionMode: Int = 0, compactStyle: Bool = false, correctionLevel: Int = 4, alwaysSpecifyCompaction: Bool = false, option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CIPDF417BarcodeGenerator", inputParameters: ["inputMessage": data, "inputMinWidth": minWidth, "inputMaxWidth": maxWidth, "inputMinHeight": minHeight, "inputMaxHeight": maxHeight, "inputDataColumns": dataColumns, "inputRows": rows, "inputPreferredAspectRatio": preferredAspectRatio, "inputCompactionMode": compactionMode, "inputCompactStyle": compactStyle, "inputCorrectionLevel": correctionLevel, "inputAlwaysSpecifyCompaction": alwaysSpecifyCompaction], cropTo: nil, option: option)
     }
 }
@@ -354,21 +354,21 @@ extension UIImage {
     /// - Parameter sharpness : A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name is Sharpness.
     ///                         Default value: 1.00
     /// - Parameter size      : The size of the generated checkerboard pattern image.
-    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option    : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A checkerboard pattern image.
-    public class func generateCheckerboard(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, inputWidth: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
+    public class func generateCheckerboard(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, inputWidth: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize, option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CICheckerboardGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1), "inputWidth": inputWidth, "inputSharpness": sharpness], cropTo: CGRect(origin: CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5), size: size), option: option)
     }
     /// Generates a solid color image.
     ///
     /// - Parameter color : A UIColor object whose display name is Color to fill the result image.
     /// - Parameter size  : The size of the image in pxiels.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: An solid color image with the given size.
-    public class func generateConstantColor(_ color: UIColor, size: CGSize = CGSize(width: 1.0, height: 1.0), option: RenderOption = .auto) -> UIImage! {
+    public class func generateConstantColor(_ color: UIColor, size: CGSize = CGSize(width: 1.0, height: 1.0), option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CIConstantColorGenerator", inputParameters: ["inputColor": CIColor(color: color)], cropTo: CGRect(origin: .zero, size: size), option: option)
     }
     /// Use this function to simulates a lens flare and creates a lens flare image.
@@ -391,22 +391,22 @@ extension UIImage {
     /// - Parameter time             : Adds a randomness to the lens flare; it causes the flare to "sparkle" as it changes through various 
     ///                                time values. A TimeInterval value whose attribute type is CIAttributeTypeScalar and whose display name
     ///                                is Time. Default value: 0.00.
-    /// - Parameter option           : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option           : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                                Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A lens flare effects image.
-    public class func generateLenticularHalo(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, haloRadius: CGFloat = 70.0, haloWidth: CGFloat = 87.0, haloOverlap: CGFloat = 0.77, striationStrength: CGFloat = 0.50, striationContrast: CGFloat = 1.0, time: TimeInterval = 0.0, option: RenderOption = .auto) -> UIImage! {
+    public class func generateLenticularHalo(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, haloRadius: CGFloat = 70.0, haloWidth: CGFloat = 87.0, haloOverlap: CGFloat = 0.77, striationStrength: CGFloat = 0.50, striationContrast: CGFloat = 1.0, time: TimeInterval = 0.0, option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CILenticularHaloGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor": CIColor(color: color), "inputHaloRadius": haloRadius, "inputHaloWidth": haloWidth, "inputHaloOverlap": haloOverlap, "inputStriationStrength": striationStrength, "inputStriationContrast": striationContrast, "inputTime": time], option: option)
     }
     /// Generates an image of infinite extent whose pixel values are made up of four independent, uniformly-distributed
     /// random numbers in the 0 to 1 range.
     ///
     /// - Parameter size  : The size of the target image to displat in pxiels.
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A random pixels image.
-    public class func generateRandom(size: CGSize, option: RenderOption = .auto) -> UIImage! {
+    public class func generateRandom(size: CGSize, option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CIRandomGenerator", inputParameters: nil, cropTo: CGRect(origin: .zero, size: size), option: option)
     }
     /// Generates a starburst pattern that is similar to a supernova; can be used to simulate a lens flare.
@@ -428,11 +428,11 @@ extension UIImage {
     /// - Parameter epsilon     : A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name is Epsilon.
     ///                           Default value: -2.00.
     /// - Parameter size        : The size of the generated starburst pattern image.
-    /// - Parameter option      : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option      : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                           Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A starburst pattern image that is similar to a supernova.
-    public class func generateStarShine(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, radius: CGFloat = 50.0, crossScale: CGFloat = 15.0, crossAngle: CGFloat = 0.60, crossOpacity: CGFloat = -2.0, crossWidth: CGFloat = 2.5, epsilon: CGFloat = -2.0, size: CGSize, option: RenderOption = .auto) -> UIImage! {
+    public class func generateStarShine(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, radius: CGFloat = 50.0, crossScale: CGFloat = 15.0, crossAngle: CGFloat = 0.60, crossOpacity: CGFloat = -2.0, crossWidth: CGFloat = 2.5, epsilon: CGFloat = -2.0, size: CGSize, option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CIStarShineGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor": CIColor(color: color), "inputRadius": radius, "inputCrossScale": crossScale, "inputCrossAngle": crossAngle, "inputCrossOpacity": crossOpacity, "inputCrossWidth": crossWidth, "inputEpsilon": epsilon], cropTo: CGRect(origin: CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5), size: size), option: option)
     }
     /// Generates a stripe pattern.
@@ -448,11 +448,11 @@ extension UIImage {
     /// - Parameter sharpness: A CGFloat value whose attribute type is CIAttributeTypeScalar and whose display name
     ///                        is Sharpness. Default value: 1.00.
     /// - Parameter size     : The size of the generated stripe pattern image. Default value [300.0, 300.0].
-    /// - Parameter option   : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// 
     /// - Returns: A stripe pattern image.
-    public class func generateStripes(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, width: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize = CGSize(width: 300.0, height: 300.0), option: RenderOption = .auto) -> UIImage! {
+    public class func generateStripes(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color0: UIColor, color1: UIColor, width: CGFloat = 80.0, sharpness: CGFloat = 1.0, size: CGSize = CGSize(width: 300.0, height: 300.0), option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CIStripesGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1), "inputWidth": width], cropTo: CGRect(origin: CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5), size: size), option: option)
     }
     /// Generates a sun effect.
@@ -470,11 +470,11 @@ extension UIImage {
     ///                                 name is Striation Strength. Default value: 0.50.
     /// - Parameter time              : A TimeInterval value whose attribute type is CIAttributeTypeScalar and whose display name
     ///                                 is Time. Default value: 0.00.
-    /// - Parameter option            : A value of `RenderOption` indicates the rendering options of the image scaling processing.
+    /// - Parameter option            : A value of `RichImage.RenderOption` indicates the rendering options of the image scaling processing.
     ///                                 Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A sun effect image.
-    public class func generateSunbeams(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, sunRadius: CGFloat = 40.0, maxStriationRadius: CGFloat = 2.58, striationStrength: CGFloat = 0.5, striationContrast: CGFloat = 1.38, time: TimeInterval = 0.0, option: RenderOption = .auto) -> UIImage! {
+    public class func generateSunbeams(center: CGPoint = CGPoint(x: 150.0, y: 150.0), color: UIColor, sunRadius: CGFloat = 40.0, maxStriationRadius: CGFloat = 2.58, striationStrength: CGFloat = 0.5, striationContrast: CGFloat = 1.38, time: TimeInterval = 0.0, option: RichImage.RenderOption = .auto) -> UIImage! {
         return generate("CISunbeamsGenerator", inputParameters: ["inputCenter": CIVector(cgPoint: center), "inputColor": CIColor(color: color), "inputSunRadius": sunRadius, "inputMaxStriationRadius": maxStriationRadius, "inputStriationStrength": striationStrength, "inputStriationContrast": striationContrast, "inputTime": time], cropTo: nil, option: option)
     }
 }

@@ -56,11 +56,11 @@ extension UIImage {
     ///                     and whose display name is MinComponents. Default value: [0.0, 0.0, 0.0, 0.0].
     /// - Parameter max   : RGBA values for the upper end of the range. A ColorComponents object whose attribute type is CIAttributeTypeRectangle
     ///                     and whose display name is MaxComponents. Default value: [1.0, 1.0, 1.0, 1.0].
-    /// - Parameter option: A value of `RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// 
     /// - Returns: A copy of the recevier clampped to the given range of color components.
-    public func clampColor(min: UIColor.Components = .min, max: UIColor.Components = .max, option: RenderOption = .auto) -> UIImage! {
+    public func clampColor(min: UIColor.Components = .min, max: UIColor.Components = .max, option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = _makeCiImage()?.applyingFilter("CIColorClamp", withInputParameters: ["inputMinComponents": CIVector(x: min.r, y: min.g, z: min.b, w: min.a), "inputMaxComponents": CIVector(x: max.r, y: max.g, z: max.b, w:  max.a)]),
               let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
         else {
@@ -86,11 +86,11 @@ extension UIImage {
     /// - Parameter saturation: The saturation component of the color of the receiver image. Default value: 1.0.
     /// - Parameter brightness: The brightness component of the color of the receiver image. Default value: 1.0.
     /// - Parameter contrast  : The contrast component of the color of the receiver image. Default value: 1.0.
-    /// - Parameter option    : A value of `RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option    : A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
     ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the receiver by adjusting the color components of the receiver image.
-    public func adjust(saturation: CGFloat = 1.0, brightness: CGFloat = 1.0, contrast: CGFloat = 1.0, option: RenderOption = .auto) -> UIImage! {
+    public func adjust(saturation: CGFloat = 1.0, brightness: CGFloat = 1.0, contrast: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = _makeCiImage()?.applyingFilter("CIColorControls", withInputParameters: ["inputSaturation": saturation, "inputBrightness": brightness, "inputContrast": contrast]),
             let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
             else {
@@ -115,11 +115,11 @@ extension UIImage {
     ///
     /// - Parameter component: The color component to be multiplied by the color of the receiver. Using `UIColor.Components.max` as default.
     /// - Parameter bias     : The color component to be added by the color of the receiver. Using `UIColor.Components.min` as default.
-    /// - Parameter option   : A value of `RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
     ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the receiver by multiplying and adding the given color components.
-    public func multiply(_ component: UIColor.Components = .max, bias: UIColor.Components = .min, option: RenderOption = .auto) -> UIImage! {
+    public func multiply(_ component: UIColor.Components = .max, bias: UIColor.Components = .min, option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = _makeCiImage()?.applyingFilter("CIColorMatrix", withInputParameters: ["inputRVector": CIVector(x: component.r, y: 0.0, z: 0.0, w: 0.0), "inputGVector": CIVector(x: 0.0, y: component.g, z: 0.0, w: 0.0), "inputBVector": CIVector(x: 0.0, y: 0.0, z: component.b, w: 0.0), "inputAVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: component.a), "inputBiasVector": CIVector(colorComponent: bias)]),
             let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
             else {

@@ -151,11 +151,11 @@ extension UIImage {
     /// CPU-Based and more efficiently blured image.
     ///
     /// - Parameter bluringOption: A `BluringOption` value indicates the bluring filter info.
-    /// - Parameter option       : A value of `RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option       : A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
     ///                            Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the receiver image with applying a blur effect.
-    public func blur(_ bluringOption: BluringOption, option: RenderOption = .auto) -> UIImage! {
+    public func blur(_ bluringOption: BluringOption, option: RichImage.RenderOption = .auto) -> UIImage! {
         if  let filter = bluringOption.mode.filter,
             let ciImage = _makeCiImage()?.applyingFilter(filter.name, withInputParameters: filter.inputParameters),
             let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option)
