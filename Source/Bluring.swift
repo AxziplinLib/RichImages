@@ -9,7 +9,7 @@
 import UIKit
 import CoreImage
 
-extension UIImage {
+extension RichImage {
     /// A type representing the algorithm of pixels to applying blur effects. References to the filters
     /// in `CICategoryBlur`.
     enum BluringMode {
@@ -45,7 +45,7 @@ extension UIImage {
     }
 }
 
-extension UIImage.BluringMode {
+extension RichImage.BluringMode {
     /// Returns the filter info depending on the current value of the bluring mode.
     /// The value is a tuple consists of filter name and input parameters of the filter.
     fileprivate var filter: (name: String, inputParameters: [String: Any]?)? {
@@ -71,30 +71,30 @@ extension UIImage.BluringMode {
     }
 }
 
-extension UIImage.BluringOption {
+extension RichImage.BluringOption {
     /// Creates a bluring option with box mode with a given bluring radius.
     ///
     /// - Parameter radius: The bluring radius to affect the bluring effects. Using 10.0 as default.
     ///
     /// - Returns: A `BluringOption` value with the given radius.
-    public static func box(radius: CGFloat = 10.0) -> UIImage.BluringOption {
-        return UIImage.BluringOption(.box(radius: radius))
+    public static func box(radius: CGFloat = 10.0) -> RichImage.BluringOption {
+        return RichImage.BluringOption(.box(radius: radius))
     }
     /// Creates a bluring option with disc mode with a given bluring radius.
     ///
     /// - Parameter radius: The bluring radius to affect the bluring effects. Using 8.0 as default.
     ///
     /// - Returns: A `BluringOption` value with the given radius.
-    public static func disc(radius: CGFloat = 8.0) -> UIImage.BluringOption {
-        return UIImage.BluringOption(.disc(radius: radius))
+    public static func disc(radius: CGFloat = 8.0) -> RichImage.BluringOption {
+        return RichImage.BluringOption(.disc(radius: radius))
     }
     /// Creates a bluring option with gaussian mode with a given bluring radius.
     ///
     /// - Parameter radius: The bluring radius to affect the bluring effects. Using 10.0 as default.
     ///
     /// - Returns: A `BluringOption` value with the given radius.
-    public static func gaussian(radius: CGFloat = 10.0) -> UIImage.BluringOption {
-        return UIImage.BluringOption(.gaussian(radius: radius))
+    public static func gaussian(radius: CGFloat = 10.0) -> RichImage.BluringOption {
+        return RichImage.BluringOption(.gaussian(radius: radius))
     }
     /// Creates a bluring option with masking mode with a given bluring radius.
     ///
@@ -105,12 +105,12 @@ extension UIImage.BluringOption {
     /// - Parameter radius: The bluring radius to affect the bluring effects. Using 10.0 as default.
     ///
     /// - Returns: A `BluringOption` value with the given radius.
-    public static func mask(_ mask: UIImage, radius: CGFloat = 10.0) -> UIImage.BluringOption {
-        return UIImage.BluringOption(.mask(mask: mask, radius: radius))
+    public static func mask(_ mask: UIImage, radius: CGFloat = 10.0) -> RichImage.BluringOption {
+        return RichImage.BluringOption(.mask(mask: mask, radius: radius))
     }
     /// Returns a bluring option with median mode with a given bluring radius.
-    public static var  median: UIImage.BluringOption {
-        return UIImage.BluringOption(.median)
+    public static var  median: RichImage.BluringOption {
+        return RichImage.BluringOption(.median)
     }
     /// Creates a bluring option with motion mode with a given angle and bluring radius.
     ///
@@ -118,8 +118,8 @@ extension UIImage.BluringOption {
     /// - Parameter radius: The bluring radius to affect the bluring effects. Using 20.0 as default.
     ///
     /// - Returns: A `BluringOption` value with the given values.
-    public static func motion(angle: CGFloat = 0.0, radius: CGFloat = 20.0) -> UIImage.BluringOption {
-        return UIImage.BluringOption(.motion(angle: angle, radius: radius))
+    public static func motion(angle: CGFloat = 0.0, radius: CGFloat = 20.0) -> RichImage.BluringOption {
+        return RichImage.BluringOption(.motion(angle: angle, radius: radius))
     }
     /// Creates a bluring option with noise mode with a given angle and bluring radius.
     ///
@@ -130,8 +130,8 @@ extension UIImage.BluringOption {
     /// - Parameter sharpness: The bluring sharpness to affect the bluring effects. Using 0.4 as default.
     ///
     /// - Returns: A `BluringOption` value with the given values.
-    public static func noise(level: CGFloat = 0.02, sharpness: CGFloat = 0.4) -> UIImage.BluringOption {
-        return UIImage.BluringOption(.noise(level: level, sharpness: sharpness))
+    public static func noise(level: CGFloat = 0.02, sharpness: CGFloat = 0.4) -> RichImage.BluringOption {
+        return RichImage.BluringOption(.noise(level: level, sharpness: sharpness))
     }
     /// Creates a bluring option with zoom mode with a given center and bluring amount.
     ///
@@ -139,8 +139,8 @@ extension UIImage.BluringOption {
     /// - Parameter amount: The bluring amount to affect the bluring effects. Using 20.0 as default.
     ///
     /// - Returns: A `BluringOption` value with the given values.
-    public static func zoom(center: CGPoint = CGPoint(x: 150.0, y: 150.0), amount: CGFloat = 20.0) -> UIImage.BluringOption {
-        return UIImage.BluringOption(.zoom(center: center, amount: amount))
+    public static func zoom(center: CGPoint = CGPoint(x: 150.0, y: 150.0), amount: CGFloat = 20.0) -> RichImage.BluringOption {
+        return RichImage.BluringOption(.zoom(center: center, amount: amount))
     }
 }
 
@@ -155,7 +155,7 @@ extension UIImage {
     ///                            Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the receiver image with applying a blur effect.
-    public func blur(_ bluringOption: BluringOption, option: RichImage.RenderOption = .auto) -> UIImage! {
+    public func blur(_ bluringOption: RichImage.BluringOption, option: RichImage.RenderOption = .auto) -> UIImage! {
         if  let filter = bluringOption.mode.filter,
             let ciImage = _makeCiImage()?.applyingFilter(filter.name, withInputParameters: filter.inputParameters),
             let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option)
