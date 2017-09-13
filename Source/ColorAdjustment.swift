@@ -255,6 +255,22 @@ extension ColorAdjustable {
         }
         return _image
     }
+    /// Changes the overall hue, or tint, of the source pixels.
+    ///
+    /// This function essentially rotates the color cube around the neutral axis.
+    ///
+    /// - Parameter angle : A CGFloat value indicates the angle to rotate with. Default value: 0.0.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by changing the overrall hue with the given angle.
+    public func adjustHue(_ angle: CGFloat = 0.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIHueAdjust", withInputParameters: ["inputAngle": angle]),
+            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 /// ColorAdjustable conformance of UIImage.
 extension UIImage: ColorAdjustable { }
