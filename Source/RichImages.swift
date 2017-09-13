@@ -83,6 +83,7 @@ internal func _correct(bitmapInfo: CGBitmapInfo, `for` colorSpace: CGColorSpace)
 /// To add `RichImagable` conformance to your custom types, define `image` property and 
 /// return an UIImage object.
 public protocol RichImagable {
+    /// The UIImage object to be processed with CoreGraphics or CoreImage.
     var image: UIImage { get }
 }
 /// Added conformance to UIImage.
