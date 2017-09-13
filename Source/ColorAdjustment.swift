@@ -210,6 +210,27 @@ extension ColorAdjustable {
         }
         return _image
     }
+    /// Adjusts the exposure setting for an image similar to the way you control exposure for a
+    /// camera when you change the F-stop.
+    ///
+    /// This filter multiplies the color values, as follows, to simulate exposure change by the specified F-stops:
+    ///```
+    /// s.rgb * pow(2.0, ev)
+    ///```
+    ///
+    /// - Parameter exposureValue: The exposure value indicates the exposures of the image. The image will be
+    ///                            under-exposed if the value is negative. Using 0.5 as default.
+    /// - Parameter option       : A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
+    ///                            Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by adjusting the exposure value.
+    public func expose(_ exposureValue: CGFloat = 0.5, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIExposureAdjust", withInputParameters: ["inputEV": exposureValue]),
+            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 /// ColorAdjustable conformance of UIImage.
 extension UIImage: ColorAdjustable { }
