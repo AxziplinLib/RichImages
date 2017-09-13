@@ -145,6 +145,47 @@ extension ColorAdjustable {
         }
         return _image
     }
+    /// Modifies the pixel values in an image by applying a set of cubic polynomials.
+    ///
+    /// For each pixel, the value of each color component is treated as the input to a cubic polynomial, 
+    /// whose coefficients are taken from the corresponding input coefficients parameter in ascending order.
+    /// Equivalent to the following formula:
+    ///```
+    /// r = rCoeff[0] + rCoeff[1] * r + rCoeff[2] * r*r + rCoeff[3] * r*r*r
+    ///```
+    ///```
+    /// g = gCoeff[0] + gCoeff[1] * g + gCoeff[2] * g*g + gCoeff[3] * g*g*g
+    ///```
+    ///```
+    /// b = bCoeff[0] + bCoeff[1] * b + bCoeff[2] * b*b + bCoeff[3] * b*b*b
+    ///```
+    ///```
+    /// a = aCoeff[0] + aCoeff[1] * a + aCoeff[2] * a*a + aCoeff[3] * a*a*a
+    ///```
+    ///
+    /// - Note: As with all color filters, this operation is performed in the working color space of the Core Image 
+    ///         context (CIContext) executing the filter, using unpremultiplied pixel color values. If you see unexpected
+    ///         results, verify that your output and working color spaces are set up as intended.
+    ///
+    /// - Parameter red   : The `red` field polynomial coefficients to modify the color source image. Using [0.0, 1.0, 0.0, 0.0] as default.
+    /// - Parameter green : The `green` field polynomial coefficients to modify the color source image. Using [0.0, 1.0, 0.0, 0.0] as default.
+    /// - Parameter blue  : The `blue` field polynomial coefficients to modify the color source image. Using [0.0, 1.0, 0.0, 0.0] as default.
+    /// - Parameter alpha : The `alpha` field polynomial coefficients to modify the color source image. Using [0.0, 1.0, 0.0, 0.0] as default.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the receiver modified with the given polynomial coefficients.
+    public func polynomial(red: RichImage.ColorPolynomial = .identity, green: RichImage.ColorPolynomial = .identity, blue: RichImage.ColorPolynomial = .identity, alpha: RichImage.ColorPolynomial = .identity, option: RichImage.RenderOption = .auto) -> UIImage! {
+        let size  = image.size
+        let scale = image.scale
+        let imageOrientation = image.imageOrientation
+        
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorPolynomial", withInputParameters: ["inputRedCoefficients": CIVector(colorPolynomial: red), "inputGreenCoefficients": CIVector(colorPolynomial: green), "inputBlueCoefficients": CIVector(colorPolynomial: blue), "inputAlphaCoefficients": CIVector(colorPolynomial: alpha)]),
+            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 /// ColorAdjustable conformance of UIImage.
 extension UIImage: ColorAdjustable { }
