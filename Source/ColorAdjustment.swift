@@ -9,6 +9,8 @@
 import UIKit
 import CoreImage
 
+/// MARK: - ColorComponents.
+
 extension UIColor {
     /// A type representing the rgba components of color object.
     public struct Components {
@@ -34,14 +36,36 @@ extension UIColor.Components {
     public static var max: UIColor.Components { return UIColor.Components(r: 1.0, g: 1.0, b: 1.0, a: 1.0) }
 }
 
+// MARK: - ColorPolynomial.
+
+extension RichImage {
+    /// A type representing the coefficients fields in the processing parameters of filter `CIColorPolynomial`.
+    public struct ColorPolynomial {
+        let zero: CGFloat, one: CGFloat, double: CGFloat, triple: CGFloat
+        /// Returns the identity color polynomial.
+        static var identity: ColorPolynomial { return ColorPolynomial(zero: 0.0, one: 1.0, double: 0.0, triple: 0.0) }
+    }
+}
+
+// MARK: - CIVector.
+
 extension CIVector {
     /// Initializes a vector that is initialized with values provided by a UIColor.Components structure.
     /// The UIColor.Components structure’s r, g, b and a values are stored in the vector’s x, y, z and w properties.
     ///
-    /// - Parameters r: A color component.
+    /// - Parameters colorComponent: A color component.
     /// - Returns: A CIVector object with the values in the given color component.
     public convenience init(colorComponent: UIColor.Components) {
         self.init(x: colorComponent.r, y: colorComponent.g, z: colorComponent.b, w: colorComponent.a)
+    }
+    /// Initializes a vector that is initialized with values provided by a RichImage.ColorPolynomial structure.
+    /// The RichImage.ColorPolynomial structure’s zero, one, double and triple values are stored in the vector’s 
+    /// x, y, z and w properties.
+    ///
+    /// - Parameters colorPolynomial: A color polynomial.
+    /// - Returns: A CIVector object with the values in the given color component.
+    public convenience init(colorPolynomial: RichImage.ColorPolynomial) {
+        self.init(x: colorPolynomial.zero, y: colorPolynomial.one, z: colorPolynomial.double, w: colorPolynomial.triple)
     }
 }
 
