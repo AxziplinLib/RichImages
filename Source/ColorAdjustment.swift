@@ -45,11 +45,20 @@ extension CIVector {
     }
 }
 
-extension UIImage {
+// MARK: - ColorAdjustable.
+
+/// A protocol defines the color adjustment processing of `RichImage` by applying the filters in category
+/// `kCICategoryColorAdjustment`.
+///
+/// Any conforming type is required to implement the getter `image` so that the conforming type can be used 
+/// to adjust color of the returned UIImage object.
+///
+public protocol ColorAdjustable: RichImagable { /* ColorAdjustable field. */ }
+extension ColorAdjustable {
     /// Modifies color values to keep them within a specified range.
     ///
-    /// At each pixel, color component values less than those in inputMinComponents will be increased to 
-    /// match those in inputMinComponents, and color component values greater than those in inputMaxComponents 
+    /// At each pixel, color component values less than those in inputMinComponents will be increased to
+    /// match those in inputMinComponents, and color component values greater than those in inputMaxComponents
     /// will be decreased to match those in inputMaxComponents.
     ///
     /// - Parameter min   : RGBA values for the lower end of the range. A ColorComponents object whose attribute type is CIAttributeTypeRectangle
@@ -58,20 +67,23 @@ extension UIImage {
     ///                     and whose display name is MaxComponents. Default value: [1.0, 1.0, 1.0, 1.0].
     /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
-    /// 
+    ///
     /// - Returns: A copy of the recevier clampped to the given range of color components.
-    public func clampColor(min: UIColor.Components = .min, max: UIColor.Components = .max, option: RichImage.RenderOption = .auto) -> UIImage! {
-        guard let ciImage = _makeCiImage()?.applyingFilter("CIColorClamp", withInputParameters: ["inputMinComponents": CIVector(x: min.r, y: min.g, z: min.b, w: min.a), "inputMaxComponents": CIVector(x: max.r, y: max.g, z: max.b, w:  max.a)]),
-              let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
-        else {
-            return nil
+    public func clamp(min: UIColor.Components = .min, max: UIColor.Components = .max, option: RichImage.RenderOption = .auto) -> UIImage! {
+        let size  = image.size
+        let scale = image.scale
+        let imageOrientation = image.imageOrientation
+        
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorClamp", withInputParameters: ["inputMinComponents": CIVector(x: min.r, y: min.g, z: min.b, w: min.a), "inputMaxComponents": CIVector(x: max.r, y: max.g, z: max.b, w:  max.a)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
+                return nil
         }
-        return image
+        return _image
     }
     /// Adjusts saturation, brightness, and contrast values.
     ///
     /// To calculate saturation, this filter linearly interpolates between a grayscale image (saturation = 0.0)
-    /// and the original image (saturation = 1.0). The filter supports extrapolation: For values large than 1.0, 
+    /// and the original image (saturation = 1.0). The filter supports extrapolation: For values large than 1.0,
     /// it increases saturation.
     ///
     /// To calculate contrast, this filter uses the following formula:
@@ -91,12 +103,15 @@ extension UIImage {
     ///
     /// - Returns: A copy of the receiver by adjusting the color components of the receiver image.
     public func adjust(saturation: CGFloat = 1.0, brightness: CGFloat = 1.0, contrast: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
-        guard let ciImage = _makeCiImage()?.applyingFilter("CIColorControls", withInputParameters: ["inputSaturation": saturation, "inputBrightness": brightness, "inputContrast": contrast]),
-            let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
-            else {
+        let size  = image.size
+        let scale = image.scale
+        let imageOrientation = image.imageOrientation
+        
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorControls", withInputParameters: ["inputSaturation": saturation, "inputBrightness": brightness, "inputContrast": contrast]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
                 return nil
         }
-        return image
+        return _image
     }
     /// Multiplies source color values and adds a bias factor to each color component.
     ///
@@ -109,8 +124,8 @@ extension UIImage {
     /// - s = s + bias
     ///
     ///
-    ///- Note: As with all color filters, this operation is performed in the working color space of the Core Image context 
-    ///        (CIContext) executing the filter, using unpremultiplied pixel color values. If you see unexpected results, 
+    ///- Note: As with all color filters, this operation is performed in the working color space of the Core Image context
+    ///        (CIContext) executing the filter, using unpremultiplied pixel color values. If you see unexpected results,
     ///        verify that your output and working color spaces are set up as intended.
     ///
     /// - Parameter component: The color component to be multiplied by the color of the receiver. Using `UIColor.Components.max` as default.
@@ -120,11 +135,16 @@ extension UIImage {
     ///
     /// - Returns: A copy of the receiver by multiplying and adding the given color components.
     public func multiply(_ component: UIColor.Components = .max, bias: UIColor.Components = .min, option: RichImage.RenderOption = .auto) -> UIImage! {
-        guard let ciImage = _makeCiImage()?.applyingFilter("CIColorMatrix", withInputParameters: ["inputRVector": CIVector(x: component.r, y: 0.0, z: 0.0, w: 0.0), "inputGVector": CIVector(x: 0.0, y: component.g, z: 0.0, w: 0.0), "inputBVector": CIVector(x: 0.0, y: 0.0, z: component.b, w: 0.0), "inputAVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: component.a), "inputBiasVector": CIVector(colorComponent: bias)]),
-            let image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option)
-            else {
+        let size  = image.size
+        let scale = image.scale
+        let imageOrientation = image.imageOrientation
+        
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMatrix", withInputParameters: ["inputRVector": CIVector(x: component.r, y: 0.0, z: 0.0, w: 0.0), "inputGVector": CIVector(x: 0.0, y: component.g, z: 0.0, w: 0.0), "inputBVector": CIVector(x: 0.0, y: 0.0, z: component.b, w: 0.0), "inputAVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: component.a), "inputBiasVector": CIVector(colorComponent: bias)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
                 return nil
         }
-        return image
+        return _image
     }
 }
+/// ColorAdjustable conformance of UIImage.
+extension UIImage: ColorAdjustable { }
