@@ -12,6 +12,65 @@ import OpenGLES
 import CoreImage
 import CoreGraphics
 
+// MARK: - Supported Pixel Formats:
+//----------------------------------------------------------------------------------------------------
+//| CS   | Pixel format and bitmap information constant                              | Availability  |
+//----------------------------------------------------------------------------------------------------
+//| Null | 8   bpp, 8  bpc, kCGImageAlphaOnly                                        | Mac OS X, iOS |
+//----------------------------------------------------------------------------------------------------
+//| Gray | 8   bpp, 8  bpc, kCGImageAlphaNone                                        | Mac OS X, iOS |
+//----------------------------------------------------------------------------------------------------
+//| Gray | 8   bpp, 8  bpc, kCGImageAlphaOnly                                        | Mac OS X, iOS |
+//----------------------------------------------------------------------------------------------------
+//| Gray | 16  bpp, 16 bpc, kCGImageAlphaNone                                        | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+//| Gray | 32  bpp, 32 bpc, kCGImageAlphaNone|kCGBitmapFloatComponents               | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 16  bpp, 5  bpc, kCGImageAlphaNoneSkipFirst                               | Mac OS X, iOS |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 32  bpp, 8  bpc, kCGImageAlphaNoneSkipFirst                               | Mac OS X, iOS |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 32  bpp, 8  bpc, kCGImageAlphaNoneSkipLast                                | Mac OS X, iOS |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 32  bpp, 8  bpc, kCGImageAlphaPremultipliedFirst                          | Mac OS X, iOS |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 32  bpp, 8  bpc, kCGImageAlphaPremultipliedLast                           | Mac OS X, iOS |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 64  bpp, 16 bpc, kCGImageAlphaPremultipliedLast                           | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 64  bpp, 16 bpc, kCGImageAlphaNoneSkipLast                                | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 128 bpp, 32 bpc, kCGImageAlphaNoneSkipLast |kCGBitmapFloatComponents      | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+//| RGB  | 128 bpp, 32 bpc, kCGImageAlphaPremultipliedLast |kCGBitmapFloatComponents | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+//| CMYK | 32  bpp, 8  bpc, kCGImageAlphaNone                                        | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+//| CMYK | 64  bpp, 16 bpc, kCGImageAlphaNone                                        | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+//| CMYK | 128 bpp, 32 bpc, kCGImageAlphaNone |kCGBitmapFloatComponents              | Mac OS X      |
+//----------------------------------------------------------------------------------------------------
+
+internal func _correct(bitmapInfo: CGBitmapInfo, `for` colorSpace: CGColorSpace) -> CGBitmapInfo {
+    var bitmap = bitmapInfo
+    if colorSpace.model == .rgb {
+        if  [CGImageAlphaInfo.first.rawValue, CGImageAlphaInfo.last.rawValue].contains(bitmap.rawValue) {
+            bitmap = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo(rawValue: (0 << 12)).rawValue)
+        }
+        if  bitmap.rawValue == CGImageAlphaInfo.none.rawValue {
+            bitmap = CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo(rawValue: (0 << 12)).rawValue)
+        }
+    } else if colorSpace.model == .monochrome {
+        if  [CGImageAlphaInfo.noneSkipLast.rawValue, CGImageAlphaInfo.noneSkipFirst.rawValue].contains(bitmap.rawValue) {
+            bitmap = CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue | CGBitmapInfo(rawValue: (0 << 12)).rawValue)
+        }
+        if  [CGImageAlphaInfo.premultipliedLast.rawValue, CGImageAlphaInfo.premultipliedFirst.rawValue, CGImageAlphaInfo.last.rawValue, CGImageAlphaInfo.first.rawValue].contains(bitmap.rawValue) {
+            bitmap = CGBitmapInfo(rawValue: CGImageAlphaInfo.alphaOnly.rawValue | CGBitmapInfo(rawValue: (0 << 12)).rawValue)
+        }
+    }
+    return bitmap
+}
+
 // MARK: - RichImagable.
 
 /// A type that can processing the UIImage object by resizing, bluring, adjusting color 
@@ -34,7 +93,90 @@ extension UIImage: RichImagable {
 // MARK: - RichImage.
 
 /// Rich image module field.
-public struct RichImage { /* Rich image module field. */ }
+public struct RichImage { /* Rich image module field. */
+    /// Storage of `_AutomaticCIContext`.
+    fileprivate var _autoCIContext     = _AutomaticCIContext()
+    /// Storage of `_GPUBasedCIContext`.
+    fileprivate var _gpuCIContext      = _GPUBasedCIContext()
+    @available(iOS 9.0, *)
+    fileprivate var _metalCIContext:     _MetalBasedCIContext { return _metalCIContextStorage as! _MetalBasedCIContext }
+    /// Storage of `_MetalBasedCIContext`.
+    fileprivate var _metalCIContextStorage: Any! = { () -> Any? in
+        if #available(iOS 9.0, *) {
+            return RichImage._MetalBasedCIContext()
+        } else {
+            return nil
+        }
+    }()
+    /// Storage of `_OpenGLESBasedCIContext`.
+    fileprivate var _openGLESCIContext = _OpenGLESBasedCIContext()
+    
+    /// Returns the default singleton value of the `RichImage`.
+    public static var `default`: RichImage = RichImage()
+}
+
+extension RichImage {
+    /// Initialize the required core image context for the given render destinations.
+    ///
+    /// - Parameter dests: A array of value defined in `UIImage.RenderDestination` used
+    ///                    to initialze the corresponding render destination context.
+    ///
+    public static func initialize(_ dests: [RichImage.RenderOption.Destination]) { dests.forEach({ self.default.ciContext(at: $0) }) }
+    /// Update the cached CIContext with the given context for the specific render destination.
+    ///
+    /// - Note: This updation will not check the render destination of the given context. So be
+    ///         careful with the updating context because the unckecking of the updation.
+    ///
+    /// - Parameter context: A CIContext for the specific render destination used to update the default context
+    /// - Parameter dest   : The render destination whose context need to be updated.
+    ///
+    /// - Returns: A boolean result indicates whether the updation is successful.
+    public mutating func update(_ context: CIContext, `for` dest: RichImage.RenderOption.Destination) -> Bool {
+        switch dest {
+        case .auto:
+            _autoCIContext.context = context
+        case .gpu(let gpu):
+            switch gpu {
+            case .metal:
+                if #available(iOS 9.0, *) {
+                    var context_ = RichImage._MetalBasedCIContext()
+                    context_.context = context
+                    _metalCIContextStorage = context_
+                } else {
+                    return false
+                }
+            case .openGLES:
+                _openGLESCIContext.context = context
+            default:
+                _gpuCIContext.context = context
+            }
+        default: return false
+        }
+        return true
+    }
+    
+    /// Get the context of core image with the given render destination.
+    @discardableResult
+    public mutating func ciContext(at dest: RichImage.RenderOption.Destination) -> CIContext! {
+        switch dest {
+        case .auto:
+            return _autoCIContext.context
+        case .gpu(let gpu):
+            switch gpu {
+            case .metal:
+                if #available(iOS 9.0, *) {
+                    var _metal = (_metalCIContextStorage as! _MetalBasedCIContext)
+                    return _metal.context
+                } else { return nil }
+            case .openGLES:
+                return _openGLESCIContext.context
+            case .default:
+                return _gpuCIContext.context
+            }
+        default: return nil
+        }
+    }
+}
 
 // MARK: - RenderOption.
 
@@ -224,7 +366,7 @@ extension RichImagable {
     ///
     /// - Returns: An UIImage object contains bitmap(CGImage-Based) data rather than core image data.
     public static func make(_ ciImage: CIImage, from extent: CGRect? = nil, scale: CGFloat = UIScreen.main.scale, orientation: UIImageOrientation = .up, option: RichImage.RenderOption) -> UIImage! {
-        guard let ciContext = _ciContext(at: option.dest)                                      else { return nil }
+        guard let ciContext = RichImage.default.ciContext(at: option.dest)                     else { return nil }
         guard let cgImage   = ciContext.createCGImage(ciImage, from: extent ?? ciImage.extent) else { return nil }
         
         return UIImage(cgImage: cgImage, scale: scale, orientation: orientation)
@@ -263,65 +405,6 @@ extension UIImage {
 extension CGRect { public func scale(by scale: CGFloat) -> CGRect {  return applying(CGAffineTransform(scaleX: scale, y: scale)) } }
 extension CGSize { public func scale(by scale: CGFloat) -> CGSize {  return applying(CGAffineTransform(scaleX: scale, y: scale)) } }
 
-// MARK: - Supported Pixel Formats:
-//----------------------------------------------------------------------------------------------------
-//| CS   | Pixel format and bitmap information constant                              | Availability  |
-//----------------------------------------------------------------------------------------------------
-//| Null | 8   bpp, 8  bpc, kCGImageAlphaOnly                                        | Mac OS X, iOS |
-//----------------------------------------------------------------------------------------------------
-//| Gray | 8   bpp, 8  bpc, kCGImageAlphaNone                                        | Mac OS X, iOS |
-//----------------------------------------------------------------------------------------------------
-//| Gray | 8   bpp, 8  bpc, kCGImageAlphaOnly                                        | Mac OS X, iOS |
-//----------------------------------------------------------------------------------------------------
-//| Gray | 16  bpp, 16 bpc, kCGImageAlphaNone                                        | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-//| Gray | 32  bpp, 32 bpc, kCGImageAlphaNone|kCGBitmapFloatComponents               | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 16  bpp, 5  bpc, kCGImageAlphaNoneSkipFirst                               | Mac OS X, iOS |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 32  bpp, 8  bpc, kCGImageAlphaNoneSkipFirst                               | Mac OS X, iOS |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 32  bpp, 8  bpc, kCGImageAlphaNoneSkipLast                                | Mac OS X, iOS |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 32  bpp, 8  bpc, kCGImageAlphaPremultipliedFirst                          | Mac OS X, iOS |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 32  bpp, 8  bpc, kCGImageAlphaPremultipliedLast                           | Mac OS X, iOS |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 64  bpp, 16 bpc, kCGImageAlphaPremultipliedLast                           | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 64  bpp, 16 bpc, kCGImageAlphaNoneSkipLast                                | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 128 bpp, 32 bpc, kCGImageAlphaNoneSkipLast |kCGBitmapFloatComponents      | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-//| RGB  | 128 bpp, 32 bpc, kCGImageAlphaPremultipliedLast |kCGBitmapFloatComponents | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-//| CMYK | 32  bpp, 8  bpc, kCGImageAlphaNone                                        | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-//| CMYK | 64  bpp, 16 bpc, kCGImageAlphaNone                                        | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-//| CMYK | 128 bpp, 32 bpc, kCGImageAlphaNone |kCGBitmapFloatComponents              | Mac OS X      |
-//----------------------------------------------------------------------------------------------------
-
-internal func _correct(bitmapInfo: CGBitmapInfo, `for` colorSpace: CGColorSpace) -> CGBitmapInfo {
-    var bitmap = bitmapInfo
-    if colorSpace.model == .rgb {
-        if  [CGImageAlphaInfo.first.rawValue, CGImageAlphaInfo.last.rawValue].contains(bitmap.rawValue) {
-            bitmap = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo(rawValue: (0 << 12)).rawValue)
-        }
-        if  bitmap.rawValue == CGImageAlphaInfo.none.rawValue {
-            bitmap = CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo(rawValue: (0 << 12)).rawValue)
-        }
-    } else if colorSpace.model == .monochrome {
-        if  [CGImageAlphaInfo.noneSkipLast.rawValue, CGImageAlphaInfo.noneSkipFirst.rawValue].contains(bitmap.rawValue) {
-            bitmap = CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue | CGBitmapInfo(rawValue: (0 << 12)).rawValue)
-        }
-        if  [CGImageAlphaInfo.premultipliedLast.rawValue, CGImageAlphaInfo.premultipliedFirst.rawValue, CGImageAlphaInfo.last.rawValue, CGImageAlphaInfo.first.rawValue].contains(bitmap.rawValue) {
-            bitmap = CGBitmapInfo(rawValue: CGImageAlphaInfo.alphaOnly.rawValue | CGBitmapInfo(rawValue: (0 << 12)).rawValue)
-        }
-    }
-    return bitmap
-}
-
 // MARK: - Context Manager.
 
 extension RichImage {
@@ -335,7 +418,11 @@ extension RichImage {
     /// A type representing a core image context using the GPU-Based rendering.
     fileprivate struct _GPUBasedCIContext {
         lazy var context: CIContext! = { () -> CIContext! in
-            let context = CIContext(options: [kCIContextUseSoftwareRenderer: false, kCIContextHighQualityDownsample: true])
+            var options: [String: Any] = [kCIContextUseSoftwareRenderer: false]
+            if #available(iOS 9.0, *) {
+                options[kCIContextHighQualityDownsample] = true
+            }
+            let context = CIContext(options: options)
             return context
         }()
     }
@@ -343,7 +430,7 @@ extension RichImage {
     @available(iOS 9.0, *)
     fileprivate struct _MetalBasedCIContext {
         lazy var context: CIContext! = { () -> CIContext! in
-            guard let device = MTLCreateSystemDefaultDevice() else { return _openGLESCIContext.context }
+            guard let device = MTLCreateSystemDefaultDevice() else { return RichImage.default._openGLESCIContext.context }
             return CIContext(mtlDevice: device)
         }()
     }
@@ -353,66 +440,6 @@ extension RichImage {
             guard let eaglContext = EAGLContext(api: .openGLES3) else { return nil }
             return CIContext(eaglContext: eaglContext)
         }()
-    }
-}
-
-private var _autoCIContext     = RichImage._AutomaticCIContext()
-private var _gpuCIContext      = RichImage._GPUBasedCIContext()
-@available(iOS 9.0, *)
-private var _metalCIContext    = RichImage._MetalBasedCIContext()
-private var _openGLESCIContext = RichImage._OpenGLESBasedCIContext()
-
-/// Initialize the required core image context for the given render destinations.
-///
-/// - Parameter dests: A array of value defined in `UIImage.RenderDestination` used
-///                    to initialze the corresponding render destination context.
-///
-public func CIContextInitialize(_ dests: [RichImage.RenderOption.Destination]) { dests.forEach({ _ciContext(at: $0) }) }
-/// Update the cached CIContext with the given context for the specific render destination.
-///
-/// - Note: This updation will not check the render destination of the given context. So be
-///         careful with the updating context because the unckecking of the updation.
-///
-/// - Parameter context: A CIContext for the specific render destination used to update the default context
-/// - Parameter dest   : The render destination whose context need to be updated.
-///
-/// - Returns: A boolean result indicates whether the updation is successful.
-public func CIContextUpdate(_ context: CIContext, `for` dest: RichImage.RenderOption.Destination) -> Bool {
-    switch dest {
-    case .auto:
-        _autoCIContext.context = context
-    case .gpu(let gpu):
-        switch gpu {
-        case .metal:
-            _metalCIContext.context = context
-        case .openGLES:
-            _openGLESCIContext.context = context
-        default:
-            _gpuCIContext.context = context
-        }
-    default: return false
-    }
-    return true
-}
-
-/// Get the context of core image with the given render destination.
-@discardableResult
-internal func _ciContext(at dest: RichImage.RenderOption.Destination) -> CIContext! {
-    switch dest {
-    case .auto:
-        return _autoCIContext.context
-    case .gpu(let gpu):
-        switch gpu {
-        case .metal:
-            if #available(iOS 9.0, *) {
-                return _metalCIContext.context
-            } else { return nil }
-        case .openGLES:
-            return _openGLESCIContext.context
-        case .default:
-            return _gpuCIContext.context
-        }
-    default: return nil
     }
 }
 
@@ -447,7 +474,7 @@ extension UIImage {
         var cgImage: CGImage! = nil
         if let underlyingCgImage = self.cgImage {
             cgImage = underlyingCgImage
-        } else if let ciImage = self.ciImage, let context = _ciContext(at: dest), let renderedCgImage = context.createCGImage(ciImage, from: ciImage.extent) {
+        } else if let ciImage = self.ciImage, let context = RichImage.default.ciContext(at: dest), let renderedCgImage = context.createCGImage(ciImage, from: ciImage.extent) {
             cgImage = renderedCgImage
         } else {
             guard let data = UIImageJPEGRepresentation(self, 1.0) as CFData?, let dataProvider = CGDataProvider(data: data) else { return nil }
