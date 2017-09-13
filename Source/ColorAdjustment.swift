@@ -89,7 +89,7 @@ extension ColorAdjustable {
     ///                     and whose display name is MinComponents. Default value: [0.0, 0.0, 0.0, 0.0].
     /// - Parameter max   : RGBA values for the upper end of the range. A ColorComponents object whose attribute type is CIAttributeTypeRectangle
     ///                     and whose display name is MaxComponents. Default value: [1.0, 1.0, 1.0, 1.0].
-    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the recevier clampped to the given range of color components.
@@ -122,7 +122,7 @@ extension ColorAdjustable {
     /// - Parameter saturation: The saturation component of the color of the receiver image. Default value: 1.0.
     /// - Parameter brightness: The brightness component of the color of the receiver image. Default value: 1.0.
     /// - Parameter contrast  : The contrast component of the color of the receiver image. Default value: 1.0.
-    /// - Parameter option    : A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option    : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
     ///                         Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the receiver by adjusting the color components of the receiver image.
@@ -154,7 +154,7 @@ extension ColorAdjustable {
     ///
     /// - Parameter component: The color component to be multiplied by the color of the receiver. Using `UIColor.Components.max` as default.
     /// - Parameter bias     : The color component to be added by the color of the receiver. Using `UIColor.Components.min` as default.
-    /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
     ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the receiver by multiplying and adding the given color components.
@@ -195,7 +195,7 @@ extension ColorAdjustable {
     /// - Parameter green : The `green` field polynomial coefficients to modify the color source image. Using [0.0, 1.0, 0.0, 0.0] as default.
     /// - Parameter blue  : The `blue` field polynomial coefficients to modify the color source image. Using [0.0, 1.0, 0.0, 0.0] as default.
     /// - Parameter alpha : The `alpha` field polynomial coefficients to modify the color source image. Using [0.0, 1.0, 0.0, 0.0] as default.
-    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the receiver modified with the given polynomial coefficients.
@@ -220,12 +220,36 @@ extension ColorAdjustable {
     ///
     /// - Parameter exposureValue: The exposure value indicates the exposures of the image. The image will be
     ///                            under-exposed if the value is negative. Using 0.5 as default.
-    /// - Parameter option       : A value of `RichImage.RenderOption` indicates the rendering options of the image blurring processing.
+    /// - Parameter option       : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
     ///                            Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
     /// - Returns: A copy of the source image by adjusting the exposure value.
     public func expose(_ exposureValue: CGFloat = 0.5, option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIExposureAdjust", withInputParameters: ["inputEV": exposureValue]),
+            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
+    /// Adjusts midtone brightness.
+    ///
+    /// This filter is typically used to compensate for nonlinear effects of displays. Adjusting the gamma 
+    /// effectively changes the slope of the transition between black and white. It uses the following formula:
+    ///```
+    /// pow(s.rgb, vec3(power))
+    ///```
+    ///
+    /// - Note: As with all color filters, this operation is performed in the working color space of the Core Image context 
+    ///         (CIContext) executing the filter, using unpremultiplied pixel color values. If you see unexpected results, 
+    ///         verify that your output and working color spaces are set up as intended.
+    ///
+    /// - Parameter power : The index field in the formula `pow(s.rgb, vec3(power))` to define the midtone brightness.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by adjusting the midtone brightness with the given power.
+    public func adjustGamma(_ power: CGFloat = 0.75, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIGammaAdjust", withInputParameters: ["inputPower": power]),
             let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
