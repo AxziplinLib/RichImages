@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // Make sure all the core image contexts are initialized.
-        CIContextInitialize(UIImage.RenderOption.Destination.availableGPURelatedDestinations)
+        RichImage.initialize(RichImage.RenderOption.Destination.availableGPURelatedDestinations)
         // let gif = UIImage.gif(named: "Gif")!
         let date = Date()
         // let data = "https://www.baidu.com".data(using: .isoLatin1)!
