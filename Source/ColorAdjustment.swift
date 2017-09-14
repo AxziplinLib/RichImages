@@ -272,5 +272,27 @@ extension ColorAdjustable {
         return _image
     }
 }
+
+extension ColorAdjustable {
+    /// Maps color intensity between a linear gamma curve and the sRGB color space.
+    ///
+    /// Pass `true` of `linearToSRGBToneCurve` to make a `LinearToSRGBToneCurve` mapping, 
+    /// `false` to make a `SRGBToneCurveToLinear` mapping.
+    ///
+    /// - Parameter linearToSRGBToneCurve: A `Boolean` value indicates the order of the mapping between linear and gamma curve color space.
+    ///                                    Linear-To-SRGB if true and SRGB-To-Linear if false.
+    /// - Parameter option               : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                                    Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by mapping color intensity with the given params.
+    public func map(linearToSRGBToneCurve: Bool = true, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter(linearToSRGBToneCurve ? "CILinearToSRGBToneCurve" : "CISRGBToneCurveToLinear", withInputParameters: nil),
+            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
+}
+
 /// ColorAdjustable conformance of UIImage.
 extension UIImage: ColorAdjustable { }
