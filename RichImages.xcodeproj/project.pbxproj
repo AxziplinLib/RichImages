@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DC08174E1F668A5200A2D1E8 /* ColorAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC376B871F64216E002D47A1 /* ColorAdjustment.swift */; };
+		DC27C91B1F6A757800A86551 /* ColorEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27C91A1F6A757800A86551 /* ColorEffect.swift */; };
 		DC2AB76A1F5D5556004095FF /* vImageBluring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7691F5D5556004095FF /* vImageBluring.swift */; };
 		DC2AB76C1F5D571C004095FF /* Resizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76B1F5D571C004095FF /* Resizing.swift */; };
 		DC2AB76E1F5D5813004095FF /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76D1F5D5813004095FF /* Merging.swift */; };
@@ -48,6 +49,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DC27C91A1F6A757800A86551 /* ColorEffect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorEffect.swift; sourceTree = "<group>"; };
 		DC2AB7691F5D5556004095FF /* vImageBluring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vImageBluring.swift; sourceTree = "<group>"; };
 		DC2AB76B1F5D571C004095FF /* Resizing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Resizing.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		DC2AB76D1F5D5813004095FF /* Merging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Merging.swift; sourceTree = "<group>"; };
@@ -168,6 +170,7 @@
 				DC2AB76F1F5D587B004095FF /* Generator.swift */,
 				DC2AB7711F5D58F3004095FF /* ColorSpace.swift */,
 				DC376B871F64216E002D47A1 /* ColorAdjustment.swift */,
+				DC27C91A1F6A757800A86551 /* ColorEffect.swift */,
 				DC2AB7731F5D5952004095FF /* Gif.swift */,
 				DC2AB7751F5D5A16004095FF /* Geometry.swift */,
 				DC2AB7771F5E404E004095FF /* Filters.swift */,
@@ -315,6 +318,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC08174E1F668A5200A2D1E8 /* ColorAdjustment.swift in Sources */,
+				DC27C91B1F6A757800A86551 /* ColorEffect.swift in Sources */,
 				DCAD09CB1F5CF03E001AF3F0 /* ImageView.swift in Sources */,
 				DC2AB7721F5D58F3004095FF /* ColorSpace.swift in Sources */,
 				DC2AB7701F5D587B004095FF /* Generator.swift in Sources */,
