@@ -102,3 +102,5 @@ extension ColorEffectAppliable {
         return _image
     }
 }
+/// ColorEffectAppliable conformance of UIImage.
+extension UIImage: ColorEffectAppliable { }
