@@ -266,7 +266,7 @@ extension ColorAdjustable {
     /// - Returns: A copy of the source image by changing the overrall hue with the given angle.
     public func adjustHue(_ angle: CGFloat = 0.0, option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIHueAdjust", withInputParameters: ["inputAngle": angle]),
-            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
         return _image
@@ -287,7 +287,21 @@ extension ColorAdjustable {
     /// - Returns: A copy of the source image by adjusting tone curve.
     public func adjustToneCurve(point0: CGPoint = .zero, point1: CGPoint = CGPoint(x: 0.25, y: 0.25), point2: CGPoint = CGPoint(x: 0.5, y: 0.5), point3: CGPoint = CGPoint(x: 0.75, y: 0.75), point4: CGPoint = CGPoint(x: 1.0, y: 1.0), option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIToneCurve", withInputParameters: ["inputPoint0": CIVector(cgPoint: point0), "inputPoint1": CIVector(cgPoint: point1), "inputPoint2": CIVector(cgPoint: point2), "inputPoint3": CIVector(cgPoint: point3), "inputPoint4": CIVector(cgPoint: point4)]),
-            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
+    /// Adjusts the saturation of an image while keeping pleasing skin tones.
+    ///
+    /// - Parameter amount: The amount to adjust the saturation as with `inputAmount` parameter.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image with adjusted vibrance.
+    public func adjustVibrance(amount: CGFloat, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIVibrance", withInputParameters: ["inputAmount": amount]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
         return _image
