@@ -292,6 +292,21 @@ extension ColorAdjustable {
         }
         return _image
     }
+    /// Adapts the reference white point for an image.
+    /// 
+    /// - Parameter neutral      : The input neutral parameter. Using [6500.0, 0.0] by default.
+    /// - Parameter targetNeutral: The input target neutral parameter. Using [6500.0, 0.0] by default.
+    /// - Parameter option       : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                            Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by adapting the white points.
+    public func adapt(temperatureAndTint neutral: CGPoint = CGPoint(x: 6500.0, y: 0.0), to targetNeutral: CGPoint = CGPoint(x: 6500.0, y: 0.0), option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CITemperatureAndTint", withInputParameters: ["inputNeutral": CIVector(cgPoint: neutral), "inputTargetNeutral": CIVector(cgPoint: targetNeutral)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 
 /// ColorAdjustable conformance of UIImage.
