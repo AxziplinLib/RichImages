@@ -306,6 +306,20 @@ extension ColorAdjustable {
         }
         return _image
     }
+    /// Adjusts the reference white point for an image and maps all colors in the source using the new reference.
+    ///
+    /// - Parameter color : A UIColor object that the source image adjust and map with.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by adjust the white point with a given color.
+    public func adjustWhitePoint(color: UIColor, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIWhitePointAdjust", withInputParameters: ["inputColor": CIColor(color: color)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 
 extension ColorAdjustable {
