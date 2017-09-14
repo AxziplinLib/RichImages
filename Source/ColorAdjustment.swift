@@ -271,6 +271,27 @@ extension ColorAdjustable {
         }
         return _image
     }
+    /// Adjusts tone response of the R, G, and B channels of an image.
+    ///
+    /// The input points are five x,y values that are interpolated using a spline curve.
+    /// The curve is applied in a perceptual (gamma 2) version of the working space.
+    ///
+    /// - Parameter point0: The x,y values interpolating using a spline curve at index 0. Using [0.0, 0.0]   by default.
+    /// - Parameter point1: The x,y values interpolating using a spline curve at index 1. Using [0.25, 0.25] by default.
+    /// - Parameter point2: The x,y values interpolating using a spline curve at index 2. Using [0.5, 0.5]   by default.
+    /// - Parameter point3: The x,y values interpolating using a spline curve at index 3. Using [0.75, 0.75] by default.
+    /// - Parameter point4: The x,y values interpolating using a spline curve at index 4. Using [1.0, 1.0]   by default.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by adjusting tone curve.
+    public func adjustToneCurve(point0: CGPoint = .zero, point1: CGPoint = CGPoint(x: 0.25, y: 0.25), point2: CGPoint = CGPoint(x: 0.5, y: 0.5), point3: CGPoint = CGPoint(x: 0.75, y: 0.75), point4: CGPoint = CGPoint(x: 1.0, y: 1.0), option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIToneCurve", withInputParameters: ["inputPoint0": CIVector(cgPoint: point0), "inputPoint1": CIVector(cgPoint: point1), "inputPoint2": CIVector(cgPoint: point2), "inputPoint3": CIVector(cgPoint: point3), "inputPoint4": CIVector(cgPoint: point4)]),
+            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 
 extension ColorAdjustable {
