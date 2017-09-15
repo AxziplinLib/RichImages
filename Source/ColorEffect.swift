@@ -76,7 +76,7 @@ extension ColorEffectAppliable {
     /// to a polynomial cross product with the input coefficients. That is, the red component of the output pixel is 
     /// calculated using the inputRedCoefficients parameter (abbreviated rC below) using the following formula:
     ///```
-    /// out.r =        in.r * rC[0] +        in.g * rC[1] +        in.b * rC[2]
+    /// out.r =  in.r * rC[0] +        in.g * rC[1] +        in.b * rC[2]
     /// + in.r * in.r * rC[3] + in.g * in.g * rC[4] + in.b * in.b * rC[5]
     /// + in.r * in.g * rC[6] + in.g * in.b * rC[7] + in.b * in.r * rC[8]
     /// + rC[9]
