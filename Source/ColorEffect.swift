@@ -87,6 +87,10 @@ extension ColorEffectAppliable {
     /// This function can be used for advanced color space and tone mapping conversions, such as imitating the color reproduction
     /// of vintage photography film.
     ///
+    /// - Note: As with all color filters, this operation is performed in the working color space of the Core Image context (CIContext)
+    ///         executing the filter, using unpremultiplied pixel color values. If you see unexpected results, verify that your output 
+    ///         and working color spaces are set up as intended.
+    ///
     /// - Parameter red   : The `red` field polynomial coefficients to modify the color source image. Using [1.0, 0.0, ...] as default.
     /// - Parameter green : The `green` field polynomial coefficients to modify the color source image. Using [0.0, 1.0, 0.0, ...] as default.
     /// - Parameter blue  : The `blue` field polynomial coefficients to modify the color source image. Using [0.0, 0.0, 1.0, 0.0, ...] as default.
