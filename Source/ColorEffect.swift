@@ -277,6 +277,18 @@ extension ColorEffectAppliable {
         }
         return _image
     }
+    /// Returns a grayscale image from min(r,g,b).
+    ///
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: A graystyle copy of the source image from min(r,g,b).
+    public func minimumComponent(option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIMinimumComponent", withInputParameters: nil),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 
 /// ColorEffectAppliable conformance of UIImage.
