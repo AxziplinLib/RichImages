@@ -246,5 +246,23 @@ extension ColorEffectAppliable {
     }
 }
 
+extension ColorEffectAppliable {
+    /// Converts a grayscale image to a white image that is masked by alpha.
+    ///
+    /// The white values from the source image produce the inside of the mask; the black values become completely transparent.
+    ///
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by masking to alpha channel.
+    public func maskToAlpha(option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIMaskToAlpha", withInputParameters: nil),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
+}
+
 /// ColorEffectAppliable conformance of UIImage.
 extension UIImage: ColorEffectAppliable { }
