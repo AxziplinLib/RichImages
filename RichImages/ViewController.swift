@@ -59,7 +59,8 @@ class ViewController: UIViewController {
         // let result = image.adjustWhitePoint(color: .orange)
         // let result = image.crossPolynomial(red: [0.5, 0.1, 0.5, 0.8, 0.9])
         // let result = image.invert()
-        let result = image.map(color: .red)
+        // let result = image.map(color: .red)
+        let result = image.posterize()
         // let transform = CGAffineTransform(rotationAngle: CGFloat.pi / 6.0).scaledBy(x: 1.0, y: 3.0)
         // let result = image.applying(transform, option: .cpu(.none))
         // let cropped = image.crop(fits: image.size.scale(by: 0.5), using: .center, rendering: .cpu).lightBlur
