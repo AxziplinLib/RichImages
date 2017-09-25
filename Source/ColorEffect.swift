@@ -169,5 +169,20 @@ extension ColorEffectAppliable {
     }
 }
 
+extension ColorEffectAppliable {
+    /// Inverts the colors in an image.
+    ///
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: A copy of the source image by invert the color of the source image.
+    public func invert(option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorInvert", withInputParameters: nil),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
+}
+
 /// ColorEffectAppliable conformance of UIImage.
 extension UIImage: ColorEffectAppliable { }
