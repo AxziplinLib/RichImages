@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreImage
+import CoreGraphics
 
 // MARK: - ColorCrossPolynomial.
 
@@ -106,5 +107,67 @@ extension ColorEffectAppliable {
         return _image
     }
 }
+
+extension ColorEffectAppliable {
+    /// Uses a three-dimensional color table to transform the source image pixels.
+    ///
+    /// This filter maps color values in the input image to new color values using a three-dimensional color lookup table 
+    /// (also called a CLUT or color cube). For each RGBA pixel in the input image, the filter uses the R, G, and B component 
+    /// values as indices to identify a location in the table; the RGBA value at that location becomes the RGBA value of the 
+    /// output pixel.
+    ///
+    /// Use the inputCubeData parameter to provide data formatted for use as a color lookup table, and the inputCubeDimension 
+    /// parameter to specify the size of the table. This data should be an array of texel values in 32-bit floating-point RGBA 
+    /// linear premultiplied format. The inputCubeDimension parameter identifies the size of the cube by specifying the length 
+    /// of one side, so the size of the array should be inputCubeDimension cubed times the size of a single texel value. In the 
+    /// color table, the R component varies fastest, followed by G, then B. Listing 1 shows a basic pattern for creating color
+    /// cube data in `objective-c`.
+    ///
+    /// ```
+    /// // Allocate and opulate color cube table
+    /// const unsigned int size = 64;
+    /// float *cubeData = (float *)malloc(size * size * size * sizeof(float) * 4);
+    /// for (int b = 0; b < size; b++) {
+    ///    for (int g = 0; g < size; r++) {
+    ///        for (int r = 0; r < size; r ++) {
+    ///            cubeData[b][g][r][0] = `output R value`;
+    ///            cubeData[b][g][r][1] = `output G value`;
+    ///            cubeData[b][g][r][2] = `output B value`;
+    ///            cubeData[b][g][r][3] = `output A value`;
+    ///        }
+    ///    }
+    /// }
+    /// // Put the table in a data object and create the filter
+    /// NSData *data = [NSData dataWithBytesNoCopy:cubeData length:cubeDataSize freeWhenDone:YES];
+    /// CIFilter *colorCube = [CIFilter filterWithName:@"CIColorCube" withInputParameters:@{@"inputCubeDimension": @(size),@"inputCubeData": data,}];
+    ///```
+    /// For another example of this filter in action, see `Chroma Key Filter Recipe` in `Core Image Programming Guide`.
+    ///
+    /// - Note: As with all color filters, this operation is performed in the working color space of the Core Image context
+    ///         (CIContext) executing the filter, using unpremultiplied pixel color values. If you see unexpected results, 
+    ///         verify that your output and working color spaces are set up as intended.
+    ///
+    /// - Parameter dimension : The dimension of the cube data for each x, y and z components.
+    /// - Parameter data      : The COLOR-LOOKUP_TABLE data of the cube data.
+    /// - Parameter colorSpace: The color space to draw the target image.
+    /// - Parameter option    : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the srouce image by applying the clut data.
+    public func transform(_ dimension: CGFloat, clut data: Data, into colorSpace: CGColorSpace? = nil, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter(colorSpace == nil ? "CIColorCube" : "CIColorCubeWithColorSpace", withInputParameters: { () -> [String: Any]? in
+            if let cs = colorSpace {
+                return ["inputCubeDimension": dimension, "inputCubeData": data, "inputColorSpace": cs]
+            } else {
+                return ["inputCubeDimension": dimension, "inputCubeData": data]
+            }
+        }()),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
+}
+
 /// ColorEffectAppliable conformance of UIImage.
 extension UIImage: ColorEffectAppliable { }
