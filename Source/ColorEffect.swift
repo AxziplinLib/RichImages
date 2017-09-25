@@ -199,7 +199,7 @@ extension ColorEffectAppliable {
     /// Remaps colors so they fall within shades of a single color.
     ///
     /// - Parameter color    : The input color object used the map the color of the source image.
-    /// - Parameter intensity: A CGFloat value indicates the intensity of the mapping.
+    /// - Parameter intensity: A CGFloat value indicates the intensity of the mapping. Using 1.0 as default.
     /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
     ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
@@ -215,7 +215,7 @@ extension ColorEffectAppliable {
     ///
     /// This filter flattens colors to achieve a look similar to that of a silk-screened poster.
     ///
-    /// - Parameter levels: The input levels parameter to remap the source image.
+    /// - Parameter levels: The input levels parameter to remap the source image. Using 6.0 as default.
     /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     ///
@@ -393,11 +393,31 @@ extension ColorEffectAppliable {
 extension ColorEffectAppliable {
     /// Maps the colors of an image to various shades of brown.
     ///
-    /// - Parameter intensity: A CGFloat value indicates the intensity of the effect.
+    /// - Parameter intensity: A CGFloat value indicates the intensity of the effect. Using 1.0 as default.
+    /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying sepia tone effect.
     public func sepiaTone(intensity: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = image._makeCiImage()?.applyingFilter("CISepiaTone", withInputParameters: ["inputIntensity": intensity]),
-            let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return img
+    }
+}
+
+extension ColorEffectAppliable {
+    /// Reduces the brightness of an image at the periphery.
+    ///
+    /// - Parameter radius   : A CGFloat value indicates the radius of applying vignette effect. Using 1.0 as default.
+    /// - Parameter intensity: A CGFloat value indicates the intensity of the effect. Using 0.0 as default.
+    /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by applying the vignette effect.
+    public func vignette(radius: CGFloat = 1.0, intensity: CGFloat = 0.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIVignette", withInputParameters: ["inputRadius": radius, "inputIntensity": intensity]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
         return img
