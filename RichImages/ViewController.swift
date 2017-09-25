@@ -58,6 +58,7 @@ class ViewController: UIViewController {
         // let result = image.adjustVibrance(amount: 10.0)
         // let result = image.adjustWhitePoint(color: .orange)
         let result = image.crossPolynomial(red: [0.5, 0.1, 0.5, 0.8, 0.9])
+        
         // let transform = CGAffineTransform(rotationAngle: CGFloat.pi / 6.0).scaledBy(x: 1.0, y: 3.0)
         // let result = image.applying(transform, option: .cpu(.none))
         // let cropped = image.crop(fits: image.size.scale(by: 0.5), using: .center, rendering: .cpu).lightBlur
@@ -82,6 +83,10 @@ class ViewController: UIViewController {
         imageView1.image = result
         // imageView1.backgroundColor = .black
         imageView0.image = image
+        
+        let _img = #imageLiteral(resourceName: "image")
+        let _imgr = _img.cornered
+        print("")
     }
     
     override func didReceiveMemoryWarning() {
@@ -94,3 +99,20 @@ extension ViewController {
     override var prefersStatusBarHidden: Bool { return true }
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation { return .fade }
 }
+
+//extension ViewController {
+//    private func _clut(dimension: Int) -> Data {
+//        var cubeSpace = Array<Array<Float>>(repeating: Array<Float>(repeating: 0.0, count: 4), count: dimension * dimension * dimension)
+//        for b in 0..<dimension {
+//            for g in 0..<dimension {
+//                for r in 0..<dimension {
+//                    let index = b * dimension * dimension + g * dimension + r
+//                    cubeSpace[index][0] = 0.0
+//                    cubeSpace[index][1] = 0.0
+//                    cubeSpace[index][2] = 0.0
+//                    cubeSpace[index][3] = 0.0
+//                }
+//            }
+//        }
+//    }
+//}
