@@ -83,10 +83,6 @@ class ViewController: UIViewController {
         imageView1.image = result
         // imageView1.backgroundColor = .black
         imageView0.image = image
-        
-        let _img = #imageLiteral(resourceName: "image")
-        let _imgr = _img.cornered
-        print("")
     }
     
     override func didReceiveMemoryWarning() {
