@@ -64,7 +64,8 @@ class ViewController: UIViewController {
         // let result = image.maskToAlpha()
         // let result = image.minimumComponent()
         // let result = image.transfer()
-        let result = image.sepiaTone()
+        // let result = image.sepiaTone()
+        let result = image.vignette(radius: 3.0, intensity: 1.0)
         // let transform = CGAffineTransform(rotationAngle: CGFloat.pi / 6.0).scaledBy(x: 1.0, y: 3.0)
         // let result = image.applying(transform, option: .cpu(.none))
         // let cropped = image.crop(fits: image.size.scale(by: 0.5), using: .center, rendering: .cpu).lightBlur
