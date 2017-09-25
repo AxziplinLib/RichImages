@@ -182,6 +182,20 @@ extension ColorEffectAppliable {
         }
         return _image
     }
+    /// Performs a nonlinear transformation of source color values using mapping values provided in a table.
+    ///
+    /// - Parameter gradientImage: The input gradient image used as the color look up table to map the source image.
+    /// - Parameter option       : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                            Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image with the given image mapped.
+    public func map(gradientImage: CIImage, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMap", withInputParameters: ["inputGradientImage": gradientImage]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 
 /// ColorEffectAppliable conformance of UIImage.
