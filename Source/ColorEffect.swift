@@ -211,6 +211,22 @@ extension ColorEffectAppliable {
         }
         return _image
     }
+    /// Remaps red, green, and blue color components to the number of brightness values you specify for each color component.
+    ///
+    /// This filter flattens colors to achieve a look similar to that of a silk-screened poster.
+    ///
+    /// - Parameter levels: The input levels parameter to remap the source image.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by posterizing with the given levels.
+    public func posterize(levels: CGFloat = 6.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorPosterize", withInputParameters: ["inputLevels": levels]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 
 /// ColorEffectAppliable conformance of UIImage.
