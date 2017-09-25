@@ -227,6 +227,23 @@ extension ColorEffectAppliable {
         }
         return _image
     }
+    /// Maps luminance to a color ramp of two colors.
+    ///
+    /// False color is often used to process astronomical and other scientific data, such as ultraviolet and x-ray images.
+    ///
+    /// - Parameter color0: A UIColor object at field `color0` used to applying the false color effect.
+    /// - Parameter color1: A UIColor object at field `color1` used to applying the false color effect.
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by applying false color effect.
+    public func falseColor(color0: UIColor, color1: UIColor, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIFalseColor", withInputParameters: ["inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 
 /// ColorEffectAppliable conformance of UIImage.
