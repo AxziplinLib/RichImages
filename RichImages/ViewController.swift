@@ -61,7 +61,8 @@ class ViewController: UIViewController {
         // let result = image.invert()
         // let result = image.map(color: .red)
         // let result = image.posterize()
-        let result = image.maskToAlpha()
+        // let result = image.maskToAlpha()
+        let result = image.maximumComponent()
         // let transform = CGAffineTransform(rotationAngle: CGFloat.pi / 6.0).scaledBy(x: 1.0, y: 3.0)
         // let result = image.applying(transform, option: .cpu(.none))
         // let cropped = image.crop(fits: image.size.scale(by: 0.5), using: .center, rendering: .cpu).lightBlur
