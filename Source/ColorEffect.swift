@@ -364,6 +364,18 @@ extension ColorEffectAppliable {
         }
         return img
     }
+    /// Applies a preconfigured set of effects that imitate black-and-white photography film without significantly altering contrast.
+    ///
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: A copy of the source image by applying photo effect tonal.
+    public func tonal(option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectTonal", withInputParameters: nil),
+            let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return img
+    }
 }
 
 /// ColorEffectAppliable conformance of UIImage.
