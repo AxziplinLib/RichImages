@@ -264,5 +264,20 @@ extension ColorEffectAppliable {
     }
 }
 
+extension ColorEffectAppliable {
+    /// Returns a grayscale image from max(r,g,b).
+    ///
+    /// - Parameter option: A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    /// - Returns: A graystyle copy of the source image from max(r,g,b).
+    public func maximumComponent(option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIMaximumComponent", withInputParameters: nil),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
+}
+
 /// ColorEffectAppliable conformance of UIImage.
 extension UIImage: ColorEffectAppliable { }
