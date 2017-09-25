@@ -196,6 +196,21 @@ extension ColorEffectAppliable {
         }
         return _image
     }
+    /// Remaps colors so they fall within shades of a single color.
+    ///
+    /// - Parameter color    : The input color object used the map the color of the source image.
+    /// - Parameter intensity: A CGFloat value indicates the intensity of the mapping.
+    /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by the remapping processing.
+    public func map(color: UIColor, intensity: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMonochrome", withInputParameters: ["inputColor": CIColor(color: color), "inputIntensity": intensity]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return _image
+    }
 }
 
 /// ColorEffectAppliable conformance of UIImage.
