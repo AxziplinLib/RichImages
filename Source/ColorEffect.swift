@@ -359,7 +359,7 @@ extension ColorEffectAppliable {
     /// - Returns: A copy of the source image by applying photo effect process.
     public func process(option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectProcess", withInputParameters: nil),
-            let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
         return img
@@ -371,7 +371,7 @@ extension ColorEffectAppliable {
     /// - Returns: A copy of the source image by applying photo effect tonal.
     public func tonal(option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectTonal", withInputParameters: nil),
-            let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
         return img
@@ -383,6 +383,20 @@ extension ColorEffectAppliable {
     /// - Returns: A copy of the source image by applying photo effect transfer.
     public func transfer(option: RichImage.RenderOption = .auto) -> UIImage! {
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectTransfer", withInputParameters: nil),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return img
+    }
+}
+
+extension ColorEffectAppliable {
+    /// Maps the colors of an image to various shades of brown.
+    ///
+    /// - Parameter intensity: A CGFloat value indicates the intensity of the effect.
+    /// - Returns: A copy of the source image by applying sepia tone effect.
+    public func sepiaTone(intensity: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CISepiaTone", withInputParameters: ["inputIntensity": intensity]),
             let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
