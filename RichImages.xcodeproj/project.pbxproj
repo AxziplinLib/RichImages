@@ -8,6 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		DC08174E1F668A5200A2D1E8 /* ColorAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC376B871F64216E002D47A1 /* ColorAdjustment.swift */; };
+		DC25BB991F7CA1A600C790DF /* RichImages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC25BB901F7CA1A600C790DF /* RichImages.framework */; };
+		DC25BBA01F7CA1A600C790DF /* RichImagesFrameworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC25BB9F1F7CA1A600C790DF /* RichImagesFrameworkTests.swift */; };
+		DC25BBA21F7CA1A600C790DF /* RichImagesFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = DC25BB921F7CA1A600C790DF /* RichImagesFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DC25BBA51F7CA1A600C790DF /* RichImages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC25BB901F7CA1A600C790DF /* RichImages.framework */; };
+		DC25BBA61F7CA1A600C790DF /* RichImages.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DC25BB901F7CA1A600C790DF /* RichImages.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DC25BBAE1F7CA1C000C790DF /* RichImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9D71F91F5D248700EE2386 /* RichImages.swift */; };
+		DC25BBAF1F7CA1C000C790DF /* vImageBluring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7691F5D5556004095FF /* vImageBluring.swift */; };
+		DC25BBB01F7CA1C000C790DF /* Bluring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC376B851F63DF97002D47A1 /* Bluring.swift */; };
+		DC25BBB11F7CA1C000C790DF /* Resizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76B1F5D571C004095FF /* Resizing.swift */; };
+		DC25BBB21F7CA1C000C790DF /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76D1F5D5813004095FF /* Merging.swift */; };
+		DC25BBB31F7CA1C000C790DF /* Generator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76F1F5D587B004095FF /* Generator.swift */; };
+		DC25BBB41F7CA1C000C790DF /* ColorSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7711F5D58F3004095FF /* ColorSpace.swift */; };
+		DC25BBB51F7CA1C000C790DF /* ColorAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC376B871F64216E002D47A1 /* ColorAdjustment.swift */; };
+		DC25BBB61F7CA1C000C790DF /* ColorEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27C91A1F6A757800A86551 /* ColorEffect.swift */; };
+		DC25BBB71F7CA1C000C790DF /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7731F5D5952004095FF /* Gif.swift */; };
+		DC25BBB81F7CA1C000C790DF /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7751F5D5A16004095FF /* Geometry.swift */; };
+		DC25BBB91F7CA1C000C790DF /* Filters.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7771F5E404E004095FF /* Filters.swift */; };
 		DC27C91B1F6A757800A86551 /* ColorEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27C91A1F6A757800A86551 /* ColorEffect.swift */; };
 		DC2AB76A1F5D5556004095FF /* vImageBluring.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB7691F5D5556004095FF /* vImageBluring.swift */; };
 		DC2AB76C1F5D571C004095FF /* Resizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB76B1F5D571C004095FF /* Resizing.swift */; };
@@ -32,6 +49,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		DC25BB9A1F7CA1A600C790DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DCAD098E1F5CEE25001AF3F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC25BB8F1F7CA1A600C790DF;
+			remoteInfo = RichImagesFramework;
+		};
+		DC25BB9C1F7CA1A600C790DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DCAD098E1F5CEE25001AF3F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DCAD09951F5CEE25001AF3F0;
+			remoteInfo = RichImages;
+		};
+		DC25BBA31F7CA1A600C790DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DCAD098E1F5CEE25001AF3F0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC25BB8F1F7CA1A600C790DF;
+			remoteInfo = RichImagesFramework;
+		};
 		DCAD09AB1F5CEE25001AF3F0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DCAD098E1F5CEE25001AF3F0 /* Project object */;
@@ -48,7 +86,27 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		DC25BBAC1F7CA1A600C790DF /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DC25BBA61F7CA1A600C790DF /* RichImages.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		DC25BB901F7CA1A600C790DF /* RichImages.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RichImages.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC25BB921F7CA1A600C790DF /* RichImagesFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RichImagesFramework.h; sourceTree = "<group>"; };
+		DC25BB931F7CA1A600C790DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC25BB981F7CA1A600C790DF /* RichImagesFrameworkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RichImagesFrameworkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC25BB9F1F7CA1A600C790DF /* RichImagesFrameworkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichImagesFrameworkTests.swift; sourceTree = "<group>"; };
+		DC25BBA11F7CA1A600C790DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC27C91A1F6A757800A86551 /* ColorEffect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorEffect.swift; sourceTree = "<group>"; };
 		DC2AB7691F5D5556004095FF /* vImageBluring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vImageBluring.swift; sourceTree = "<group>"; };
 		DC2AB76B1F5D571C004095FF /* Resizing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Resizing.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -80,10 +138,26 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DC25BB8C1F7CA1A600C790DF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC25BB951F7CA1A600C790DF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC25BB991F7CA1A600C790DF /* RichImages.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DCAD09931F5CEE25001AF3F0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC25BBA51F7CA1A600C790DF /* RichImages.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +178,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DC25BB911F7CA1A600C790DF /* RichImagesFramework */ = {
+			isa = PBXGroup;
+			children = (
+				DC25BB921F7CA1A600C790DF /* RichImagesFramework.h */,
+				DC25BB931F7CA1A600C790DF /* Info.plist */,
+			);
+			path = RichImagesFramework;
+			sourceTree = "<group>";
+		};
+		DC25BB9E1F7CA1A600C790DF /* RichImagesFrameworkTests */ = {
+			isa = PBXGroup;
+			children = (
+				DC25BB9F1F7CA1A600C790DF /* RichImagesFrameworkTests.swift */,
+				DC25BBA11F7CA1A600C790DF /* Info.plist */,
+			);
+			path = RichImagesFrameworkTests;
+			sourceTree = "<group>";
+		};
 		DCAD098D1F5CEE25001AF3F0 = {
 			isa = PBXGroup;
 			children = (
@@ -111,6 +203,8 @@
 				DCAD09981F5CEE25001AF3F0 /* RichImages */,
 				DCAD09AD1F5CEE25001AF3F0 /* RichImagesTests */,
 				DCAD09B81F5CEE25001AF3F0 /* RichImagesUITests */,
+				DC25BB911F7CA1A600C790DF /* RichImagesFramework */,
+				DC25BB9E1F7CA1A600C790DF /* RichImagesFrameworkTests */,
 				DCAD09971F5CEE25001AF3F0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -121,6 +215,8 @@
 				DCAD09961F5CEE25001AF3F0 /* RichImages.app */,
 				DCAD09AA1F5CEE25001AF3F0 /* RichImagesTests.xctest */,
 				DCAD09B51F5CEE25001AF3F0 /* RichImagesUITests.xctest */,
+				DC25BB901F7CA1A600C790DF /* RichImages.framework */,
+				DC25BB981F7CA1A600C790DF /* RichImagesFrameworkTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -180,7 +276,55 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		DC25BB8D1F7CA1A600C790DF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC25BBA21F7CA1A600C790DF /* RichImagesFramework.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		DC25BB8F1F7CA1A600C790DF /* RichImagesFramework */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC25BBAB1F7CA1A600C790DF /* Build configuration list for PBXNativeTarget "RichImagesFramework" */;
+			buildPhases = (
+				DC25BB8B1F7CA1A600C790DF /* Sources */,
+				DC25BB8C1F7CA1A600C790DF /* Frameworks */,
+				DC25BB8D1F7CA1A600C790DF /* Headers */,
+				DC25BB8E1F7CA1A600C790DF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RichImagesFramework;
+			productName = RichImagesFramework;
+			productReference = DC25BB901F7CA1A600C790DF /* RichImages.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		DC25BB971F7CA1A600C790DF /* RichImagesFrameworkTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC25BBAD1F7CA1A600C790DF /* Build configuration list for PBXNativeTarget "RichImagesFrameworkTests" */;
+			buildPhases = (
+				DC25BB941F7CA1A600C790DF /* Sources */,
+				DC25BB951F7CA1A600C790DF /* Frameworks */,
+				DC25BB961F7CA1A600C790DF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DC25BB9B1F7CA1A600C790DF /* PBXTargetDependency */,
+				DC25BB9D1F7CA1A600C790DF /* PBXTargetDependency */,
+			);
+			name = RichImagesFrameworkTests;
+			productName = RichImagesFrameworkTests;
+			productReference = DC25BB981F7CA1A600C790DF /* RichImagesFrameworkTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		DCAD09951F5CEE25001AF3F0 /* RichImages */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DCAD09BE1F5CEE25001AF3F0 /* Build configuration list for PBXNativeTarget "RichImages" */;
@@ -188,10 +332,12 @@
 				DCAD09921F5CEE25001AF3F0 /* Sources */,
 				DCAD09931F5CEE25001AF3F0 /* Frameworks */,
 				DCAD09941F5CEE25001AF3F0 /* Resources */,
+				DC25BBAC1F7CA1A600C790DF /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				DC25BBA41F7CA1A600C790DF /* PBXTargetDependency */,
 			);
 			name = RichImages;
 			productName = RichImages;
@@ -240,10 +386,21 @@
 		DCAD098E1F5CEE25001AF3F0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0830;
+				LastSwiftUpdateCheck = 0900;
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = devedbox;
 				TargetAttributes = {
+					DC25BB8F1F7CA1A600C790DF = {
+						CreatedOnToolsVersion = 9.0;
+						DevelopmentTeam = TKA48YVS5T;
+						ProvisioningStyle = Automatic;
+					};
+					DC25BB971F7CA1A600C790DF = {
+						CreatedOnToolsVersion = 9.0;
+						DevelopmentTeam = TKA48YVS5T;
+						ProvisioningStyle = Automatic;
+						TestTargetID = DCAD09951F5CEE25001AF3F0;
+					};
 					DCAD09951F5CEE25001AF3F0 = {
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = TKA48YVS5T;
@@ -279,11 +436,27 @@
 				DCAD09951F5CEE25001AF3F0 /* RichImages */,
 				DCAD09A91F5CEE25001AF3F0 /* RichImagesTests */,
 				DCAD09B41F5CEE25001AF3F0 /* RichImagesUITests */,
+				DC25BB8F1F7CA1A600C790DF /* RichImagesFramework */,
+				DC25BB971F7CA1A600C790DF /* RichImagesFrameworkTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		DC25BB8E1F7CA1A600C790DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC25BB961F7CA1A600C790DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DCAD09941F5CEE25001AF3F0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -313,6 +486,33 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		DC25BB8B1F7CA1A600C790DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC25BBAE1F7CA1C000C790DF /* RichImages.swift in Sources */,
+				DC25BBAF1F7CA1C000C790DF /* vImageBluring.swift in Sources */,
+				DC25BBB01F7CA1C000C790DF /* Bluring.swift in Sources */,
+				DC25BBB11F7CA1C000C790DF /* Resizing.swift in Sources */,
+				DC25BBB21F7CA1C000C790DF /* Merging.swift in Sources */,
+				DC25BBB31F7CA1C000C790DF /* Generator.swift in Sources */,
+				DC25BBB41F7CA1C000C790DF /* ColorSpace.swift in Sources */,
+				DC25BBB51F7CA1C000C790DF /* ColorAdjustment.swift in Sources */,
+				DC25BBB61F7CA1C000C790DF /* ColorEffect.swift in Sources */,
+				DC25BBB71F7CA1C000C790DF /* Gif.swift in Sources */,
+				DC25BBB81F7CA1C000C790DF /* Geometry.swift in Sources */,
+				DC25BBB91F7CA1C000C790DF /* Filters.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC25BB941F7CA1A600C790DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC25BBA01F7CA1A600C790DF /* RichImagesFrameworkTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DCAD09921F5CEE25001AF3F0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -354,6 +554,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		DC25BB9B1F7CA1A600C790DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DC25BB8F1F7CA1A600C790DF /* RichImagesFramework */;
+			targetProxy = DC25BB9A1F7CA1A600C790DF /* PBXContainerItemProxy */;
+		};
+		DC25BB9D1F7CA1A600C790DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DCAD09951F5CEE25001AF3F0 /* RichImages */;
+			targetProxy = DC25BB9C1F7CA1A600C790DF /* PBXContainerItemProxy */;
+		};
+		DC25BBA41F7CA1A600C790DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DC25BB8F1F7CA1A600C790DF /* RichImagesFramework */;
+			targetProxy = DC25BBA31F7CA1A600C790DF /* PBXContainerItemProxy */;
+		};
 		DCAD09AC1F5CEE25001AF3F0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DCAD09951F5CEE25001AF3F0 /* RichImages */;
@@ -386,6 +601,128 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		DC25BBA71F7CA1A600C790DF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = TKA48YVS5T;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = RichImagesFramework/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = devedbox.RichImagesFramework;
+				PRODUCT_NAME = RichImages;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		DC25BBA81F7CA1A600C790DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = TKA48YVS5T;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = RichImagesFramework/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = devedbox.RichImagesFramework;
+				PRODUCT_NAME = RichImages;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		DC25BBA91F7CA1A600C790DF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TKA48YVS5T;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = RichImagesFrameworkTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = devedbox.RichImagesFrameworkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RichImages.app/RichImages";
+			};
+			name = Debug;
+		};
+		DC25BBAA1F7CA1A600C790DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TKA48YVS5T;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = RichImagesFrameworkTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = devedbox.RichImagesFrameworkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RichImages.app/RichImages";
+			};
+			name = Release;
+		};
 		DCAD09BC1F5CEE25001AF3F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -482,7 +819,9 @@
 		DCAD09BF1F5CEE25001AF3F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = TKA48YVS5T;
 				INFOPLIST_FILE = RichImages/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -499,7 +838,9 @@
 		DCAD09C01F5CEE25001AF3F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = TKA48YVS5T;
 				INFOPLIST_FILE = RichImages/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -572,6 +913,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		DC25BBAB1F7CA1A600C790DF /* Build configuration list for PBXNativeTarget "RichImagesFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC25BBA71F7CA1A600C790DF /* Debug */,
+				DC25BBA81F7CA1A600C790DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DC25BBAD1F7CA1A600C790DF /* Build configuration list for PBXNativeTarget "RichImagesFrameworkTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC25BBA91F7CA1A600C790DF /* Debug */,
+				DC25BBAA1F7CA1A600C790DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		DCAD09911F5CEE25001AF3F0 /* Build configuration list for PBXProject "RichImages" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
