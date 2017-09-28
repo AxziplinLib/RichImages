@@ -422,6 +422,24 @@ extension ColorEffectAppliable {
         }
         return img
     }
+    /// Modifies the brightness of an image around the periphery of a specified region.
+    ///
+    /// - Parameter center   : The centered region to make the brightness effect. Default value: [150.0, 150.0]
+    /// - Parameter radius   : A CGFloat value indicates the radius of applying vignette effect. The value is valid in [0.0, 0.0].
+    ///                        Using 0.0 as default.
+    /// - Parameter intensity: A CGFloat value indicates the intensity of the effect. The value is valid in [0.0, 1.0],
+    ///                        Using 1.0 as default.
+    /// - Parameter option   : A value of `RichImage.RenderOption` indicates the rendering options of the image processing.
+    ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
+    ///
+    /// - Returns: A copy of the source image by applying the vignette effect.
+    public func vignetteEffect(center: CGPoint = CGPoint(x: 150.0, y: 150.0), radius: CGFloat = 0.0, intensity: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIVignetteEffect", withInputParameters: ["inputCenter": CIVector(cgPoint: center), "inputRadius": radius, "inputIntensity": intensity]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+        return img
+    }
 }
 
 /// ColorEffectAppliable conformance of UIImage.
