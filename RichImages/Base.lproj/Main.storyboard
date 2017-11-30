@@ -41,10 +41,10 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="DjE-zW-9tu" firstAttribute="trailing" secondItem="TRz-H9-1kg" secondAttribute="trailing" id="Hid-6k-6az"/>
-                            <constraint firstItem="DjE-zW-9tu" firstAttribute="bottom" secondItem="TRz-H9-1kg" secondAttribute="bottom" id="Q7b-To-NaI"/>
+                            <constraint firstAttribute="trailing" secondItem="TRz-H9-1kg" secondAttribute="trailing" id="Hid-6k-6az"/>
+                            <constraint firstAttribute="bottom" secondItem="TRz-H9-1kg" secondAttribute="bottom" id="Q7b-To-NaI"/>
                             <constraint firstItem="TRz-H9-1kg" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="k9h-pA-VZc"/>
-                            <constraint firstItem="TRz-H9-1kg" firstAttribute="leading" secondItem="DjE-zW-9tu" secondAttribute="leading" id="zrK-uy-22L"/>
+                            <constraint firstItem="TRz-H9-1kg" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="zrK-uy-22L"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="DjE-zW-9tu"/>
                     </view>
