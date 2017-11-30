@@ -439,7 +439,7 @@ extension RichImage {
     @available(iOS 9.0, *)
     fileprivate struct _MetalBasedCIContext {
         lazy var context: CIContext! = { () -> CIContext! in
-            guard let device = MTLCreateSystemDefaultDevice() else { return RichImage.default._openGLESCIContext.context }
+            guard let device = MTLCreateSystemDefaultDevice() else { return nil }
             return CIContext(mtlDevice: device)
         }()
     }
