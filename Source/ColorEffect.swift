@@ -100,10 +100,17 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the receiver modified with the given cross polynomial coefficients.
     public func crossPolynomial(red: RichImage.ColorCrossPolynomial = [1.0], green: RichImage.ColorCrossPolynomial = [0.0, 1.0], blue: RichImage.ColorCrossPolynomial = [0.0, 0.0, 1.0], option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorCrossPolynomial", parameters: ["inputRedCoefficients": CIVector(colorCrossPolynomial: red), "inputGreenCoefficients": CIVector(colorCrossPolynomial: green), "inputBlueCoefficients": CIVector(colorCrossPolynomial: blue)]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorCrossPolynomial", withInputParameters: ["inputRedCoefficients": CIVector(colorCrossPolynomial: red), "inputGreenCoefficients": CIVector(colorCrossPolynomial: green), "inputBlueCoefficients": CIVector(colorCrossPolynomial: blue)]),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
 }
@@ -155,6 +162,18 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the srouce image by applying the clut data.
     public func transform(_ dimension: CGFloat, clut data: Data, into colorSpace: CGColorSpace? = nil, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter(colorSpace == nil ? "CIColorCube" : "CIColorCubeWithColorSpace", parameters: { () -> [String: Any]? in
+            if let cs = colorSpace {
+                return ["inputCubeDimension": dimension, "inputCubeData": data, "inputColorSpace": cs]
+            } else {
+                return ["inputCubeDimension": dimension, "inputCubeData": data]
+            }
+            }() ?? [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter(colorSpace == nil ? "CIColorCube" : "CIColorCubeWithColorSpace", withInputParameters: { () -> [String: Any]? in
             if let cs = colorSpace {
                 return ["inputCubeDimension": dimension, "inputCubeData": data, "inputColorSpace": cs]
@@ -165,6 +184,7 @@ extension ColorEffectAppliable {
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
 }
@@ -176,10 +196,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by invert the color of the source image.
     public func invert(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorInvert", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorInvert", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Performs a nonlinear transformation of source color values using mapping values provided in a table.
@@ -190,10 +217,17 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the source image with the given image mapped.
     public func map(gradientImage: CIImage, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMap", parameters: ["inputGradientImage": gradientImage]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMap", withInputParameters: ["inputGradientImage": gradientImage]),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Remaps colors so they fall within shades of a single color.
@@ -205,10 +239,17 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the source image by the remapping processing.
     public func map(color: UIColor, intensity: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMonochrome", parameters: ["inputColor": CIColor(color: color), "inputIntensity": intensity]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMonochrome", withInputParameters: ["inputColor": CIColor(color: color), "inputIntensity": intensity]),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Remaps red, green, and blue color components to the number of brightness values you specify for each color component.
@@ -221,10 +262,17 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the source image by posterizing with the given levels.
     public func posterize(levels: CGFloat = 6.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorPosterize", parameters: ["inputLevels": levels]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorPosterize", withInputParameters: ["inputLevels": levels]),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Maps luminance to a color ramp of two colors.
@@ -238,10 +286,17 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the source image by applying false color effect.
     public func falseColor(color0: UIColor, color1: UIColor, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIFalseColor", parameters: ["inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1)]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIFalseColor", withInputParameters: ["inputColor0": CIColor(color: color0), "inputColor1": CIColor(color: color1)]),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
 }
@@ -256,10 +311,17 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the source image by masking to alpha channel.
     public func maskToAlpha(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIMaskToAlpha", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIMaskToAlpha", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
 }
@@ -271,10 +333,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A graystyle copy of the source image from max(r,g,b).
     public func maximumComponent(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIMaximumComponent", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIMaximumComponent", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Returns a grayscale image from min(r,g,b).
@@ -283,10 +352,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A graystyle copy of the source image from min(r,g,b).
     public func minimumComponent(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIMinimumComponent", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIMinimumComponent", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
 }
@@ -298,10 +374,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying photo effect chrome.
     public func chrome(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectChrome", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectChrome", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Applies a preconfigured set of effects that imitate vintage photography film with diminished color.
@@ -310,10 +393,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying photo effect fade.
     public func fade(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectFade", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectFade", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Applies a preconfigured set of effects that imitate vintage photography film with distorted colors.
@@ -322,10 +412,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying photo effect instant.
     public func instant(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectInstant", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectInstant", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Applies a preconfigured set of effects that imitate black-and-white photography film with low contrast.
@@ -334,10 +431,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying photo effect mono.
     public func mono(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectMono", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectMono", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Applies a preconfigured set of effects that imitate black-and-white photography film with exaggerated contrast.
@@ -346,10 +450,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying photo effect noir.
     public func noir(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectNoir", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectNoir", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Applies a preconfigured set of effects that imitate vintage photography film with emphasized cool colors.
@@ -358,10 +469,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying photo effect process.
     public func process(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectProcess", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectProcess", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Applies a preconfigured set of effects that imitate black-and-white photography film without significantly altering contrast.
@@ -370,10 +488,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying photo effect tonal.
     public func tonal(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectTonal", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectTonal", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Applies a preconfigured set of effects that imitate vintage photography film with emphasized warm colors.
@@ -382,10 +507,17 @@ extension ColorEffectAppliable {
     ///                     Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying photo effect transfer.
     public func transfer(option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectTransfer", parameters: [:]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIPhotoEffectTransfer", withInputParameters: nil),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
 }
@@ -398,10 +530,17 @@ extension ColorEffectAppliable {
     ///                        Note that the CPU-Based option is not available in ths section. Using `.auto` by default.
     /// - Returns: A copy of the source image by applying sepia tone effect.
     public func sepiaTone(intensity: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CISepiaTone", parameters: ["inputIntensity": intensity]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CISepiaTone", withInputParameters: ["inputIntensity": intensity]),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
 }
@@ -416,10 +555,17 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the source image by applying the vignette effect.
     public func vignette(radius: CGFloat = 1.0, intensity: CGFloat = 0.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIVignette", parameters: ["inputRadius": radius, "inputIntensity": intensity]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIVignette", withInputParameters: ["inputRadius": radius, "inputIntensity": intensity]),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
     /// Modifies the brightness of an image around the periphery of a specified region.
@@ -434,10 +580,17 @@ extension ColorEffectAppliable {
     ///
     /// - Returns: A copy of the source image by applying the vignette effect.
     public func vignetteEffect(center: CGPoint = CGPoint(x: 150.0, y: 150.0), radius: CGFloat = 0.0, intensity: CGFloat = 1.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIVignetteEffect", parameters: ["inputCenter": CIVector(cgPoint: center), "inputRadius": radius, "inputIntensity": intensity]),
+              let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIVignetteEffect", withInputParameters: ["inputCenter": CIVector(cgPoint: center), "inputRadius": radius, "inputIntensity": intensity]),
               let img = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return img
     }
 }

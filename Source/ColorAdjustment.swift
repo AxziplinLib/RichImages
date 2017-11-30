@@ -43,7 +43,7 @@ extension RichImage {
     public struct ColorPolynomial {
         let zero: CGFloat, one: CGFloat, double: CGFloat, triple: CGFloat
         /// Returns the identity color polynomial.
-        static var identity: ColorPolynomial { return ColorPolynomial(zero: 0.0, one: 1.0, double: 0.0, triple: 0.0) }
+        public static var identity: ColorPolynomial { return ColorPolynomial(zero: 0.0, one: 1.0, double: 0.0, triple: 0.0) }
     }
 }
 
@@ -97,11 +97,17 @@ extension ColorAdjustable {
         let size  = image.size
         let scale = image.scale
         let imageOrientation = image.imageOrientation
-        
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorClamp", parameters: ["inputMinComponents": CIVector(x: min.r, y: min.g, z: min.b, w: min.a), "inputMaxComponents": CIVector(x: max.r, y: max.g, z: max.b, w:  max.a)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorClamp", withInputParameters: ["inputMinComponents": CIVector(x: min.r, y: min.g, z: min.b, w: min.a), "inputMaxComponents": CIVector(x: max.r, y: max.g, z: max.b, w:  max.a)]),
               let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
     /// Adjusts saturation, brightness, and contrast values.
@@ -130,11 +136,17 @@ extension ColorAdjustable {
         let size  = image.size
         let scale = image.scale
         let imageOrientation = image.imageOrientation
-        
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorControls", parameters: ["inputSaturation": saturation, "inputBrightness": brightness, "inputContrast": contrast]),
+            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorControls", withInputParameters: ["inputSaturation": saturation, "inputBrightness": brightness, "inputContrast": contrast]),
               let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
     /// Multiplies source color values and adds a bias factor to each color component.
@@ -162,11 +174,17 @@ extension ColorAdjustable {
         let size  = image.size
         let scale = image.scale
         let imageOrientation = image.imageOrientation
-        
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMatrix", parameters: ["inputRVector": CIVector(x: component.r, y: 0.0, z: 0.0, w: 0.0), "inputGVector": CIVector(x: 0.0, y: component.g, z: 0.0, w: 0.0), "inputBVector": CIVector(x: 0.0, y: 0.0, z: component.b, w: 0.0), "inputAVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: component.a), "inputBiasVector": CIVector(colorComponent: bias)]),
+            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorMatrix", withInputParameters: ["inputRVector": CIVector(x: component.r, y: 0.0, z: 0.0, w: 0.0), "inputGVector": CIVector(x: 0.0, y: component.g, z: 0.0, w: 0.0), "inputBVector": CIVector(x: 0.0, y: 0.0, z: component.b, w: 0.0), "inputAVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: component.a), "inputBiasVector": CIVector(colorComponent: bias)]),
               let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
     /// Modifies the pixel values in an image by applying a set of cubic polynomials.
@@ -203,11 +221,17 @@ extension ColorAdjustable {
         let size  = image.size
         let scale = image.scale
         let imageOrientation = image.imageOrientation
-        
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorPolynomial", parameters: ["inputRedCoefficients": CIVector(colorPolynomial: red), "inputGreenCoefficients": CIVector(colorPolynomial: green), "inputBlueCoefficients": CIVector(colorPolynomial: blue), "inputAlphaCoefficients": CIVector(colorPolynomial: alpha)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIColorPolynomial", withInputParameters: ["inputRedCoefficients": CIVector(colorPolynomial: red), "inputGreenCoefficients": CIVector(colorPolynomial: green), "inputBlueCoefficients": CIVector(colorPolynomial: blue), "inputAlphaCoefficients": CIVector(colorPolynomial: alpha)]),
             let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: size.scale(by: scale)), scale: scale, orientation: imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
     /// Adjusts the exposure setting for an image similar to the way you control exposure for a
@@ -225,10 +249,17 @@ extension ColorAdjustable {
     ///
     /// - Returns: A copy of the source image by adjusting the exposure value.
     public func expose(_ exposureValue: CGFloat = 0.5, option: RichImage.RenderOption = .auto) -> UIImage! {
-        guard let ciImage = image._makeCiImage()?.applyingFilter("CIExposureAdjust", withInputParameters: ["inputEV": exposureValue]),
-            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIExposureAdjust", parameters: ["inputEV": exposureValue]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #else
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIExposureAdjust", withInputParameters: ["inputEV": exposureValue]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #endif
         return _image
     }
     /// Adjusts midtone brightness.
@@ -249,10 +280,17 @@ extension ColorAdjustable {
     ///
     /// - Returns: A copy of the source image by adjusting the midtone brightness with the given power.
     public func adjustGamma(_ power: CGFloat = 0.75, option: RichImage.RenderOption = .auto) -> UIImage! {
-        guard let ciImage = image._makeCiImage()?.applyingFilter("CIGammaAdjust", withInputParameters: ["inputPower": power]),
-            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIGammaAdjust", parameters: ["inputPower": power]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #else
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIGammaAdjust", withInputParameters: ["inputPower": power]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #endif
         return _image
     }
     /// Changes the overall hue, or tint, of the source pixels.
@@ -265,10 +303,17 @@ extension ColorAdjustable {
     ///
     /// - Returns: A copy of the source image by changing the overrall hue with the given angle.
     public func adjustHue(_ angle: CGFloat = 0.0, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIHueAdjust", parameters: ["inputAngle": angle]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIHueAdjust", withInputParameters: ["inputAngle": angle]),
               let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
     /// Adjusts tone response of the R, G, and B channels of an image.
@@ -286,10 +331,17 @@ extension ColorAdjustable {
     ///
     /// - Returns: A copy of the source image by adjusting tone curve.
     public func adjustToneCurve(point0: CGPoint = .zero, point1: CGPoint = CGPoint(x: 0.25, y: 0.25), point2: CGPoint = CGPoint(x: 0.5, y: 0.5), point3: CGPoint = CGPoint(x: 0.75, y: 0.75), point4: CGPoint = CGPoint(x: 1.0, y: 1.0), option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIToneCurve", parameters: ["inputPoint0": CIVector(cgPoint: point0), "inputPoint1": CIVector(cgPoint: point1), "inputPoint2": CIVector(cgPoint: point2), "inputPoint3": CIVector(cgPoint: point3), "inputPoint4": CIVector(cgPoint: point4)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIToneCurve", withInputParameters: ["inputPoint0": CIVector(cgPoint: point0), "inputPoint1": CIVector(cgPoint: point1), "inputPoint2": CIVector(cgPoint: point2), "inputPoint3": CIVector(cgPoint: point3), "inputPoint4": CIVector(cgPoint: point4)]),
               let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
     /// Adjusts the saturation of an image while keeping pleasing skin tones.
@@ -300,10 +352,17 @@ extension ColorAdjustable {
     ///
     /// - Returns: A copy of the source image with adjusted vibrance.
     public func adjustVibrance(amount: CGFloat, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIVibrance", parameters: ["inputAmount": amount]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIVibrance", withInputParameters: ["inputAmount": amount]),
               let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
     /// Adjusts the reference white point for an image and maps all colors in the source using the new reference.
@@ -314,10 +373,17 @@ extension ColorAdjustable {
     ///
     /// - Returns: A copy of the source image by adjust the white point with a given color.
     public func adjustWhitePoint(color: UIColor, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CIWhitePointAdjust", parameters: ["inputColor": CIColor(color: color)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CIWhitePointAdjust", withInputParameters: ["inputColor": CIColor(color: color)]),
               let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
 }
@@ -335,10 +401,17 @@ extension ColorAdjustable {
     ///
     /// - Returns: A copy of the source image by mapping color intensity with the given params.
     public func map(linearToSRGBToneCurve: Bool = true, option: RichImage.RenderOption = .auto) -> UIImage! {
-        guard let ciImage = image._makeCiImage()?.applyingFilter(linearToSRGBToneCurve ? "CILinearToSRGBToneCurve" : "CISRGBToneCurveToLinear", withInputParameters: nil),
-            let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter(linearToSRGBToneCurve ? "CILinearToSRGBToneCurve" : "CISRGBToneCurveToLinear", parameters: [:]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #else
+        guard let ciImage = image._makeCiImage()?.applyingFilter(linearToSRGBToneCurve ? "CILinearToSRGBToneCurve" : "CISRGBToneCurveToLinear", withInputParameters: nil),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #endif
         return _image
     }
     /// Adapts the reference white point for an image.
@@ -350,10 +423,17 @@ extension ColorAdjustable {
     ///
     /// - Returns: A copy of the source image by adapting the white points.
     public func adapt(temperatureAndTint neutral: CGPoint = CGPoint(x: 6500.0, y: 0.0), to targetNeutral: CGPoint = CGPoint(x: 6500.0, y: 0.0), option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        guard let ciImage = image._makeCiImage()?.applyingFilter("CITemperatureAndTint", parameters: ["inputNeutral": CIVector(cgPoint: neutral), "inputTargetNeutral": CIVector(cgPoint: targetNeutral)]),
+              let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
+                return nil
+        }
+    #else
         guard let ciImage = image._makeCiImage()?.applyingFilter("CITemperatureAndTint", withInputParameters: ["inputNeutral": CIVector(cgPoint: neutral), "inputTargetNeutral": CIVector(cgPoint: targetNeutral)]),
               let _image = type(of: self).make(ciImage, from: CGRect(origin: .zero, size: image.size.scale(by: image.scale)), scale: image.scale, orientation: image.imageOrientation, option: option) else {
                 return nil
         }
+    #endif
         return _image
     }
 }

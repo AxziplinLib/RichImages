@@ -160,12 +160,21 @@ extension Blurrable {
     ///
     /// - Returns: A copy of the receiver image with applying a blur effect.
     public func blur(_ bluringOption: RichImage.BluringOption, option: RichImage.RenderOption = .auto) -> UIImage! {
+    #if swift(>=4.0)
+        if  let filter  = bluringOption.mode.filter,
+            let ciImage = image._makeCiImage()?.applyingFilter(filter.name, parameters: filter.inputParameters!),
+            let uiImage = type(of: self).make(ciImage, scale: image.scale, orientation: image.imageOrientation, option: option)
+        {
+            return uiImage
+        }
+    #else
         if  let filter  = bluringOption.mode.filter,
             let ciImage = image._makeCiImage()?.applyingFilter(filter.name, withInputParameters: filter.inputParameters),
             let uiImage = type(of: self).make(ciImage, scale: image.scale, orientation: image.imageOrientation, option: option)
         {
             return uiImage
         }
+    #endif
         return nil
     }
 }

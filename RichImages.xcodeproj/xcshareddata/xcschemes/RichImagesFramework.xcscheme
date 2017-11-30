@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DC25BB8F1F7CA1A600C790DF"
-               BuildableName = "RichImagesFramework.framework"
+               BuildableName = "RichImages.framework"
                BlueprintName = "RichImagesFramework"
                ReferencedContainer = "container:RichImages.xcodeproj">
             </BuildableReference>
@@ -48,7 +48,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DC25BB8F1F7CA1A600C790DF"
-            BuildableName = "RichImagesFramework.framework"
+            BuildableName = "RichImages.framework"
             BlueprintName = "RichImagesFramework"
             ReferencedContainer = "container:RichImages.xcodeproj">
          </BuildableReference>
@@ -66,7 +66,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DC25BB8F1F7CA1A600C790DF"
-            BuildableName = "RichImagesFramework.framework"
+            BuildableName = "RichImages.framework"
             BlueprintName = "RichImagesFramework"
             ReferencedContainer = "container:RichImages.xcodeproj">
          </BuildableReference>

@@ -148,8 +148,15 @@ extension UIImage {
         let green = Float(rawData.load(fromByteOffset: bytesIndex + 1, as: UInt8.self)) / 255.0
         let blue  = Float(rawData.load(fromByteOffset: bytesIndex + 2, as: UInt8.self)) / 255.0
         let alpha = Float(rawData.load(fromByteOffset: bytesIndex + 2, as: UInt8.self)) / 255.0
-        
+    #if swift(>=4.0)
+        if #available(iOS 10.0, *) {
+            return UIColor(displayP3Red: CGFloat(red), green: CGFloat(green), blue: CGFloat(blue), alpha: CGFloat(alpha))
+        } else {
+            return UIColor(red: CGFloat(red), green: CGFloat(green), blue: CGFloat(blue), alpha: CGFloat(alpha))
+        }
+    #else
         return UIColor(colorLiteralRed: red, green: green, blue: blue, alpha: alpha)
+    #endif
     }
     /// Calculates and fetchs the major colors of the receiver image with the accuracy length and
     /// a color to ignore with. High accuracy will need high performance of the CPU. Cliens should
@@ -197,11 +204,24 @@ extension UIImage {
         func _UIColor(_ comp: Any) -> UIColor {
             
             let components = comp as! [AnyObject]
-            
+        #if swift(>=4.0)
+            if #available(iOS 10.0, *) {
+                return UIColor(displayP3Red: CGFloat(Float((components[0x0] as AnyObject).integerValue)/Float(0xff)),
+                               green:        CGFloat(Float((components[0x1] as AnyObject).integerValue)/Float(0xff)),
+                               blue:         CGFloat(Float((components[0x2] as AnyObject).integerValue)/Float(0xff)),
+                               alpha:        CGFloat(Float((components[0x3] as AnyObject).integerValue)/Float(0xff)))
+            } else {
+                return UIColor(red:          CGFloat(Float((components[0x0] as AnyObject).integerValue)/Float(0xff)),
+                               green:        CGFloat(Float((components[0x1] as AnyObject).integerValue)/Float(0xff)),
+                               blue:         CGFloat(Float((components[0x2] as AnyObject).integerValue)/Float(0xff)),
+                               alpha:        CGFloat(Float((components[0x3] as AnyObject).integerValue)/Float(0xff)))
+            }
+        #else
             return UIColor(colorLiteralRed: Float((components[0x0] as AnyObject).integerValue)/Float(0xff),
                            green:           Float((components[0x1] as AnyObject).integerValue)/Float(0xff),
                            blue:            Float((components[0x2] as AnyObject).integerValue)/Float(0xff),
                            alpha:           Float((components[0x3] as AnyObject).integerValue)/Float(0xff))
+        #endif
         }
         
         var colors = countedSet.sorted{ _count($0) > _count($1) }.map { _UIColor($0) }

@@ -53,9 +53,15 @@ extension UIImage {
             fallthroughToCpu = true
             fallthrough
         case .gpu(_):
+        #if swift(>=4.0)
+            if let ciImage = _makeCiImage()?.cropped(to: croppingRect), let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option) {
+                return image
+            }
+        #else
             if let ciImage = _makeCiImage()?.cropping(to: croppingRect), let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option) {
                 return image
             }
+        #endif
             return fallthroughToCpu ? crop(to:rect, option: .cpu(option.quality)) : nil
         default:
             guard let cgImage = _makeCgImage()?.cropping(to: croppingRect) else { return nil }
@@ -233,9 +239,15 @@ extension UIImage {
             fallthrough
         case .gpu(_):
             let extentScale: CGPoint = CGPoint(x: newRect.width / scaledWidth, y: newRect.height / scaledHeight)
+        #if swift(>=4.0)
+            if let ciImage = _makeCiImage()?.transformed(by: CGAffineTransform(scaleX: extentScale.x, y: extentScale.y).concatenating(transform)), let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option) {
+                return image
+            }
+        #else
             if let ciImage = _makeCiImage()?.applying(CGAffineTransform(scaleX: extentScale.x, y: extentScale.y).concatenating(transform)), let image = type(of: self).make(ciImage, scale: scale, orientation: imageOrientation, option: option) {
                 return image
             }
+        #endif
             return fallthroughToCpu ? _resize(fills: newSize, applying: transform, transposed: transposed, option: .cpu(option.quality)) : nil
         default:
             guard let cgImage  = _makeCgImage(), let colorSpace = cgImage.colorSpace else { return nil }

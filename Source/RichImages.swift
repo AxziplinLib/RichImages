@@ -340,10 +340,18 @@ extension RichImagable {
                 // Some of the generator filters need to be cropped before they can be displayed.
                 /// Crop the input to the given rect if any.
                 if let crop = croppingRect {
+                #if swift(>=4.0)
+                    input = input.cropped(to: crop)
+                #else
                     input = input.cropping(to: crop)
+                #endif
                 }
             } else {
+            #if swift(>=4.0)
+                input = image?._makeCiImage()?.applyingFilter(filterName, parameters: params ?? [:])
+            #else
                 input = image?._makeCiImage()?.applyingFilter(filterName, withInputParameters: params)
+            #endif
             }
             guard let ciImage   = input else { return nil }
             
