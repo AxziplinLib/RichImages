@@ -20,7 +20,7 @@ class TableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
         if #available(iOS 11.0, *) {
-            tableView.contentInsetAdjustmentBehavior = .never
+            tableView.contentInsetAdjustmentBehavior = .scrollableAxes
         }
     }
 
