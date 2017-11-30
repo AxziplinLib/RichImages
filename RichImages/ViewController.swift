@@ -10,6 +10,9 @@ import UIKit
 import CoreImage
 
 class ViewController: UIViewController {
+    
+    var original: UIImage!
+    var result  : UIImage!
 
     @IBOutlet weak var imageView0: UIImageView!
     @IBOutlet weak var imageView1: UIImageView!
@@ -22,11 +25,11 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // Make sure all the core image contexts are initialized.
-        RichImage.initialize(RichImage.RenderOption.Destination.availableGPURelatedDestinations)
+        // RichImage.initialize(RichImage.RenderOption.Destination.availableGPURelatedDestinations)
         // let gif = UIImage.gif(named: "Gif")!
-        let date = Date()
+        // let date = Date()
         // let data = "https://www.baidu.com".data(using: .isoLatin1)!
-        let image = #imageLiteral(resourceName: "image_to_merge")
+        // let image = #imageLiteral(resourceName: "image_to_merge")
         // let bordered = image.bordered(100.0)
         // let rounded = image.makeCornered(.gpu(.default))
         // let size = CGSize(width: image.size.width * 0.5, height: image.size.height * 0.8)
@@ -64,7 +67,7 @@ class ViewController: UIViewController {
         // let result = image.maskToAlpha()
         // let result = image.minimumComponent()
         // let result = image.transfer()
-        let result = image.sepiaTone()
+        // let result = image.sepiaTone()
         // let result = image.vignette(radius: 3.0, intensity: 1.0)
         // let result = image.vignetteEffect(radius: 3.0, intensity: 1.0)
         // let transform = CGAffineTransform(rotationAngle: CGFloat.pi / 6.0).scaledBy(x: 1.0, y: 3.0)
@@ -87,10 +90,10 @@ class ViewController: UIViewController {
         // let handled1 = image1.resize(fits: CGSize(width: 120, height: 120), using: .center)
         // let image2 = #imageLiteral(resourceName: "image_to_merge")
         // let handled2 = image2.resize(fits: CGSize(width: 120, height: 80), using: .center)
-        print("Cost timing: \(Date().timeIntervalSince(date))")
+        // print("Cost timing: \(Date().timeIntervalSince(date))")
         imageView1.image = result
         // imageView1.backgroundColor = .black
-        imageView0.image = image
+        imageView0.image = original
     }
     
     override func didReceiveMemoryWarning() {

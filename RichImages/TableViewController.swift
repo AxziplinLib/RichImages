@@ -9,7 +9,15 @@
 import UIKit
 
 class TableViewController: UITableViewController {
-
+    /// The image object.
+    var image = #imageLiteral(resourceName: "image_to_merge") {
+        didSet {
+            resultViewController.original = image
+        }
+    }
+    /// The result image view controller.
+    let resultViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ViewController") as! ViewController
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -22,6 +30,8 @@ class TableViewController: UITableViewController {
         if #available(iOS 11.0, *) {
             tableView.contentInsetAdjustmentBehavior = .scrollableAxes
         }
+        
+        resultViewController.original = image
     }
 
     override func didReceiveMemoryWarning() {
@@ -33,5 +43,16 @@ class TableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        switch indexPath.section {
+        case 1:// Bluring effects.
+            switch indexPath.row {
+            case 0:
+                resultViewController.result = image.lightBlur
+                resultViewController.title = "vImage_light"
+                navigationController?.pushViewController(resultViewController, animated: true)
+            default: break
+            }
+        default: break
+        }
     }
 }
