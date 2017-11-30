@@ -48,10 +48,14 @@ class TableViewController: UITableViewController {
             switch indexPath.row {
             case 0:
                 resultViewController.result = image.lightBlur
-                resultViewController.title = "vImage_light"
-                navigationController?.pushViewController(resultViewController, animated: true)
+            case 1:
+                resultViewController.result = image.extraLightBlur
+            case 2:
+                resultViewController.result = image.darkBlur
             default: break
             }
+            resultViewController.title = tableView.cellForRow(at: indexPath)?.textLabel?.text
+            navigationController?.pushViewController(resultViewController, animated: true)
         default: break
         }
     }
