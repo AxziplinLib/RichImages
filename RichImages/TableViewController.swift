@@ -10,13 +10,7 @@ import UIKit
 
 class TableViewController: UITableViewController {
     /// The image object.
-    var image = #imageLiteral(resourceName: "image_to_merge") {
-        didSet {
-            resultViewController.original = image
-        }
-    }
-    /// The result image view controller.
-    let resultViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ViewController") as! ViewController
+    var image = #imageLiteral(resourceName: "image_to_merge")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,8 +24,6 @@ class TableViewController: UITableViewController {
         if #available(iOS 11.0, *) {
             tableView.contentInsetAdjustmentBehavior = .scrollableAxes
         }
-        
-        resultViewController.original = image
     }
 
     override func didReceiveMemoryWarning() {
@@ -43,6 +35,8 @@ class TableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let resultViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ViewController") as! ViewController
+        resultViewController.original = image
         switch indexPath.section {
         case 1:// Bluring effects.
             switch indexPath.row {
@@ -52,6 +46,20 @@ class TableViewController: UITableViewController {
                 resultViewController.result = image.extraLightBlur
             case 2:
                 resultViewController.result = image.darkBlur
+            case 3:
+                resultViewController.result = image.blur(.box())
+            case 4:
+                resultViewController.result = image.blur(.disc())
+            case 5:
+                resultViewController.result = image.blur(.gaussian())
+            case 6:
+                resultViewController.result = image.blur(.median)
+            case 7:
+                resultViewController.result = image.blur(.motion())
+            case 8:
+                resultViewController.result = image.blur(.noise())
+            case 9:
+                resultViewController.result = image.blur(.zoom())
             default: break
             }
             resultViewController.title = tableView.cellForRow(at: indexPath)?.textLabel?.text
