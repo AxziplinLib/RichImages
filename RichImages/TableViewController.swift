@@ -39,31 +39,83 @@ class TableViewController: UITableViewController {
         resultViewController.original = image
         switch indexPath.section {
         case 1:// Bluring effects.
-            switch indexPath.row {
-            case 0:
-                resultViewController.result = image.lightBlur
-            case 1:
-                resultViewController.result = image.extraLightBlur
-            case 2:
-                resultViewController.result = image.darkBlur
-            case 3:
-                resultViewController.result = image.blur(.box())
-            case 4:
-                resultViewController.result = image.blur(.disc())
-            case 5:
-                resultViewController.result = image.blur(.gaussian())
-            case 6:
-                resultViewController.result = image.blur(.median)
-            case 7:
-                resultViewController.result = image.blur(.motion())
-            case 8:
-                resultViewController.result = image.blur(.noise())
-            case 9:
-                resultViewController.result = image.blur(.zoom())
-            default: break
-            }
             resultViewController.title = tableView.cellForRow(at: indexPath)?.textLabel?.text
             navigationController?.pushViewController(resultViewController, animated: true)
+            let renderOption = RichImage.RenderOption(dest: .gpu(.openGLES))
+            switch indexPath.row {
+            case 0:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.lightBlur
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            case 1:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.extraLightBlur
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            case 2:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.darkBlur
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            case 3:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.blur(.box(), option: renderOption)
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            case 4:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.blur(.disc(), option: renderOption)
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            case 5:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.blur(.gaussian(), option: renderOption)
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            case 6:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.blur(.median, option: renderOption)
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+        
+            case 7:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.blur(.motion(), option: renderOption)
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            case 8:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.blur(.noise(), option: renderOption)
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            case 9:
+                DispatchQueue(label: "com.bluring.rich-images", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil).async {
+                    let img = self.image.blur(.zoom(), option: renderOption)
+                    DispatchQueue.main.sync {
+                        resultViewController.result = img
+                    }
+                }
+            default: break
+            }
         default: break
         }
     }

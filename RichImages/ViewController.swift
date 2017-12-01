@@ -12,14 +12,28 @@ import CoreImage
 class ViewController: UIViewController {
     
     var original: UIImage!
-    var result  : UIImage!
-
+    var result  : UIImage! {
+        didSet {
+            if isViewLoaded {
+                imageView0.image = original
+                imageView1.image = result
+                activityIndicatorView?.stopAnimating()
+            }
+        }
+    }
+    
+    @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
     @IBOutlet weak var imageView0: UIImageView!
     @IBOutlet weak var imageView1: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        activityIndicatorView.startAnimating()
+        if result != nil {
+            imageView0.image = original
+            imageView1.image = result
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -91,9 +105,11 @@ class ViewController: UIViewController {
         // let image2 = #imageLiteral(resourceName: "image_to_merge")
         // let handled2 = image2.resize(fits: CGSize(width: 120, height: 80), using: .center)
         // print("Cost timing: \(Date().timeIntervalSince(date))")
-        imageView1.image = result
         // imageView1.backgroundColor = .black
-        imageView0.image = original
+        
+        if result != nil {
+            activityIndicatorView.stopAnimating()
+        }
     }
     
     override func didReceiveMemoryWarning() {

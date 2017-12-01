@@ -38,17 +38,24 @@
                                     <constraint firstItem="39O-lg-4Vb" firstAttribute="top" secondItem="Px0-uZ-dXk" secondAttribute="bottom" constant="20" id="wOT-0T-eWn"/>
                                 </constraints>
                             </scrollView>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="ewR-nB-5NQ">
+                                <rect key="frame" x="169" y="315" width="37" height="37"/>
+                                <color key="color" red="0.1333333333" green="0.13725490200000001" blue="0.1647058824" alpha="1" colorSpace="calibratedRGB"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="ewR-nB-5NQ" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="5eA-CP-SsY"/>
                             <constraint firstAttribute="trailing" secondItem="TRz-H9-1kg" secondAttribute="trailing" id="Hid-6k-6az"/>
                             <constraint firstAttribute="bottom" secondItem="TRz-H9-1kg" secondAttribute="bottom" id="Q7b-To-NaI"/>
+                            <constraint firstItem="ewR-nB-5NQ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Sh5-pm-tIS"/>
                             <constraint firstItem="TRz-H9-1kg" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="k9h-pA-VZc"/>
                             <constraint firstItem="TRz-H9-1kg" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="zrK-uy-22L"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="DjE-zW-9tu"/>
                     </view>
                     <connections>
+                        <outlet property="activityIndicatorView" destination="ewR-nB-5NQ" id="RRX-0i-sR4"/>
                         <outlet property="imageView0" destination="Px0-uZ-dXk" id="SOm-7z-7o6"/>
                         <outlet property="imageView1" destination="39O-lg-4Vb" id="Jjb-g1-EmC"/>
                     </connections>
