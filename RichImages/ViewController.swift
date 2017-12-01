@@ -118,11 +118,6 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController {
-    override var prefersStatusBarHidden: Bool { return true }
-    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation { return .fade }
-}
-
 //extension ViewController {
 //    private func _clut(dimension: Int) -> Data {
 //        var cubeSpace = Array<Array<Float>>(repeating: Array<Float>(repeating: 0.0, count: 4), count: dimension * dimension * dimension)
