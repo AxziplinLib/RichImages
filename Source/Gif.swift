@@ -66,7 +66,7 @@ extension UIImage {
     ///
     /// - Returns: An instance of animated image contains multiple frame of images.
     public class func gif(contentsOf url: URL, options: Data.ReadingOptions = [], scale: CGFloat = 1.0) -> UIImage! {
-        guard let data = try? Data(contentsOf: url, options: options) else {return nil }
+        guard let data = try? Data(contentsOf: url, options: options) else { return nil }
         return gif(data, scale: scale)
     }
     /// Creates a `GIF` animated image with the name path extension in a `Bundle`.
@@ -79,11 +79,20 @@ extension UIImage {
         var fileName: String = name; var scale: CGFloat = 1.0
         switch UIScreen.main.scale {
         case 3.0: //@3x
-            fileName += "@3x"; scale = 3.0
+            if !fileName.hasSuffix("@3x") {
+                fileName += "@3x"
+            }
+            scale = 3.0
         case 2.0: //@2x
-            fileName += "@2x"; scale = 2.0
+            if !fileName.hasSuffix("@2x") {
+                fileName += "@2x"
+            }
+            scale = 2.0
         default: // @1x
-            fileName += "@1x"; scale = 1.0
+            if !fileName.hasSuffix("@1x") {
+                fileName += "@1x"
+            }
+            scale = 1.0
         }
         if let path = bundle.path(forResource: fileName, ofType: "gif"), let image = gif(contentsOf: URL(fileURLWithPath: path), scale: scale) {
             return image
