@@ -155,7 +155,7 @@ extension UIImage {
             return UIColor(red: CGFloat(red), green: CGFloat(green), blue: CGFloat(blue), alpha: CGFloat(alpha))
         }
     #else
-        return UIColor(colorLiteralRed: red, green: green, blue: blue, alpha: alpha)
+        return UIColor(red: CGFloat(red), green: CGFloat(green), blue: CGFloat(blue), alpha: CGFloat(alpha))
     #endif
     }
     /// Calculates and fetchs the major colors of the receiver image with the accuracy length and
@@ -217,10 +217,10 @@ extension UIImage {
                                alpha:        CGFloat(Float((components[0x3] as AnyObject).integerValue)/Float(0xff)))
             }
         #else
-            return UIColor(colorLiteralRed: Float((components[0x0] as AnyObject).integerValue)/Float(0xff),
-                           green:           Float((components[0x1] as AnyObject).integerValue)/Float(0xff),
-                           blue:            Float((components[0x2] as AnyObject).integerValue)/Float(0xff),
-                           alpha:           Float((components[0x3] as AnyObject).integerValue)/Float(0xff))
+            return UIColor(red:          CGFloat(Float((components[0x0] as AnyObject).integerValue)/Float(0xff)),
+                           green:        CGFloat(Float((components[0x1] as AnyObject).integerValue)/Float(0xff)),
+                           blue:         CGFloat(Float((components[0x2] as AnyObject).integerValue)/Float(0xff)),
+                           alpha:        CGFloat(Float((components[0x3] as AnyObject).integerValue)/Float(0xff)))
         #endif
         }
         
