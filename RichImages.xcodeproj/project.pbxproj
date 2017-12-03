@@ -279,9 +279,17 @@
 				DC2AB7731F5D5952004095FF /* Gif.swift */,
 				DC2AB7751F5D5A16004095FF /* Geometry.swift */,
 				DC2AB7771F5E404E004095FF /* Filters.swift */,
-				DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */,
+				DCDF295C1FD3DC4500DC1C2F /* View Controller Supportings */,
 			);
 			path = Source;
+			sourceTree = "<group>";
+		};
+		DCDF295C1FD3DC4500DC1C2F /* View Controller Supportings */ = {
+			isa = PBXGroup;
+			children = (
+				DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */,
+			);
+			path = "View Controller Supportings";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
