@@ -48,6 +48,7 @@
 		DCAD09CB1F5CF03E001AF3F0 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAD09CA1F5CF03E001AF3F0 /* ImageView.swift */; };
 		DCAD09CD1F5CF0AD001AF3F0 /* Gif.gif in Resources */ = {isa = PBXBuildFile; fileRef = DCAD09CC1F5CF0AD001AF3F0 /* Gif.gif */; };
 		DCAD09CF1F5CF0B2001AF3F0 /* Swift.pdf in Resources */ = {isa = PBXBuildFile; fileRef = DCAD09CE1F5CF0B2001AF3F0 /* Swift.pdf */; };
+		DCDF295A1FD3DBEE00DC1C2F /* ImageEditingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -139,6 +140,7 @@
 		DCAD09CA1F5CF03E001AF3F0 /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		DCAD09CC1F5CF0AD001AF3F0 /* Gif.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Gif.gif; sourceTree = "<group>"; };
 		DCAD09CE1F5CF0B2001AF3F0 /* Swift.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Swift.pdf; sourceTree = "<group>"; };
+		DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditingViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -233,6 +235,7 @@
 				DCAD099B1F5CEE25001AF3F0 /* ViewController.swift */,
 				DC9C9B331FCFF5F1004C86A9 /* TableViewController.swift */,
 				DC9C9B351FD007F9004C86A9 /* CIContextViewController.swift */,
+				DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */,
 				DCAD099D1F5CEE25001AF3F0 /* Main.storyboard */,
 				DCAD09A01F5CEE25001AF3F0 /* Assets.xcassets */,
 				DCAD09CE1F5CF0B2001AF3F0 /* Swift.pdf */,
@@ -537,6 +540,7 @@
 				DC2AB76C1F5D571C004095FF /* Resizing.swift in Sources */,
 				DC9C9B341FCFF5F1004C86A9 /* TableViewController.swift in Sources */,
 				DC2AB7781F5E404E004095FF /* Filters.swift in Sources */,
+				DCDF295A1FD3DBEE00DC1C2F /* ImageEditingViewController.swift in Sources */,
 				DC2AB76E1F5D5813004095FF /* Merging.swift in Sources */,
 				DC9D71FA1F5D248700EE2386 /* RichImages.swift in Sources */,
 				DC376B861F63DF97002D47A1 /* Bluring.swift in Sources */,
