@@ -49,6 +49,7 @@
 		DCAD09CD1F5CF0AD001AF3F0 /* Gif.gif in Resources */ = {isa = PBXBuildFile; fileRef = DCAD09CC1F5CF0AD001AF3F0 /* Gif.gif */; };
 		DCAD09CF1F5CF0B2001AF3F0 /* Swift.pdf in Resources */ = {isa = PBXBuildFile; fileRef = DCAD09CE1F5CF0B2001AF3F0 /* Swift.pdf */; };
 		DCDF295A1FD3DBEE00DC1C2F /* ImageEditingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */; };
+		DCDF295B1FD3DC1D00DC1C2F /* ImageEditingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -235,7 +236,6 @@
 				DCAD099B1F5CEE25001AF3F0 /* ViewController.swift */,
 				DC9C9B331FCFF5F1004C86A9 /* TableViewController.swift */,
 				DC9C9B351FD007F9004C86A9 /* CIContextViewController.swift */,
-				DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */,
 				DCAD099D1F5CEE25001AF3F0 /* Main.storyboard */,
 				DCAD09A01F5CEE25001AF3F0 /* Assets.xcassets */,
 				DCAD09CE1F5CF0B2001AF3F0 /* Swift.pdf */,
@@ -279,6 +279,7 @@
 				DC2AB7731F5D5952004095FF /* Gif.swift */,
 				DC2AB7751F5D5A16004095FF /* Geometry.swift */,
 				DC2AB7771F5E404E004095FF /* Filters.swift */,
+				DCDF29591FD3DBEE00DC1C2F /* ImageEditingViewController.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -511,6 +512,7 @@
 				DC25BBB71F7CA1C000C790DF /* Gif.swift in Sources */,
 				DC25BBB81F7CA1C000C790DF /* Geometry.swift in Sources */,
 				DC25BBB91F7CA1C000C790DF /* Filters.swift in Sources */,
+				DCDF295B1FD3DC1D00DC1C2F /* ImageEditingViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
