@@ -8,12 +8,23 @@
 
 import UIKit
 
-class ImageEditingViewController: UIViewController {
+private func _createContainerScrollView() -> UIScrollView {
+    let scrollView = UIScrollView(frame: .zero)
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+    scrollView.backgroundColor = .clear
+    return scrollView
+}
 
+class ImageEditingViewController: UIViewController {
+    /// The scroll view of the visible content.
+    public lazy var scrollView: UIScrollView = _createContainerScrollView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        _setupScrollView()
     }
 
     override func didReceiveMemoryWarning() {
@@ -32,4 +43,15 @@ class ImageEditingViewController: UIViewController {
     }
     */
 
+}
+
+extension ImageEditingViewController {
+    /// Add scroll view to the root view and add constraints to the scroll view.
+    fileprivate func _setupScrollView() {
+        view.addSubview(scrollView)
+        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    }
 }
