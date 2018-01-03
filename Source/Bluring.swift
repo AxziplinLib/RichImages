@@ -60,7 +60,11 @@ extension RichImage.BluringMode {
             guard let ciImage = img._makeCgImage() else { return nil }
             return ("CIMaskedVariableBlur", ["inputMask": ciImage, "inputRadius": r])
         case .median:
+        #if swift(>=4.0)
+            return ("CIMedianFilter"      , [:])
+        #else
             return ("CIMedianFilter"      , nil)
+        #endif
         case .motion(angle:    let a, radius: let r):
             return ("CIMotionBlur"        , ["inputRadius": r, "inputAngle": a])
         case .noise(level:     let l, sharpness: let s):
